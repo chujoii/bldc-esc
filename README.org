@@ -45,4 +45,40 @@ Author: Roman V. Prikhodchenko <chujoii@gmail.com>
 
 * Dependences:
   
-  
+* Comment  
+схема скопирован из референсного источника doc7518.pdf (сайт atmel.com)
+
+
+file:///home/store/doc/other_doc/fly/motor/other/8-%D1%80%D0%B0%D0%B7%D1%80%D1%8F%D0%B4%D0%BD%D1%8B%D0%B5_RISC-%D0%BC%D0%B8%D0%BA%D1%80%D0%BE%D0%BA%D0%BE%D0%BD%D1%82%D1%80%D0%BE%D0%BB%D0%BB%D0%B5%D1%80%D1%8B_AVR_%D0%B2_%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0%D1%85_%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD/index.html
+
+
+Back-EMF (BEMF) sensorless
+
+other/_КЛЮЧЕВАЯ_СТРАНИЦА_КУРСА/doc7518.pdf 	allschem bemf+hall (2007)
+avr492.pdf					allschem bemf+hall (2005)
+doc32094.pdf                                    driver hall
+doc7658.pdf 					sensorless(bemf)
+
+
+Термистор
+4N35 оптопара
+
+стабилизаторы напряжения (вместо lm***)
+MC34063
+
+
+Мгновенный ток: 800А (с конденсатором)
+Постоянный ток: 120А
+Сопротивление: 0,0003 Ом     0.3m Ohm
+Батарея: 4,8 – 8,4В (2 Li-Po батареи 4 – 6/бан. NiMH батареи)
+
+Рабочий ток: 60A
+Максимальный ток: 240A (10 секунд)
+Ограничение для бесколлекторного мотора с датчиком: 5.5 витков для 6 банок 7.2В и 4.5 витка для 5 банокl 6.0В
+Сопротивление: 1мОм
+
+
+
+
+
+
