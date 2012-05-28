@@ -36,7 +36,7 @@ refdes=R201
 T 52700 68200 5 10 1 1 0 0 1
 value=10
 T 52500 68400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 52500 66400 1 0 0 resistor-2.sym
 {
@@ -47,7 +47,7 @@ refdes=R202
 T 52700 66200 5 10 1 1 0 0 1
 value=10
 T 52500 66400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 N 54300 67000 54300 68000 4
 N 54300 67500 50000 67500 4
@@ -72,7 +72,7 @@ symversion=0.1
 T 55500 69400 5 10 1 1 0 0 1
 value=100n
 T 55500 69400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 50800 68900 1 270 0 capacitor-1.sym
 {
@@ -85,7 +85,7 @@ symversion=0.1
 T 50800 68900 5 10 1 1 0 0 1
 value=100n
 T 50800 68900 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 55600 68000 1 0 0 gnd-1.sym
 N 50000 67200 51800 67200 4
@@ -107,7 +107,7 @@ refdes=R203
 T 45500 66800 5 10 1 1 0 0 1
 value=10k
 T 45500 66800 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 66800 1 270 0 resistor-2.sym
 {
@@ -118,7 +118,7 @@ refdes=R204
 T 46500 66800 5 10 1 1 0 0 1
 value=10k
 T 46500 66800 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 N 45600 65800 45600 65900 4
 N 46600 65800 46600 65900 4
@@ -134,7 +134,7 @@ device=ZENER_DIODE
 T 62400 67100 5 10 1 1 90 0 1
 refdes=Z201
 T 62900 66800 5 10 0 0 0 0 1
-footprint=1206
+footprint=DO214AC
 }
 N 62700 66700 62700 66800 4
 C 61600 67800 1 0 0 resistor-2.sym
@@ -144,7 +144,7 @@ device=RESISTOR
 T 61800 68100 5 10 1 1 0 0 1
 refdes=R205
 T 61600 67800 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 N 61200 67900 61600 67900 4
 N 62500 67900 63200 67900 4
@@ -169,7 +169,7 @@ symversion=0.1
 T 46800 68100 5 10 1 1 0 0 1
 value=100n
 T 46800 68100 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 67900 1 0 0 gnd-1.sym
 N 46800 68300 46600 68300 4
@@ -184,7 +184,7 @@ device=DIODE
 T 51300 70000 5 10 1 1 270 0 1
 refdes=D201
 T 50800 70300 5 10 0 0 0 0 1
-footprint=1206
+footprint=DO214AC
 }
 N 51000 70600 51000 70300 4
 N 51000 69400 51000 68900 4
@@ -290,7 +290,7 @@ refdes=R206
 T 52700 55200 5 10 1 1 0 0 1
 value=10
 T 52500 55400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 52500 53400 1 0 0 resistor-2.sym
 {
@@ -301,7 +301,7 @@ refdes=R207
 T 52700 53200 5 10 1 1 0 0 1
 value=10
 T 52500 53400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 N 54300 54000 54300 55000 4
 N 54300 54500 50000 54500 4
@@ -326,7 +326,7 @@ symversion=0.1
 T 55500 56400 5 10 1 1 0 0 1
 value=100n
 T 55500 56400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 50800 55900 1 270 0 capacitor-1.sym
 {
@@ -339,7 +339,7 @@ symversion=0.1
 T 50800 55900 5 10 1 1 0 0 1
 value=100n
 T 50800 55900 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 55600 55000 1 0 0 gnd-1.sym
 N 50000 54200 51800 54200 4
@@ -361,7 +361,7 @@ refdes=R208
 T 45500 53800 5 10 1 1 0 0 1
 value=10k
 T 45500 53800 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 53800 1 270 0 resistor-2.sym
 {
@@ -372,7 +372,7 @@ refdes=R209
 T 46500 53800 5 10 1 1 0 0 1
 value=10k
 T 46500 53800 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 N 45600 52800 45600 52900 4
 N 46600 52800 46600 52900 4
@@ -400,7 +400,7 @@ symversion=0.1
 T 46800 55100 5 10 1 1 0 0 1
 value=100n
 T 46800 55100 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 54900 1 0 0 gnd-1.sym
 N 46800 55300 46600 55300 4
@@ -415,7 +415,7 @@ device=DIODE
 T 51300 57000 5 10 1 1 270 0 1
 refdes=D202
 T 50800 57300 5 10 0 0 0 0 1
-footprint=1206
+footprint=DO214AC
 }
 N 51000 57600 51000 57300 4
 N 51000 56400 51000 55900 4
@@ -499,7 +499,7 @@ refdes=R210
 T 52700 61700 5 10 1 1 0 0 1
 value=10
 T 52500 61900 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 52500 59900 1 0 0 resistor-2.sym
 {
@@ -510,7 +510,7 @@ refdes=R211
 T 52700 59700 5 10 1 1 0 0 1
 value=10
 T 52500 59900 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 N 54300 60500 54300 61500 4
 N 54300 61000 50000 61000 4
@@ -535,7 +535,7 @@ symversion=0.1
 T 55500 62900 5 10 1 1 0 0 1
 value=100n
 T 55500 62900 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 50800 62400 1 270 0 capacitor-1.sym
 {
@@ -548,7 +548,7 @@ symversion=0.1
 T 50800 62400 5 10 1 1 0 0 1
 value=100n
 T 50800 62400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 55600 61500 1 0 0 gnd-1.sym
 N 50000 60700 51800 60700 4
@@ -570,7 +570,7 @@ refdes=R212
 T 45500 60300 5 10 1 1 0 0 1
 value=10k
 T 45500 60300 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 60300 1 270 0 resistor-2.sym
 {
@@ -581,7 +581,7 @@ refdes=R213
 T 46500 60300 5 10 1 1 0 0 1
 value=10k
 T 46500 60300 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 N 45600 59300 45600 59400 4
 N 46600 59300 46600 59400 4
@@ -609,7 +609,7 @@ symversion=0.1
 T 46800 61600 5 10 1 1 0 0 1
 value=100n
 T 46800 61600 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 61400 1 0 0 gnd-1.sym
 N 46800 61800 46600 61800 4
@@ -624,7 +624,7 @@ device=DIODE
 T 51300 63500 5 10 1 1 270 0 1
 refdes=D203
 T 50800 63800 5 10 0 0 0 0 1
-footprint=1206
+footprint=DO214AC
 }
 N 51000 64100 51000 63800 4
 N 51000 62900 51000 62400 4
@@ -750,7 +750,7 @@ refdes=R214
 T 66400 64400 5 10 1 1 0 0 1
 value=4.7k
 T 66400 64400 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 67400 64400 1 270 0 resistor-2.sym
 {
@@ -761,7 +761,7 @@ refdes=R215
 T 67400 64400 5 10 1 1 0 0 1
 value=4.7k
 T 67400 64400 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 68400 64400 1 270 0 resistor-2.sym
 {
@@ -772,7 +772,7 @@ refdes=R216
 T 68400 64400 5 10 1 1 0 0 1
 value=4.7k
 T 68400 64400 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 65200 62700 1 0 0 resistor-2.sym
 {
@@ -783,7 +783,7 @@ refdes=R217
 T 65200 62700 5 10 1 1 0 0 1
 value=100
 T 65200 62700 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 65200 61200 1 0 0 resistor-2.sym
 {
@@ -794,7 +794,7 @@ refdes=R218
 T 65200 61200 5 10 1 1 0 0 1
 value=100
 T 65200 61200 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 65300 59700 1 0 0 resistor-2.sym
 {
@@ -805,7 +805,7 @@ refdes=R219
 T 65300 59700 5 10 1 1 0 0 1
 value=100
 T 65300 59700 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 66300 58500 1 270 0 capacitor-1.sym
 {
@@ -818,7 +818,7 @@ symversion=0.1
 T 66300 58500 5 10 1 1 0 0 1
 value=1n
 T 66300 58500 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 67300 58500 1 270 0 capacitor-1.sym
 {
@@ -831,7 +831,7 @@ symversion=0.1
 T 67300 58500 5 10 1 1 0 0 1
 value=1n
 T 67300 58500 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 68300 58500 1 270 0 capacitor-1.sym
 {
@@ -844,7 +844,7 @@ symversion=0.1
 T 68300 58500 5 10 1 1 0 0 1
 value=1n
 T 68300 58500 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 64300 64800 1 0 0 capacitor-1.sym
 {
@@ -857,7 +857,7 @@ symversion=0.1
 T 64300 64800 5 10 1 1 0 0 1
 value=100n
 T 64300 64800 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 N 69700 63300 69700 63000 4
 N 68500 63000 70000 63000 4

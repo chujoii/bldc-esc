@@ -1,4 +1,4 @@
 schematics 0-bldc-esc.sch 1-micro-controller.sch 2-power-bridge.sch 3-power-lin.sch 4-zcd-detection.sch
 output-name bldc-esc
-elements-dir /home/toor/project/geda/footprints-geda
-elements-dir /home/toor/project/geda/footprints-my
+elements-dir /home/chujoii/project/geda/footprints-geda
+elements-dir /home/chujoii/project/geda/footprints-my
