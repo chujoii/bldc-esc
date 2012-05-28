@@ -27,7 +27,7 @@ refdes=R401
 T 42500 49400 5 10 1 1 0 0 1
 value=15k
 T 42500 49400 5 10 0 0 0 0 1
-footprint=1206
+footprint=0805
 }
 C 43700 49400 1 0 0 resistor-2.sym
 {
@@ -38,7 +38,7 @@ refdes=R402
 T 43700 49400 5 10 1 1 0 0 1
 value=100k
 T 43700 49400 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 44800 49300 1 270 0 resistor-2.sym
 {
@@ -49,7 +49,7 @@ refdes=R403
 T 44800 49300 5 10 1 1 0 0 1
 value=22k
 T 44800 49300 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 44800 48200 1 270 0 resistor-2.sym
 {
@@ -60,7 +60,7 @@ refdes=R404
 T 44800 48200 5 10 1 1 0 0 1
 value=22k
 T 44800 48200 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 45500 49200 1 270 0 capacitor-1.sym
 {
@@ -73,7 +73,7 @@ symversion=0.1
 T 45500 49200 5 10 1 1 0 0 1
 value=100p
 T 45500 49200 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 49200 1 270 0 capacitor-1.sym
 {
@@ -86,7 +86,7 @@ symversion=0.1
 T 46500 49200 5 10 1 1 0 0 1
 value=470p
 T 46500 49200 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 47100 50700 1 270 0 terminal-1.sym
 {
@@ -138,7 +138,7 @@ refdes=R405
 T 42500 45300 5 10 1 1 0 0 1
 value=15k
 T 42500 45300 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 43700 45300 1 0 0 resistor-2.sym
 {
@@ -149,7 +149,7 @@ refdes=R406
 T 43700 45300 5 10 1 1 0 0 1
 value=100k
 T 43700 45300 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 44800 45300 1 270 0 resistor-2.sym
 {
@@ -160,7 +160,7 @@ refdes=R407
 T 44800 45300 5 10 1 1 0 0 1
 value=22k
 T 44800 45300 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 44800 44100 1 270 0 resistor-2.sym
 {
@@ -171,7 +171,7 @@ refdes=R408
 T 44800 44100 5 10 1 1 0 0 1
 value=22k
 T 44800 44100 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 45500 45100 1 270 0 capacitor-1.sym
 {
@@ -184,7 +184,7 @@ symversion=0.1
 T 45500 45100 5 10 1 1 0 0 1
 value=100p
 T 45500 45100 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 45100 1 270 0 capacitor-1.sym
 {
@@ -197,7 +197,7 @@ symversion=0.1
 T 46500 45100 5 10 1 1 0 0 1
 value=470p
 T 46500 45100 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 47100 46600 1 270 0 terminal-1.sym
 {
@@ -249,7 +249,7 @@ refdes=R409
 T 42500 41300 5 10 1 1 0 0 1
 value=15k
 T 42500 41300 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 43700 41300 1 0 0 resistor-2.sym
 {
@@ -260,7 +260,7 @@ refdes=R410
 T 43700 41300 5 10 1 1 0 0 1
 value=100k
 T 43700 41300 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 44800 41200 1 270 0 resistor-2.sym
 {
@@ -271,7 +271,7 @@ refdes=R411
 T 44800 41200 5 10 1 1 0 0 1
 value=22k
 T 44800 41200 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 44800 40100 1 270 0 resistor-2.sym
 {
@@ -282,7 +282,7 @@ refdes=R412
 T 44800 40100 5 10 1 1 0 0 1
 value=22k
 T 44800 40100 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 45500 41100 1 270 0 capacitor-1.sym
 {
@@ -295,7 +295,7 @@ symversion=0.1
 T 45500 41100 5 10 1 1 0 0 1
 value=100p
 T 45500 41100 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 46500 41100 1 270 0 capacitor-1.sym
 {
@@ -308,7 +308,7 @@ symversion=0.1
 T 46500 41100 5 10 1 1 0 0 1
 value=470p
 T 46500 41100 5 10 0 1 0 0 1
-footprint=1206
+footprint=0805
 }
 C 47100 42600 1 270 0 terminal-1.sym
 {
