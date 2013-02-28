@@ -1,0 +1,4 @@
+schematics 2-power-bridge.sch
+output-name 2-power-bridge
+elements-dir /home/chujoii/project/geda/footprints-geda
+elements-dir /home/chujoii/project/geda/footprints-my
