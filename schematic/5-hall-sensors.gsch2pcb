@@ -1,0 +1,4 @@
+schematics 5-hall-sensors.sch
+output-name 5-hall-sensors
+elements-dir /home/chujoii/project/geda/footprints-geda
+elements-dir /home/chujoii/project/geda/footprints-my
