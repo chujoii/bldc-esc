@@ -3,10 +3,10 @@
 # To read pcb files, the pcb version (or the git source date) must be >= the file version
 FileVersion[20070407]
 
-PCB["" 295276 440945]
+PCB["" 440945 440945]
 
-Grid[2500.0 0 0 1]
-Cursor[0 7500 0.000000]
+Grid[2500.0 0 0 0]
+Cursor[440000 7500 0.000000]
 PolyArea[3100.006200]
 Thermal[0.500000]
 DRC[1000 1000 1000 1000 1500 1000]
@@ -790,7 +790,7 @@ Attribute("PCB::grid::unit" "mm")
 
 Element["" "M4_plated" "T206" "unknown" 37500 420000 -3000 -3000 0 100 ""]
 (
-	Pin[0 0 30996 5000 31783 16141 "terminal" "1" "thermal(0S)"]
+	Pin[0 0 30996 5000 31783 16141 "terminal" "1" "warn,thermal(0S)"]
 	ElementArc [0 0 8070 8070 0 360 500]
 	ElementArc [0 0 16141 16141 0 360 500]
 
@@ -1046,17 +1046,6 @@ Element["" "SMC_DO-214AB" "D209" "unknown" 162304 359930 0 0 3 100 ""]
 
 	)
 
-Element["" "IRLR3636PBF-DPAK_TO_252AA" "Q204" "unknown" 127500 380000 -13000 -47000 0 100 ""]
-(
-	Pad[0 -27000 0 -27000 27600 2000 29600 "D" "D" "square"]
-	Pad[9000 -2000 9000 2000 6000 2000 8000 "S" "S" "square,edge2"]
-	Pad[-9000 -2000 -9000 2000 6000 2000 8000 "G" "G" "square,edge2"]
-	ElementLine [-15000 -13000 -15000 -9000 1000]
-	ElementLine [-15000 -9000 15000 -9000 1000]
-	ElementLine [15000 -9000 15000 -13000 1000]
-
-	)
-
 Element["" "SMC_DO-214AB" "D205" "unknown" 162500 115000 0 0 3 100 ""]
 (
 	Pad[-1968 -14173 1968 -14173 11024 4000 11824 "1" "1" "square"]
@@ -1071,7 +1060,7 @@ Element["" "SMC_DO-214AB" "D205" "unknown" 162500 115000 0 0 3 100 ""]
 Element["" "DIO__MOV-LA20-series" "V202" "unknown" 205000 125000 -8200 -39700 3 100 ""]
 (
 	Pin[3500 -22000 9500 2000 10700 4500 "1" "1" ""]
-	Pin[-3500 22000 9500 2000 10700 4500 "2" "2" ""]
+	Pin[-3500 22000 9500 2000 10700 4500 "2" "2" "warn"]
 	ElementLine [7200 -39700 7200 -29000 1000]
 	ElementLine [-7200 -39700 7200 -39700 1000]
 	ElementLine [-7200 -39700 -7200 13000 1000]
@@ -1097,7 +1086,7 @@ Element["" "DIO__MOV-LA20-series" "V201" "unknown" 187500 70000 -8200 -39700 3 1
 Element["" "DIO__MOV-LA20-series" "V206" "unknown" 205000 370000 -8200 -39700 3 100 ""]
 (
 	Pin[3500 -22000 9500 2000 10700 4500 "1" "1" ""]
-	Pin[-3500 22000 9500 2000 10700 4500 "2" "2" ""]
+	Pin[-3500 22000 9500 2000 10700 4500 "2" "2" "warn"]
 	ElementLine [7200 -39700 7200 -29000 1000]
 	ElementLine [-7200 -39700 7200 -39700 1000]
 	ElementLine [-7200 -39700 -7200 13000 1000]
@@ -1123,7 +1112,7 @@ Element["" "DIO__MOV-LA20-series" "V205" "unknown" 187500 315000 -8200 -39700 3 
 Element["" "DIO__MOV-LA20-series" "V204" "unknown" 205000 247500 -8200 -39700 3 100 ""]
 (
 	Pin[3500 -22000 9500 2000 10700 4500 "1" "1" ""]
-	Pin[-3500 22000 9500 2000 10700 4500 "2" "2" ""]
+	Pin[-3500 22000 9500 2000 10700 4500 "2" "2" "warn"]
 	ElementLine [7200 -39700 7200 -29000 1000]
 	ElementLine [-7200 -39700 7200 -39700 1000]
 	ElementLine [-7200 -39700 -7200 13000 1000]
@@ -1253,6 +1242,120 @@ Element["" "TANT_D" "C702" "unknown" 237500 32500 0 -22900 0 100 ""]
 	ElementLine [-15000 15800 -11700 21900 1000]
 
 	)
+
+Element["" "CONNECTOR-1-2" "CONN210" "unknown" 275000 352500 -5000 -5000 3 100 ""]
+(
+	Pin[0 0 6000 3000 6600 3800 "1" "1" "square,edge2"]
+	Pin[10000 0 6000 3000 6600 3800 "2" "2" "edge2"]
+	ElementLine [-5000 -5000 -5000 5000 1000]
+	ElementLine [-5000 5000 15000 5000 1000]
+	ElementLine [15000 5000 15000 -5000 1000]
+	ElementLine [15000 -5000 -5000 -5000 1000]
+	ElementLine [-5000 5000 5000 5000 1000]
+	ElementLine [5000 5000 5000 -5000 1000]
+
+	)
+
+Element["" "CONNECTOR-1-2" "CONN209" "unknown" 277500 197500 -5000 -5000 3 100 ""]
+(
+	Pin[0 0 6000 3000 6600 3800 "1" "1" "square,edge2"]
+	Pin[10000 0 6000 3000 6600 3800 "2" "2" "edge2"]
+	ElementLine [-5000 -5000 -5000 5000 1000]
+	ElementLine [-5000 5000 15000 5000 1000]
+	ElementLine [15000 5000 15000 -5000 1000]
+	ElementLine [15000 -5000 -5000 -5000 1000]
+	ElementLine [-5000 5000 5000 5000 1000]
+	ElementLine [5000 5000 5000 -5000 1000]
+
+	)
+
+Element["" "CONNECTOR-1-2" "CONN208" "unknown" 275000 70000 -5000 -5000 3 100 ""]
+(
+	Pin[0 0 6000 3000 6600 3800 "1" "1" "square,edge2"]
+	Pin[10000 0 6000 3000 6600 3800 "2" "2" "edge2"]
+	ElementLine [-5000 -5000 -5000 5000 1000]
+	ElementLine [-5000 5000 15000 5000 1000]
+	ElementLine [15000 5000 15000 -5000 1000]
+	ElementLine [15000 -5000 -5000 -5000 1000]
+	ElementLine [-5000 5000 5000 5000 1000]
+	ElementLine [5000 5000 5000 -5000 1000]
+
+	)
+
+Element["" "IRLR3636PBF-DPAK_TO_252AA" "Q204" "unknown" 127500 380000 -13000 -47000 0 100 ""]
+(
+	Pad[0 -27000 0 -27000 27600 2000 29600 "D" "D" "square"]
+	Pad[9000 -2000 9000 2000 6000 2000 8000 "S" "S" "square,edge2"]
+	Pad[-9000 -2000 -9000 2000 6000 2000 8000 "G" "G" "square,edge2"]
+	ElementLine [-15000 -13000 -15000 -9000 1000]
+	ElementLine [-15000 -9000 15000 -9000 1000]
+	ElementLine [15000 -9000 15000 -13000 1000]
+
+	)
+
+Element["" "SHUNT_5" "R215" "unknown" 277500 252500 0 4000 2 100 ""]
+(
+	Pin[9842 0 12000 6000 12800 3937 "1" "1" "square,edge2"]
+	Pin[-9842 0 12000 6000 12800 3937 "2" "2" "edge2"]
+	ElementLine [-19685 -9842 19685 -9842 1000]
+	ElementLine [19685 -9842 19685 9842 1000]
+	ElementLine [-19685 9842 19685 9842 1000]
+	ElementLine [-19685 -9842 -19685 9842 1000]
+	ElementLine [0 9842 19685 9842 1000]
+	ElementLine [0 -9843 0 9842 1000]
+	ElementLine [0 -9843 19685 -9843 1000]
+	ElementLine [19685 -9843 19685 9842 1000]
+
+	)
+
+Element["" "SHUNT_5" "R216" "unknown" 280000 377500 0 4000 2 100 ""]
+(
+	Pin[9842 0 12000 6000 12800 3937 "1" "1" "square,edge2"]
+	Pin[-9842 0 12000 6000 12800 3937 "2" "2" "edge2"]
+	ElementLine [-19685 -9842 19685 -9842 1000]
+	ElementLine [19685 -9842 19685 9842 1000]
+	ElementLine [-19685 9842 19685 9842 1000]
+	ElementLine [-19685 -9842 -19685 9842 1000]
+	ElementLine [0 9842 19685 9842 1000]
+	ElementLine [0 -9843 0 9842 1000]
+	ElementLine [0 -9843 19685 -9843 1000]
+	ElementLine [19685 -9843 19685 9842 1000]
+
+	)
+
+Element["" "SHUNT_5" "R214" "unknown" 275000 132500 0 4000 2 100 ""]
+(
+	Pin[9842 0 12000 6000 12800 3937 "1" "1" "square,edge2"]
+	Pin[-9842 0 12000 6000 12800 3937 "2" "2" "edge2"]
+	ElementLine [-19685 -9842 19685 -9842 1000]
+	ElementLine [19685 -9842 19685 9842 1000]
+	ElementLine [-19685 9842 19685 9842 1000]
+	ElementLine [-19685 -9842 -19685 9842 1000]
+	ElementLine [0 9842 19685 9842 1000]
+	ElementLine [0 -9843 0 9842 1000]
+	ElementLine [0 -9843 19685 -9843 1000]
+	ElementLine [19685 -9843 19685 9842 1000]
+
+	)
+Rat[231900 21000 0 248543 62107 0  ""]
+Rat[255000 62500 0 285000 70000 1  ""]
+Rat[285000 70000 1 265158 132500 1  ""]
+Rat[265158 132500 1 231900 143500 0  ""]
+Rat[231900 143500 0 248543 184607 0  ""]
+Rat[255000 185000 0 287500 197500 1  ""]
+Rat[50000 150000 0 50000 195000 0  ""]
+Rat[231900 266000 0 267658 252500 1  ""]
+Rat[231900 266000 0 248543 307107 0  ""]
+Rat[50000 272500 0 50000 317500 0  ""]
+Rat[50000 395000 0 37500 420000 1  ""]
+Rat[255000 307500 0 285000 352500 1  ""]
+Rat[285000 352500 1 270158 377500 1  ""]
+Rat[275000 70000 1 255000 62500 0  ""]
+Rat[255000 185000 0 284842 132500 1  ""]
+Rat[275000 352500 1 289842 377500 1  ""]
+Rat[275000 352500 1 255000 307500 0  ""]
+Rat[277500 197500 1 255000 185000 0  ""]
+Rat[277500 197500 1 287342 252500 1  ""]
 Layer(1 "component")
 (
 	Line[60000 214350 60000 217500 2500 2000 "clearline,auto"]
@@ -1313,10 +1416,6 @@ Layer(1 "component")
 	Text[90000 17500 0 300 "2013" "clearline"]
 	Text[80000 0 0 300 "chujoii" "clearline"]
 	Text[22500 402500 3 300 "GND" "clearline"]
-	Polygon("clearpoly")
-	(
-		[255000 2500] [292500 2500] [292500 437500] [255000 437500] 
-	)
 	Polygon("")
 	(
 		[127500 315000] [252500 315000] [252500 365000] [127500 365000] 
@@ -1421,21 +1520,25 @@ Layer(1 "component")
 	(
 		[127500 2500] [292500 2500] [292500 30000] [127500 30000] 
 	)
-	Polygon("")
-	(
-		[127500 125000] [292500 125000] [292500 152500] [127500 152500] 
-	)
-	Polygon("")
-	(
-		[127500 247500] [292500 247500] [292500 275000] [127500 275000] 
-	)
-	Polygon("")
-	(
-		[127500 370000] [292500 370000] [292500 397500] [127500 397500] 
-	)
 	Polygon("clearpoly")
 	(
 		[5000 400000] [292500 400000] [292500 437500] [5000 437500] 
+	)
+	Polygon("")
+	(
+		[127500 125000] [252500 125000] [252500 152500] [127500 152500] 
+	)
+	Polygon("")
+	(
+		[127500 247500] [252500 247500] [252500 275000] [127500 275000] 
+	)
+	Polygon("")
+	(
+		[127500 370000] [252500 370000] [252500 397500] [127500 397500] 
+	)
+	Polygon("clearpoly")
+	(
+		[310000 5000] [347500 5000] [347500 440000] [310000 440000] 
 	)
 )
 Layer(2 "solder")
@@ -1487,22 +1590,19 @@ NetList()
 		Connect("C705-2")
 		Connect("C706-2")
 		Connect("C707-2")
-		Connect("D205-2")
-		Connect("D207-2")
-		Connect("D209-2")
-		Connect("Q202-S")
-		Connect("Q204-S")
-		Connect("Q206-S")
+		Connect("CONN208-2")
+		Connect("CONN209-2")
+		Connect("CONN210-2")
 		Connect("R203-2")
 		Connect("R204-2")
 		Connect("R208-2")
 		Connect("R209-2")
 		Connect("R212-2")
 		Connect("R213-2")
+		Connect("R214-2")
+		Connect("R215-2")
+		Connect("R216-2")
 		Connect("T206-1")
-		Connect("V202-2")
-		Connect("V204-2")
-		Connect("V206-2")
 	)
 	Net("PH_A" "(unknown)")
 	(
@@ -1575,29 +1675,53 @@ NetList()
 	)
 	Net("unnamed_net2" "(unknown)")
 	(
+		Connect("CONN208-1")
+		Connect("D205-2")
+		Connect("Q202-S")
+		Connect("R214-1")
+		Connect("V202-2")
+	)
+	Net("unnamed_net3" "(unknown)")
+	(
 		Connect("Q202-G")
 		Connect("R202-2")
 		Connect("R204-1")
 	)
-	Net("unnamed_net3" "(unknown)")
+	Net("unnamed_net4" "(unknown)")
 	(
 		Connect("Q203-G")
 		Connect("R206-2")
 		Connect("R208-1")
 	)
-	Net("unnamed_net4" "(unknown)")
+	Net("unnamed_net5" "(unknown)")
+	(
+		Connect("CONN210-1")
+		Connect("D209-2")
+		Connect("Q204-S")
+		Connect("R216-1")
+		Connect("V206-2")
+	)
+	Net("unnamed_net6" "(unknown)")
 	(
 		Connect("Q204-G")
 		Connect("R207-2")
 		Connect("R209-1")
 	)
-	Net("unnamed_net5" "(unknown)")
+	Net("unnamed_net7" "(unknown)")
 	(
 		Connect("Q205-G")
 		Connect("R210-2")
 		Connect("R212-1")
 	)
-	Net("unnamed_net6" "(unknown)")
+	Net("unnamed_net8" "(unknown)")
+	(
+		Connect("CONN209-1")
+		Connect("D207-2")
+		Connect("Q206-S")
+		Connect("R215-1")
+		Connect("V204-2")
+	)
+	Net("unnamed_net9" "(unknown)")
 	(
 		Connect("Q206-G")
 		Connect("R211-2")

@@ -1,0 +1,4 @@
+schematics 8-shoot-through-prevention.sch
+output-name 8-shoot-through-prevention
+elements-dir /home/chujoii/project/geda/footprints-geda
+elements-dir /home/chujoii/project/geda/footprints-my
