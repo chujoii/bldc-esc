@@ -1,0 +1,4 @@
+schematics 10-fuse.sch
+output-name 10-fuse
+elements-dir /home/chujoii/project/geda/footprints-geda
+elements-dir /home/chujoii/project/geda/footprints-my
