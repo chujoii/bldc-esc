@@ -1,0 +1,4 @@
+schematics 1-micro-controller.sch
+output-name 1-micro-controller
+elements-dir /home/toor/project/geda/footprints-geda
+elements-dir /home/toor/project/geda/footprints-my
