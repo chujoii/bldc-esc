@@ -25,7 +25,7 @@
 
 
 
- Keywords: bldc esc hall bemf current motor sensor
+ Keywords: bldc esc hall bemf current motor sensor optocouple
 
 
 
@@ -41,6 +41,11 @@
  Code:
 */
 
+// pins:     [1 2] 3 4 5 6 7 8 9 10 11 12 13 A0 A1 A2 A3 A4 A5
+// free pin: [1 2]                     12 13          A3 A4 A5
+// used pin: [1 2] 3 4 5 6 7 8 9 10 11       A0 A1 A2 A3 A4 A5
+
+
 // phase a, b, c
 int pin_a_hi = 3;
 int pin_a_lo = 5;
@@ -49,27 +54,19 @@ int pin_b_lo = 9;
 int pin_c_hi = 10;
 int pin_c_lo = 11;
 
+// global interrupt pin
+int pin_global_interrupt = 2;
+
+// ///////////////////////////////////////////// sensors ////////
+
 // Hall a, b, c (or other type of sensor: for example optic)
-/*
-int analog_pin_a_hall = A0;
-int analog_pin_b_hall = A1;
-int analog_pin_c_hall = A2;
-*/
-int digital_pin_a_hall = 4;
-int digital_pin_b_hall = 7;
-int digital_pin_c_hall = 8;
+//int analog_pin_a_hall = A0;
+//int analog_pin_b_hall = A1;
+//int analog_pin_c_hall = A2;
 
-
-// BEMF sensors
-int analog_pin_a_bemf = A0;
-int analog_pin_b_bemf = A1;
-int analog_pin_c_bemf = A2;
-
-// Current sensors
-int analog_pin_a_current = A3;
-int analog_pin_b_current = A4;
-int analog_pin_c_current = A5;
-
+//int digital_pin_a_hall = 4;
+//int digital_pin_b_hall = 7;
+//int digital_pin_c_hall = 8;
 
 // hall max min level
 int a_hall_max;
@@ -84,13 +81,38 @@ int c_hall_max;
 int c_hall_min;
 int c_hall_zero;
 
+int analog_pin_a_optocouple = A0;
+int analog_pin_b_optocouple = A1;
+int analog_pin_c_optocouple = A2;
+
+int pin_a_cotrol_optocouple = 4;
+int pin_b_cotrol_optocouple = 7;
+int pin_c_cotrol_optocouple = 8;
+
+const byte optocouple_delay = 1; // us   fixme: need experiments
+int optocouple_threshold_level = 128; // fixme: need experiments
+
+
+// BEMF sensors
+//int analog_pin_a_bemf = A0;
+//int analog_pin_b_bemf = A1;
+//int analog_pin_c_bemf = A2;
+
+// Current sensors
+//int analog_pin_a_current = A3;
+//int analog_pin_b_current = A4;
+//int analog_pin_c_current = A5;
+
+
+
 
 const byte pwm_min = 0;
 const byte pwm_max = 255;
 
+int delay_between_step = 1; // us
 
 
-
+/*
 void analog_hall_level_detect() // need rotate rotor by hand ~10 sec
 {
 	int startt = millis();
@@ -123,9 +145,21 @@ void analog_hall_level_detect() // need rotate rotor by hand ~10 sec
 	c_hall_zero = (c_hall_max - c_hall_min)>>1; // /2
 	
 }
+*/
 
 
+boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sensor_delay, int sensor_threshold_level)
+{
+	int dark_current = analogRead(pin_sensor_input);
+	digitalWrite(pin_sensor_output, HIGH);
+	delayMicroseconds(sensor_delay);
+	int light_current = analogRead(pin_sensor_input);
+	digitalWrite(pin_sensor_output, LOW);
+	return ((light_current - dark_current) > sensor_threshold_level);
+}
 
+
+/*
 void turn_analoghall(int diretcion) // not work
 {
 	// current state of hall sensor
@@ -138,11 +172,11 @@ void turn_analoghall(int diretcion) // not work
 	int u_control_a_hi = map(state_a_hall, a_hall_min, a_hall_max, -pwm_max, pwm_max); // fixme: need use direction
 	int u_control_a_lo = map(state_a_hall, a_hall_min, a_hall_max, -pwm_max, pwm_max); // fixme: need use direction
 
-	int u_control_b_hi = map(state_a_hall, b_hall_min, b_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-	int u_control_b_lo = map(state_a_hall, b_hall_min, b_hall_max, -pwm_max, pwm_max); // fixme: need use direction
+	int u_control_b_hi = map(state_b_hall, b_hall_min, b_hall_max, -pwm_max, pwm_max); // fixme: need use direction
+	int u_control_b_lo = map(state_b_hall, b_hall_min, b_hall_max, -pwm_max, pwm_max); // fixme: need use direction
 
-	int u_control_c_hi = map(state_a_hall, c_hall_min, c_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-	int u_control_c_lo = map(state_a_hall, c_hall_min, c_hall_max, -pwm_max, pwm_max); // fixme: need use direction
+	int u_control_c_hi = map(state_c_hall, c_hall_min, c_hall_max, -pwm_max, pwm_max); // fixme: need use direction
+	int u_control_c_lo = map(state_c_hall, c_hall_min, c_hall_max, -pwm_max, pwm_max); // fixme: need use direction
 
 	//if (u_control_a<0)
 	digitalWrite(pin_a_hi, abs(u_control_a_hi));
@@ -152,28 +186,31 @@ void turn_analoghall(int diretcion) // not work
 	digitalWrite(pin_c_hi, abs(u_control_c_hi));
 	digitalWrite(pin_c_lo, abs(u_control_c_lo));
 }
+*/
 
 
 
-
-void turn_digitalhall_case(int diretcion) // different number of compare "state_adc_hall"
+void turn_digital(int direction)
 {
 
 	byte speed;
 	
-	speed = abc(direction);
+	speed = abs(direction);
 
 
 	// current state of hall sensor
-	int state_a_hall, state_b_hall, state_c_hall;
+	boolean state_a_hall, state_b_hall, state_c_hall;
 	byte state_abc_hall = 0;
 
-	state_a_hall = digitalRead(digital_pin_a_hall);
-	state_b_hall = digitalRead(digital_pin_b_hall);
-	state_c_hall = digitalRead(digital_pin_c_hall);
-	
 
+	state_a_hall = read_optic_sensor (pin_a_cotrol_optocouple, analog_pin_a_optocouple, optocouple_delay, optocouple_threshold_level);
+	state_b_hall = read_optic_sensor (pin_b_cotrol_optocouple, analog_pin_b_optocouple, optocouple_delay, optocouple_threshold_level);
+	state_c_hall = read_optic_sensor (pin_c_cotrol_optocouple, analog_pin_c_optocouple, optocouple_delay, optocouple_threshold_level);
 	
+	
+	if (state_a_hall) {state_abc_hall = state_abc_hall & B100;};
+	if (state_b_hall) {state_abc_hall = state_abc_hall & B010;};
+	if (state_c_hall) {state_abc_hall = state_abc_hall & B001;};
 	
 	/*
 	  Switches commutation for rotor rotation
@@ -197,9 +234,6 @@ void turn_digitalhall_case(int diretcion) // different number of compare "state_
 
 
 
-	if (HIGH == state_a_hall) {state_abc_hall = state_abc_hall & B100};
-	if (HIGH == state_b_hall) {state_abc_hall = state_abc_hall & B010};
-	if (HIGH == state_c_hall) {state_abc_hall = state_abc_hall & B001};
 	
 	
 	switch (state_abc_hall) {
@@ -274,141 +308,6 @@ void turn_digitalhall_case(int diretcion) // different number of compare "state_
 
 
 
-void turn_digitalhall_if(int diretcion) // only 3 if ""
-{
-
-	byte speed;
-	
-	speed = abc(direction);
-
-
-	// current state of hall sensor
-	int state_a_hall, state_b_hall, state_c_hall;
-	byte state_abc_hall = 0;
-
-	state_a_hall = digitalRead(digital_pin_a_hall);
-	state_b_hall = digitalRead(digital_pin_b_hall);
-	state_c_hall = digitalRead(digital_pin_c_hall);
-	
-
-	
-	
-	/*
-	  Switches commutation for rotor rotation
-
-	  ahi           bhi           chi
-	  alo           blo           clo
-	  
-
-	  hall        phase     switches
-	  101         a-b       a-hi b-lo
-	  001         a-c       a-hi c-lo
-	  011         b-c       b-hi c-lo
-	  010         b-a       b-hi a-lo
-	  110         c-a       c-hi a-lo
-	  100         c-b       c-hi b-lo
-
-	  111         error
-	  000         error
-
-	 */
-
-
-	
-	if (HIGH == state_a_hall) {
-		// 1xx ---------------------------------
-		if (HIGH == state_b_hall) {
-			// 11x -------------------------
-			if (HIGH == state_c_hall) {
-				// 111
-				// error
-				// fixme
-				analogWrite(pin_a_hi, 0);
-				analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-				analogWrite(pin_b_hi, 0);
-				analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-				analogWrite(pin_c_hi, 0);
-				analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
-			} else {
-				// 110
-				// c-hi a-lo
-				analogWrite(pin_a_hi, 0);
-				analogWrite(pin_a_lo, speed); // digitalWrite(pin_a_lo, HIGH)
-				analogWrite(pin_b_hi, 0);
-				analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-				analogWrite(pin_c_hi, speed);
-				analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
-			}
-		} else {
-			// 10x -------------------------
-			if (HIGH == state_c_hall) {
-				// 101
-				// a-hi b-lo
-				analogWrite(pin_a_hi, speed);
-				analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-				analogWrite(pin_b_hi, 0);
-				analogWrite(pin_b_lo, speed); // digitalWrite(pin_b_lo, HIGH)
-				analogWrite(pin_c_hi, 0);
-				analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
-			} else {
-				// 100
-				// c-hi b-lo
-				analogWrite(pin_a_hi, 0);
-				analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-				analogWrite(pin_b_hi, 0);
-				analogWrite(pin_b_lo, speed); // digitalWrite(pin_b_lo, HIGH)
-				analogWrite(pin_c_hi, speed);
-				analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
-			}
-		}
-	} else {
-		// 0xx ---------------------------------
-		if (HIGH == state_b_hall) {
-			// 01x -------------------------
-			if (HIGH == state_c_hall) {
-				// 011
-				// b-hi c-lo
-				analogWrite(pin_a_hi, 0);
-				analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-				analogWrite(pin_b_hi, speed);
-				analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-				analogWrite(pin_c_hi, 0);
-				analogWrite(pin_c_lo, speed); // digitalWrite(pin_c_lo, HIGH)
-			} else {
-				// 010
-				// b-hi a-lo
-				analogWrite(pin_a_hi, 0);
-				analogWrite(pin_a_lo, speed); // digitalWrite(pin_a_lo, HIGH)
-				analogWrite(pin_b_hi, speed);
-				analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-				analogWrite(pin_c_hi, 0);
-				analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
-			}
-		} else {
-			// 00x -------------------------
-			if (HIGH == state_c_hall) {
-				// 001
-				// a-hi c-lo
-				analogWrite(pin_a_hi, speed);
-				analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-				analogWrite(pin_b_hi, 0);
-				analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-				analogWrite(pin_c_hi, 0);
-				analogWrite(pin_c_lo, speed); // digitalWrite(pin_c_lo, HIGH)
-			} else {
-				// 000
-				// error
-				// fixme
-				analogWrite(pin_a_hi, 0);
-				analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-				analogWrite(pin_b_hi, 0);
-				analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-				analogWrite(pin_c_hi, 0);
-				analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
-			}
-		}
-	}
-}
 			
 
 
@@ -420,33 +319,28 @@ void setup()
 	pinMode(pin_b_lo, OUTPUT);
 	pinMode(pin_c_hi, OUTPUT);
 	pinMode(pin_c_lo, OUTPUT);
-
-
+	
+	
 	digitalWrite(pin_a_hi, LOW);
 	digitalWrite(pin_a_lo, LOW);
 	digitalWrite(pin_b_hi, LOW);
 	digitalWrite(pin_b_lo, LOW);
 	digitalWrite(pin_c_hi, LOW);
 	digitalWrite(pin_c_lo, LOW);
-
-
-
-	pinMode(pin_a_hi, OUTPUT);
-	pinMode(pin_a_lo, OUTPUT);
-	pinMode(pin_b_hi, OUTPUT);
-	pinMode(pin_b_lo, OUTPUT);
-	pinMode(pin_c_hi, OUTPUT);
-	pinMode(pin_c_lo, OUTPUT);
-
-	hall_level_detect();
+	
+	
+	
+	pinMode(pin_a_cotrol_optocouple, OUTPUT);
+	pinMode(pin_b_cotrol_optocouple, OUTPUT);
+	pinMode(pin_c_cotrol_optocouple, OUTPUT);
+	
+	//analog_hall_level_detect();
 }
 
 
 void loop()
 {
-	turn(1);
+	turn_digital(1);
 
-	delay(1);
+	delayMicroseconds(delay_between_step);
 }
-
-
