@@ -41,32 +41,42 @@
  Code:
 */
 
+#include <math.h>
+
 // pins:     [1 2] 3 4 5 6 7 8 9 10 11 12 13 A0 A1 A2 A3 A4 A5
 // free pin: [1 2]                     12 13          A3 A4 A5
 // used pin: [1 2] 3 4 5 6 7 8 9 10 11       A0 A1 A2 A3 A4 A5
 
 
 // phase a, b, c
-int pin_a_hi = 3;
-int pin_a_lo = 5;
-int pin_b_hi = 6;
-int pin_b_lo = 9;
-int pin_c_hi = 10;
-int pin_c_lo = 11;
+const int pin_a_hi = 3;
+const int pin_a_lo = 5;
+const int pin_b_hi = 6;
+const int pin_b_lo = 9;
+const int pin_c_hi = 10;
+const int pin_c_lo = 11;
 
 // global interrupt pin
 int pin_global_interrupt = 2;
 
+float angle_a_shift =   0.0;  
+float angle_b_shift = 120.0;
+float angle_c_shift = 240.0;
+
+const float point_of_symmetry_sin_x_plus  =  90.0;
+const float point_of_symmetry_sin_x_minus = 270.0;
+const float poin_of_zero_cross_sin_x      = 180.0;
+
 // ///////////////////////////////////////////// sensors ////////
 
 // Hall a, b, c (or other type of sensor: for example optic)
-//int analog_pin_a_hall = A0;
-//int analog_pin_b_hall = A1;
-//int analog_pin_c_hall = A2;
+//const int analog_pin_a_hall = A0;
+//const int analog_pin_b_hall = A1;
+//const int analog_pin_c_hall = A2;
 
-//int digital_pin_a_hall = 4;
-//int digital_pin_b_hall = 7;
-//int digital_pin_c_hall = 8;
+//const int digital_pin_a_hall = 4;
+//const int digital_pin_b_hall = 7;
+//const int digital_pin_c_hall = 8;
 
 // hall max min level
 int a_hall_max;
@@ -81,27 +91,28 @@ int c_hall_max;
 int c_hall_min;
 int c_hall_zero;
 
-int analog_pin_a_optocouple = A0;
-int analog_pin_b_optocouple = A1;
-int analog_pin_c_optocouple = A2;
+const int analog_pin_a_optocouple = A0;
+const int analog_pin_b_optocouple = A1;
+const int analog_pin_c_optocouple = A2;
 
-int pin_a_cotrol_optocouple = 4;
-int pin_b_cotrol_optocouple = 7;
-int pin_c_cotrol_optocouple = 8;
+const int pin_a_cotrol_optocouple = 4;
+const int pin_b_cotrol_optocouple = 7;
+const int pin_c_cotrol_optocouple = 8;
 
 const byte optocouple_delay = 1; // us   fixme: need experiments
 int optocouple_threshold_level = 128; // fixme: need experiments
 
 
 // BEMF sensors
-//int analog_pin_a_bemf = A0;
-//int analog_pin_b_bemf = A1;
-//int analog_pin_c_bemf = A2;
+//const int analog_pin_a_bemf = A0;
+//const int analog_pin_b_bemf = A1;
+//const int analog_pin_c_bemf = A2;
 
 // Current sensors
-//int analog_pin_a_current = A3;
-//int analog_pin_b_current = A4;
-//int analog_pin_c_current = A5;
+//const int analog_pin_a_current = A3;
+//const int analog_pin_b_current = A4;
+//const int analog_pin_c_current = A5;
+//const int analog_pin_abc_current = A3;
 
 
 
@@ -158,6 +169,87 @@ boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sens
 	return ((light_current - dark_current) > sensor_threshold_level);
 }
 
+float calculation_angle_from_three_phases(float a, float b, float c) // int prev_angle, int prev_step)
+{
+	// all value in degree
+
+	// a = sin(x)
+	// b = sin(x+120)
+	// c = sin(x+240)
+	// x = ?
+
+
+	// Each arc sine gives two solutions for the period.
+	// for example real_motor_angle = 230 (degree)
+	// and we need calculate motor_angle
+	//
+	// read a, b, c from sensors:
+	// a ~ -0.77
+	// b ~ -0.17
+	// c ~ +0.92
+	//
+	// all value in degree
+	// x[rad]  = x[grad] * (3.14/180)
+        // x[grad] = x[rad]  * (180/3.14)
+	//
+	// angle_a_1 = (- (* (asin -0.77) (/ 180.0 3.14))   0) =  -50.4 [degree]
+	// angle_b_1 = (- (* (asin -0.17) (/ 180.0 3.14)) 120) = -129.8 [degree]
+        // angle_c_1 = (- (* (asin  0.92) (/ 180.0 3.14)) 240) = -173.0 [degree]
+	//
+	// period of sin = 360[degree] = 2*3.14[rad]
+	// 
+	//
+	// if (angle_x_1 < 0)   {angle_x_1 = angle_x_1 + 360;}
+	//
+	// angle_a_1 = 309.6
+	// angle_b_1 = 230.2 + 120
+        // angle_c_1 = 187.0 + 240
+	//
+	// if (angle_x_1 < poin_of_zero_cross_sin_x) { angle_x_2 = point_of_symmetry_sin_x_plus  * 2 - angle_x_1;}
+	// else                 { angle_x_2 = point_of_symmetry_sin_x_minus * 2 - angle_x_1;}
+	//
+	// angle_a_2 = 230.4
+	// angle_b_2 = 309.8 + 120
+        // angle_c_2 = 353.0 + 240
+	// 
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+	//
+
+
+
+		
+	// fixme need change math function asin to table function
+	// fixme float -> int
+
+	// http://www.nongnu.org/avr-libc/user-manual/group__avr__math.html
+	// The asin() function computes the principal value of the arc
+	// sine of __x. The returned value is in the range [-pi/2,
+	// pi/2] radians. A domain error occurs for arguments not in
+	// the range [-1, +1].
+	float angle_a = asin(a) * (180/3.14) - angle_a_shift; // - 0
+	float angle_b = asin(b) * (180/3.14) - angle_b_shift; // - 120
+	float angle_c = asin(c) * (180/3.14) - angle_c_shift; // - 240
+	
+
+
+	
+	float diff_1 = 
+	
+	
+	return (angle_a + angle_b + angle_c)/3.0;
+}
+
+boolean unit_test_calculation_angle_from_three_phases()
+{
+	boolean result = true;
+	if (){}
+}
 
 /*
 void turn_analoghall(int diretcion) // not work
