@@ -12,8 +12,8 @@ const float point_of_zero_cross_sin_x     = 180.0;
 
 float cycle_constrain_angle (float x, float xmin, float xmax)
 {
-	if (x < xmin) {x = x + xmax;}
-	if (x > xmax) {x = x - xmax;}
+	while (x < xmin) {x = x + xmax;}
+	while (x > xmax) {x = x - xmax;}
 	return x;
 }
 
@@ -67,35 +67,37 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	float angle_a_2;
 	float angle_b_2;
 	float angle_c_2;
-	if (angle_a_1 < point_of_zero_cross_sin_x - angle_a_shift) { angle_a_2 = (point_of_symmetry_sin_x_plus  - angle_a_shift)  * 2 - angle_a_1;}
-	else                                                       { angle_a_2 = (point_of_symmetry_sin_x_minus - angle_a_shift) * 2 - angle_a_1;}
-	if (angle_b_1 < point_of_zero_cross_sin_x - angle_b_shift) { angle_b_2 = (point_of_symmetry_sin_x_plus  - angle_b_shift)  * 2 - angle_b_1;}
-	else                                                       { angle_b_2 = (point_of_symmetry_sin_x_minus - angle_b_shift) * 2 - angle_b_1;}
-	if (angle_c_1 < point_of_zero_cross_sin_x - angle_c_shift) { angle_c_2 = (point_of_symmetry_sin_x_plus  - angle_c_shift) * 2 - angle_c_1;}
-	else                                                       { angle_c_2 = (point_of_symmetry_sin_x_minus - angle_c_shift) * 2 - angle_c_1;}
-	printf("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n", angle_a_2, angle_b_2, angle_c_2);
-	//
-	angle_a_2 = angle_a_2 + angle_a_shift;
-	angle_b_2 = angle_b_2 + angle_b_shift;
-	angle_c_2 = angle_c_2 + angle_c_shift;
+	printf("symmetry\n");
+	if (angle_a_1 < point_of_zero_cross_sin_x - angle_a_shift) {
+		printf("a smaller\t\t");
+		angle_a_2 = (point_of_symmetry_sin_x_plus  - angle_a_shift) * 2 - angle_a_1;
+	} else {
+		printf("a biger\t\t");
+		angle_a_2 = (point_of_symmetry_sin_x_minus - angle_a_shift) * 2 - angle_a_1;
+	}
+	
+	if (angle_b_1 < point_of_zero_cross_sin_x - angle_b_shift) {
+		printf("b smaller\t\t");
+		angle_b_2 = (point_of_symmetry_sin_x_plus  - angle_b_shift) * 2 - angle_b_1;
+	} else {
+		printf("b biger\t\t");
+		angle_b_2 = (point_of_symmetry_sin_x_minus - angle_b_shift) * 2 - angle_b_1;
+	}
+	
+	if (angle_c_1 < point_of_zero_cross_sin_x - angle_c_shift) {
+		printf("c smaller\t\t");
+		angle_c_2 = (point_of_symmetry_sin_x_plus  - angle_c_shift) * 2 - angle_c_1;
+	} else {
+		printf("c biger\t\t");
+		angle_c_2 = (point_of_symmetry_sin_x_minus - angle_c_shift) * 2 - angle_c_1;
+	}
+	printf("%7.2f\n", cycle_constrain_angle(point_of_zero_cross_sin_x - angle_c_shift, 0.0, 360));
 	printf("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n", angle_a_2, angle_b_2, angle_c_2);
 
 	angle_a_2 = cycle_constrain_angle(angle_a_2, 0.0, 360.0);
 	angle_b_2 = cycle_constrain_angle(angle_b_2, 0.0, 360.0);
 	angle_c_2 = cycle_constrain_angle(angle_c_2, 0.0, 360.0);
-	// 
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-
-
-
-		
+	printf("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n\n", angle_a_2, angle_b_2, angle_c_2);
 	// fixme need change math function asin to table function
 	// fixme float -> int
 
@@ -117,7 +119,7 @@ int unit_test_calculation_angle_from_three_phases()
 {
 	//int result = 0;
 	float test_angle = 230.0;
-	printf("original_angle=%7.2f\n", test_angle);
+	printf("original_angle=%7.2f\n\n", test_angle);
 	calculation_angle_from_three_phases(sin((test_angle + angle_a_shift) * (3.14/180.0)),
 					    sin((test_angle + angle_b_shift) * (3.14/180.0)),
 					    sin((test_angle + angle_c_shift) * (3.14/180.0)));//-0.77, -0.17, 0.92);
