@@ -46,44 +46,100 @@
 
 float cycle_constrain_angle (float x, float xmin, float xmax)
 {
-	while (x < xmin) {x = x + xmax;}
-	while (x > xmax) {x = x - xmax;}
+	while (x <  xmin) {x = x + xmax;}
+	while (x >= xmax) {x = x - xmax;}
 	return x;
 }
 
 
-
-
-float max_diff_from_three (float a, float b, float c)
+float cycle_max_diff_from_three (float a, float b, float c, float cycle)
 {
-	return MAX(MAX(fabs(a-b), fabs(b-c)), fabs(a-c));
+	float diffab = MIN(fabs(a - b), fabs(fabs(a - b) - cycle));
+	float diffbc = MIN(fabs(b - c), fabs(fabs(b - c) - cycle));
+	float diffca = MIN(fabs(c - a), fabs(fabs(c - a) - cycle));
+	
+	return MAX(MAX(diffab, diffbc), diffca);
 }
 
 
 
 float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2, float epsilon)
 {
-	float min_angle_diff = 360.0;
+	float min_angle_diff = point_of_cycle_max;
 	float result_angle = 0.0;
 	float tmp_diff;
 	
-	tmp_diff = max_diff_from_three(a1, b1, c1); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a1 + b1 + c1);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
-	if (tmp_diff < epsilon) {return result_angle/3.0;}
-	tmp_diff = max_diff_from_three(a1, b1, c2); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a1 + b1 + c2);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
-	if (tmp_diff < epsilon) {return result_angle/3.0;}
-	tmp_diff = max_diff_from_three(a1, b2, c1); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a1 + b2 + c1);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
-	if (tmp_diff < epsilon) {return result_angle/3.0;}
-	tmp_diff = max_diff_from_three(a1, b2, c2); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a1 + b2 + c2);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
-	if (tmp_diff < epsilon) {return result_angle/3.0;}
-	tmp_diff = max_diff_from_three(a2, b1, c1); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a2 + b1 + c1);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
-	if (tmp_diff < epsilon) {return result_angle/3.0;}
-	tmp_diff = max_diff_from_three(a2, b1, c2); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a2 + b1 + c2);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
-	if (tmp_diff < epsilon) {return result_angle/3.0;}
-	tmp_diff = max_diff_from_three(a2, b2, c1); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a2 + b2 + c1);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
-	if (tmp_diff < epsilon) {return result_angle/3.0;}
-	tmp_diff = max_diff_from_three(a2, b2, c2); if (tmp_diff < min_angle_diff){min_angle_diff = tmp_diff;result_angle = (a2 + b2 + c2);printf("*");} printf("tmp=%7.2f\tmin=%7.2f\ta=%7.2f\n", tmp_diff, min_angle_diff, result_angle/3.0);
+	tmp_diff = cycle_max_diff_from_three(a1, b1, c1, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a1;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b1, c1, tmp_diff, min_angle_diff, result_angle);
+	if (tmp_diff < epsilon) {return result_angle;}
 	
-	return result_angle/3.0;
+	tmp_diff = cycle_max_diff_from_three(a1, b1, c2, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a1;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b1, c2, tmp_diff, min_angle_diff, result_angle);
+	if (tmp_diff < epsilon) {return result_angle;}
+	
+	tmp_diff = cycle_max_diff_from_three(a1, b2, c1, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a1;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b2, c1, tmp_diff, min_angle_diff, result_angle);
+	if (tmp_diff < epsilon) {return result_angle;}
+	
+	tmp_diff = cycle_max_diff_from_three(a1, b2, c2, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a1;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b2, c2, tmp_diff, min_angle_diff, result_angle);
+	if (tmp_diff < epsilon) {return result_angle;}
+	
+	tmp_diff = cycle_max_diff_from_three(a2, b1, c1, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a2;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a2, b1, c1, tmp_diff, min_angle_diff, result_angle);
+	if (tmp_diff < epsilon) {return result_angle;}
+	
+	tmp_diff = cycle_max_diff_from_three(a2, b1, c2, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a2;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a2, b1, c2, tmp_diff, min_angle_diff, result_angle);
+	if (tmp_diff < epsilon) {return result_angle;}
+	
+	tmp_diff = cycle_max_diff_from_three(a2, b2, c1, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a2;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a2, b2, c1, tmp_diff, min_angle_diff, result_angle);
+	if (tmp_diff < epsilon) {return result_angle;}
+	
+	tmp_diff = cycle_max_diff_from_three(a2, b2, c2, point_of_cycle_max);
+	if (tmp_diff < min_angle_diff){
+		min_angle_diff = tmp_diff;
+		result_angle = a2;
+		printf("*");
+	}
+	printf("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a2, b2, c2, tmp_diff, min_angle_diff, result_angle);
+	return result_angle;
 }
 
 float calculation_angle_from_three_phases(float a, float b, float c) // int prev_angle, int prev_step)
@@ -127,9 +183,9 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	// 
 	//
 	printf("cycle constrain\n");
-	angle_a_1 = cycle_constrain_angle(angle_a_1, 0.0, 360.0);
-	angle_b_1 = cycle_constrain_angle(angle_b_1, 0.0, 360.0);
-	angle_c_1 = cycle_constrain_angle(angle_c_1, 0.0, 360.0);
+	angle_a_1 = cycle_constrain_angle(angle_a_1, 0.0, point_of_cycle_max);
+	angle_b_1 = cycle_constrain_angle(angle_b_1, 0.0, point_of_cycle_max);
+	angle_c_1 = cycle_constrain_angle(angle_c_1, 0.0, point_of_cycle_max);
 	printf("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1);
 	// angle_a_1= 309.62	angle_b_1= 230.21	angle_c_1= 186.96
 	//
@@ -163,9 +219,9 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	printf("%7.2f\n", cycle_constrain_angle(point_of_zero_cross_sin_x - angle_c_shift, 0.0, 360));
 	printf("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n", angle_a_2, angle_b_2, angle_c_2);
 
-	angle_a_2 = cycle_constrain_angle(angle_a_2, 0.0, 360.0);
-	angle_b_2 = cycle_constrain_angle(angle_b_2, 0.0, 360.0);
-	angle_c_2 = cycle_constrain_angle(angle_c_2, 0.0, 360.0);
+	angle_a_2 = cycle_constrain_angle(angle_a_2, 0.0, point_of_cycle_max);
+	angle_b_2 = cycle_constrain_angle(angle_b_2, 0.0, point_of_cycle_max);
+	angle_c_2 = cycle_constrain_angle(angle_c_2, 0.0, point_of_cycle_max);
 	printf("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n\n", angle_a_2, angle_b_2, angle_c_2);
 	// fixme need change math function asin to table function
 	// fixme float -> int
@@ -178,7 +234,7 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 
 
 
-	float result = examine_angles(angle_a_1, angle_a_2, angle_b_1, angle_b_2, angle_c_1, angle_c_2, 1.0);
+	float result = examine_angles(angle_a_1, angle_a_2, angle_b_1, angle_b_2, angle_c_1, angle_c_2, epsilon);
 	printf("result angle = %7.2f\n", result);
 	return result;
 }
