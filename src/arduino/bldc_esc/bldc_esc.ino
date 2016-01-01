@@ -65,7 +65,14 @@ float angle_c_shift = 240.0;
 
 const float point_of_symmetry_sin_x_plus  =  90.0;
 const float point_of_symmetry_sin_x_minus = 270.0;
-const float poin_of_zero_cross_sin_x      = 180.0;
+const float point_of_zero_cross_sin_x     = 180.0;
+const float point_of_cycle_min            =   0.0;
+const float point_of_cycle_max            = 360.0;
+
+const float epsilon = 1.0;
+
+const float min_sin_val = -1.0;
+const float max_sin_val =  1.0;
 
 // ///////////////////////////////////////////// sensors ////////
 
@@ -123,6 +130,9 @@ const byte pwm_max = 255;
 int delay_between_step = 1; // us
 
 
+
+#include "/home/chujoii/project/bldc-esc/src/angle-calculation.c"
+
 /*
 void analog_hall_level_detect() // need rotate rotor by hand ~10 sec
 {
@@ -169,87 +179,6 @@ boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sens
 	return ((light_current - dark_current) > sensor_threshold_level);
 }
 
-float calculation_angle_from_three_phases(float a, float b, float c) // int prev_angle, int prev_step)
-{
-	// all value in degree
-
-	// a = sin(x)
-	// b = sin(x+120)
-	// c = sin(x+240)
-	// x = ?
-
-
-	// Each arc sine gives two solutions for the period.
-	// for example real_motor_angle = 230 (degree)
-	// and we need calculate motor_angle
-	//
-	// read a, b, c from sensors:
-	// a ~ -0.77
-	// b ~ -0.17
-	// c ~ +0.92
-	//
-	// all value in degree
-	// x[rad]  = x[grad] * (3.14/180)
-        // x[grad] = x[rad]  * (180/3.14)
-	//
-	// angle_a_1 = (- (* (asin -0.77) (/ 180.0 3.14))   0) =  -50.4 [degree]
-	// angle_b_1 = (- (* (asin -0.17) (/ 180.0 3.14)) 120) = -129.8 [degree]
-        // angle_c_1 = (- (* (asin  0.92) (/ 180.0 3.14)) 240) = -173.0 [degree]
-	//
-	// period of sin = 360[degree] = 2*3.14[rad]
-	// 
-	//
-	// if (angle_x_1 < 0)   {angle_x_1 = angle_x_1 + 360;}
-	//
-	// angle_a_1 = 309.6
-	// angle_b_1 = 230.2 + 120
-        // angle_c_1 = 187.0 + 240
-	//
-	// if (angle_x_1 < poin_of_zero_cross_sin_x) { angle_x_2 = point_of_symmetry_sin_x_plus  * 2 - angle_x_1;}
-	// else                 { angle_x_2 = point_of_symmetry_sin_x_minus * 2 - angle_x_1;}
-	//
-	// angle_a_2 = 230.4
-	// angle_b_2 = 309.8 + 120
-        // angle_c_2 = 353.0 + 240
-	// 
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-	//
-
-
-
-		
-	// fixme need change math function asin to table function
-	// fixme float -> int
-
-	// http://www.nongnu.org/avr-libc/user-manual/group__avr__math.html
-	// The asin() function computes the principal value of the arc
-	// sine of __x. The returned value is in the range [-pi/2,
-	// pi/2] radians. A domain error occurs for arguments not in
-	// the range [-1, +1].
-	float angle_a = asin(a) * (180/3.14) - angle_a_shift; // - 0
-	float angle_b = asin(b) * (180/3.14) - angle_b_shift; // - 120
-	float angle_c = asin(c) * (180/3.14) - angle_c_shift; // - 240
-	
-
-
-	
-	float diff_1 = 
-	
-	
-	return (angle_a + angle_b + angle_c)/3.0;
-}
-
-boolean unit_test_calculation_angle_from_three_phases()
-{
-	boolean result = true;
-	if (){}
-}
 
 /*
 void turn_analoghall(int diretcion) // not work
