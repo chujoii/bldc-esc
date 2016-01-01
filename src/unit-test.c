@@ -1,7 +1,7 @@
 /*
   unit-test.c --- unit test for check bldc-esk functions
 
-  Copyright (C) 2012 Roman V. Prikhodchenko
+  Copyright (C) 2015 Roman V. Prikhodchenko
 
 
 
