@@ -57,57 +57,66 @@ const float epsilon = 1.0;
 
 int unit_test_calculation_angle_from_three_phases(float test_angle)
 {
-	printf("unit_test_calculation_angle_from_three_phases\n");
-	printf("original_angle=%7.2f\n\n", test_angle);
+	printf("unit_test_calculation_angle_from_three_phases\t");
+	printf("original_angle=%7.2f\t", test_angle);
 	float result = calculation_angle_from_three_phases(sin((test_angle + angle_a_shift) * (3.14/180.0)),
 							   sin((test_angle + angle_b_shift) * (3.14/180.0)),
 							   sin((test_angle + angle_c_shift) * (3.14/180.0)));
 	
 	if (fabs(test_angle - result) < epsilon) {
-		printf("Ok\n\n");
+		printf("Ok\n");
 		return 0;
 	} else {
-		printf("err\n\n");
-		return -1;
+		printf("err\n");
+		return 1;
 	}
 }
 
 int unit_test_cycle_max_diff_from_three(float a, float b, float c, float right_result)
 {
-	printf("unit_test_cycle_max_diff_from_three\n");
+	printf("unit_test_cycle_max_diff_from_three\t");
 
 	float result = cycle_max_diff_from_three(a, b, c, point_of_cycle_max);
 
-	printf("a=%7.2f\tb=%7.2f\tb=%7.2f\tright_result=%7.2f\tcalculated_result=%7.2f\t\n", a, b, c, right_result, result);
+	printf("a=%7.2f\tb=%7.2f\tb=%7.2f\tright_result=%7.2f\tcalculated_result=%7.2f\t", a, b, c, right_result, result);
 
 	if (fabs(right_result - result) < epsilon) {
-		printf("Ok\n\n");
+		printf("Ok\n");
 		return 0;
 	} else {
-		printf("err\n\n");
-		return -1;
+		printf("err\n");
+		return 1;
 	}
 }
 
 
 int main()
 {
-	unit_test_calculation_angle_from_three_phases(0);
-	unit_test_calculation_angle_from_three_phases(3);
-	unit_test_calculation_angle_from_three_phases(30);
-	unit_test_calculation_angle_from_three_phases(60);
-	unit_test_calculation_angle_from_three_phases(90);
-	unit_test_calculation_angle_from_three_phases(120);
-	unit_test_calculation_angle_from_three_phases(150);
-	unit_test_calculation_angle_from_three_phases(180);
-	unit_test_calculation_angle_from_three_phases(210);
-	unit_test_calculation_angle_from_three_phases(240);
-	unit_test_calculation_angle_from_three_phases(270);
-	unit_test_calculation_angle_from_three_phases(300);
-	unit_test_calculation_angle_from_three_phases(330);
-	unit_test_calculation_angle_from_three_phases(360);
+	int count = 0;
+	count += unit_test_calculation_angle_from_three_phases(0);
+	count += unit_test_calculation_angle_from_three_phases(3);
+	count += unit_test_calculation_angle_from_three_phases(30);
+	count += unit_test_calculation_angle_from_three_phases(60);
+	count += unit_test_calculation_angle_from_three_phases(90);
+	count += unit_test_calculation_angle_from_three_phases(120);
+	count += unit_test_calculation_angle_from_three_phases(150);
+	count += unit_test_calculation_angle_from_three_phases(180);
+	count += unit_test_calculation_angle_from_three_phases(210);
+	count += unit_test_calculation_angle_from_three_phases(240);
+	count += unit_test_calculation_angle_from_three_phases(270);
+	count += unit_test_calculation_angle_from_three_phases(300);
+	count += unit_test_calculation_angle_from_three_phases(330);
+	count += unit_test_calculation_angle_from_three_phases(360);
 
-	unit_test_cycle_max_diff_from_three(10.0, 20.0, 30.0,       20.0); // 20-10=10 30-20=10 *30-10=20* -> maxdiff = 20
-	unit_test_cycle_max_diff_from_three(30.0, 32.0, 330.0,      62.0); // 32-30=2 330-32=min(62 298)=62 330-30=min(60 300)=60 -> maxdiff = 61
-	return 0;
+	count += unit_test_cycle_max_diff_from_three(10.0, 20.0, 30.0,       20.0); // 20-10=10 30-20=10 *30-10=20* -> maxdiff = 20
+	count += unit_test_cycle_max_diff_from_three(30.0, 32.0, 330.0,      62.0); // 32-30=2 330-32=min(62 298)=62 330-30=min(60 300)=60 -> maxdiff = 61
+
+
+	if (count == 0){
+			printf("all Ok\n");
+		return 0;
+	} else {
+		printf("error in test\n");
+		return 1;
+	}
 }
