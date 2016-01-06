@@ -85,6 +85,6 @@ int main (){
 	asin_tab(255, 254); // 254 because driver high and low
 			    // transistors - ir2101 does not contains
 			    // generator, and use pwm from high logic
-			    // input for charge bootstrap condensator
+			    // input for charge bootstrap capacitor
 	return 0;
 }

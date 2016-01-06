@@ -48,18 +48,8 @@ boolean debugging = true;
 char buffer [50];
 
 
-// pins:     [1 2] 3 4 5 6 7 8 9 10 11 12 13 A0 A1 A2 A3 A4 A5
-// free pin: [1 2]                     12 13          A3 A4 A5
-// used pin: [1 2] 3 4 5 6 7 8 9 10 11       A0 A1 A2 A3 A4 A5
 
 
-// phase a, b, c
-const int pin_a_hi = 3;
-const int pin_a_lo = 5;
-const int pin_b_hi = 6;
-const int pin_b_lo = 9;
-const int pin_c_hi = 10;
-const int pin_c_lo = 11;
 
 // global interrupt pin
 int pin_global_interrupt = 2;
@@ -79,12 +69,47 @@ const float max_sin_val =  1.0;
 
 const float epsilon = 0.01;
 
+// -------------------------------------- pins --------------------------------------
+/* http://arduino.cc/en/Main/ArduinoBoardDuemilanove
+   On boards other than the Mega, use of the Servo library disables analogWrite() (PWM) functionality on pins 9 and 10.
+   
+   pin  - capability     - function   (if pin without [] == NotConnected)
+   0    - rx             - 
+   1    - tx             - 
+   2    -      ext_int 0 - 
+   3    - pwm, ext_int 1 - 
+  [4]   -                - a_lo
+  [5]   - pwm            - a_hi
+  [6]   - pwm            - b_hi
+  [7]   -                - b_lo
+  [8]   -                - c_lo
+  [9]   - {pwm}          - c_hi
+   10   - {pwm}          - 
+   11   - pwm            - 
+   12   -                - 
+   13   - led            - 
+
+  [A0]  -                - a hall
+  [A1]  -                - b hall
+  [A2]  -                - c hall
+  [A3]  -                - abc current
+   A4   - sda            - 
+   A5   - scl            - 
+*/
+
+const int pin_phase_a_hi = 5; // pwm
+const int pin_phase_a_lo = 4;
+const int pin_phase_b_hi = 6; // pwm
+const int pin_phase_b_lo = 7;
+const int pin_phase_c_hi = 9; // pwm
+const int pin_phase_c_lo = 8;
+
 // ///////////////////////////////////////////// sensors ////////
 
 // Hall a, b, c (or other type of sensor: for example optic)
-//const int analog_pin_a_hall = A0;
-//const int analog_pin_b_hall = A1;
-//const int analog_pin_c_hall = A2;
+const int analog_pin_a_hall = A0;
+const int analog_pin_b_hall = A1;
+const int analog_pin_c_hall = A2;
 
 //const int digital_pin_a_hall = 4;
 //const int digital_pin_b_hall = 7;
@@ -103,16 +128,16 @@ int c_hall_max;
 int c_hall_min;
 int c_hall_zero;
 
-const int analog_pin_a_optocouple = A0;
-const int analog_pin_b_optocouple = A1;
-const int analog_pin_c_optocouple = A2;
+//const int analog_pin_a_optocouple = A0;
+//const int analog_pin_b_optocouple = A1;
+//const int analog_pin_c_optocouple = A2;
 
-const int pin_a_cotrol_optocouple = 4;
-const int pin_b_cotrol_optocouple = 7;
-const int pin_c_cotrol_optocouple = 8;
+//const int pin_a_cotrol_optocouple = 4;
+//const int pin_b_cotrol_optocouple = 7;
+//const int pin_c_cotrol_optocouple = 8;
 
-const byte optocouple_delay = 1; // us   fixme: need experiments
-int optocouple_threshold_level = 128; // fixme: need experiments
+//const byte optocouple_delay = 1; // us   fixme: need experiments
+//int optocouple_threshold_level = 128; // fixme: need experiments
 
 
 // BEMF sensors
@@ -130,7 +155,11 @@ int g_zero_abc_current = 0;
 
 
 const byte pwm_min = 0;
-const byte pwm_max = 255;
+const byte pwm_max = 254; // 254 because driver high and low
+                          // transistors - ir2101 does not contains
+                          // generator, and use pwm from high logic
+                          // input for charge bootstrap capacitor
+
 
 int delay_between_step = 1; // us
 
@@ -211,12 +240,12 @@ void turn_analoghall(int diretcion) // not work
 	int u_control_c_lo = map(state_c_hall, c_hall_min, c_hall_max, -pwm_max, pwm_max); // fixme: need use direction
 
 	//if (u_control_a<0)
-	digitalWrite(pin_a_hi, abs(u_control_a_hi));
-	digitalWrite(pin_a_lo, abs(u_control_a_lo));
-	digitalWrite(pin_b_hi, abs(u_control_b_hi));
-	digitalWrite(pin_b_lo, abs(u_control_b_lo));
-	digitalWrite(pin_c_hi, abs(u_control_c_hi));
-	digitalWrite(pin_c_lo, abs(u_control_c_lo));
+	digitalWrite(pin_phase_a_hi, abs(u_control_a_hi));
+	digitalWrite(pin_phase_a_lo, abs(u_control_a_lo));
+	digitalWrite(pin_phase_b_hi, abs(u_control_b_hi));
+	digitalWrite(pin_phase_b_lo, abs(u_control_b_lo));
+	digitalWrite(pin_phase_c_hi, abs(u_control_c_hi));
+	digitalWrite(pin_phase_c_lo, abs(u_control_c_lo));
 }
 */
 
@@ -271,67 +300,67 @@ void turn_digital(int direction)
 	switch (state_abc_hall) {
 	case B101:
 		// a-hi b-lo
-		analogWrite(pin_a_hi, speed);
-		analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-		analogWrite(pin_b_hi, 0);
-		analogWrite(pin_b_lo, speed); // digitalWrite(pin_b_lo, HIGH)
-		analogWrite(pin_c_hi, 0);
-		analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
+		analogWrite(pin_phase_a_hi, speed);
+		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		analogWrite(pin_phase_b_hi, 0);
+		analogWrite(pin_phase_b_lo, speed); // digitalWrite(pin_phase_b_lo, HIGH)
+		analogWrite(pin_phase_c_hi, 0);
+		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
 		break;
 	case B001:
 		// a-hi c-lo
-		analogWrite(pin_a_hi, speed);
-		analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-		analogWrite(pin_b_hi, 0);
-		analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-		analogWrite(pin_c_hi, 0);
-		analogWrite(pin_c_lo, speed); // digitalWrite(pin_c_lo, HIGH)
+		analogWrite(pin_phase_a_hi, speed);
+		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		analogWrite(pin_phase_b_hi, 0);
+		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		analogWrite(pin_phase_c_hi, 0);
+		analogWrite(pin_phase_c_lo, speed); // digitalWrite(pin_phase_c_lo, HIGH)
 		break;
 	case B011:
 		// b-hi c-lo
-		analogWrite(pin_a_hi, 0);
-		analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-		analogWrite(pin_b_hi, speed);
-		analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-		analogWrite(pin_c_hi, 0);
-		analogWrite(pin_c_lo, speed); // digitalWrite(pin_c_lo, HIGH)
+		analogWrite(pin_phase_a_hi, 0);
+		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		analogWrite(pin_phase_b_hi, speed);
+		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		analogWrite(pin_phase_c_hi, 0);
+		analogWrite(pin_phase_c_lo, speed); // digitalWrite(pin_phase_c_lo, HIGH)
 		break;
 	case B010:
 		// b-hi a-lo
-		analogWrite(pin_a_hi, 0);
-		analogWrite(pin_a_lo, speed); // digitalWrite(pin_a_lo, HIGH)
-		analogWrite(pin_b_hi, speed);
-		analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-		analogWrite(pin_c_hi, 0);
-		analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
+		analogWrite(pin_phase_a_hi, 0);
+		analogWrite(pin_phase_a_lo, speed); // digitalWrite(pin_phase_a_lo, HIGH)
+		analogWrite(pin_phase_b_hi, speed);
+		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		analogWrite(pin_phase_c_hi, 0);
+		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
 		break;
 	case B110:
 		// c-hi a-lo
-		analogWrite(pin_a_hi, 0);
-		analogWrite(pin_a_lo, speed); // digitalWrite(pin_a_lo, HIGH)
-		analogWrite(pin_b_hi, 0);
-		analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-		analogWrite(pin_c_hi, speed);
-		analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
+		analogWrite(pin_phase_a_hi, 0);
+		analogWrite(pin_phase_a_lo, speed); // digitalWrite(pin_phase_a_lo, HIGH)
+		analogWrite(pin_phase_b_hi, 0);
+		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		analogWrite(pin_phase_c_hi, speed);
+		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
 		break;
 	case B100:
 		// c-hi b-lo
-		analogWrite(pin_a_hi, 0);
-		analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-		analogWrite(pin_b_hi, 0);
-		analogWrite(pin_b_lo, speed); // digitalWrite(pin_b_lo, HIGH)
-		analogWrite(pin_c_hi, speed);
-		analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
+		analogWrite(pin_phase_a_hi, 0);
+		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		analogWrite(pin_phase_b_hi, 0);
+		analogWrite(pin_phase_b_lo, speed); // digitalWrite(pin_phase_b_lo, HIGH)
+		analogWrite(pin_phase_c_hi, speed);
+		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
 		break;
 	default: 
 		// 000 111 error
 		// fixme
-		analogWrite(pin_a_hi, 0);
-		analogWrite(pin_a_lo, 0); // digitalWrite(pin_a_lo, LOW)
-		analogWrite(pin_b_hi, 0);
-		analogWrite(pin_b_lo, 0); // digitalWrite(pin_b_lo, LOW)
-		analogWrite(pin_c_hi, 0);
-		analogWrite(pin_c_lo, 0); // digitalWrite(pin_c_lo, LOW)
+		analogWrite(pin_phase_a_hi, 0);
+		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		analogWrite(pin_phase_b_hi, 0);
+		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		analogWrite(pin_phase_c_hi, 0);
+		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
 	}
 	
 }
@@ -345,20 +374,20 @@ void turn_digital(int direction)
 
 void setup()
 {
-	pinMode(pin_a_hi, OUTPUT);
-	pinMode(pin_a_lo, OUTPUT);
-	pinMode(pin_b_hi, OUTPUT);
-	pinMode(pin_b_lo, OUTPUT);
-	pinMode(pin_c_hi, OUTPUT);
-	pinMode(pin_c_lo, OUTPUT);
+	pinMode(pin_phase_a_hi, OUTPUT);
+	pinMode(pin_phase_a_lo, OUTPUT);
+	pinMode(pin_phase_b_hi, OUTPUT);
+	pinMode(pin_phase_b_lo, OUTPUT);
+	pinMode(pin_phase_c_hi, OUTPUT);
+	pinMode(pin_phase_c_lo, OUTPUT);
 	
 	
-	digitalWrite(pin_a_hi, LOW);
-	digitalWrite(pin_a_lo, LOW);
-	digitalWrite(pin_b_hi, LOW);
-	digitalWrite(pin_b_lo, LOW);
-	digitalWrite(pin_c_hi, LOW);
-	digitalWrite(pin_c_lo, LOW);
+	digitalWrite(pin_phase_a_hi, LOW);
+	digitalWrite(pin_phase_a_lo, LOW);
+	digitalWrite(pin_phase_b_hi, LOW);
+	digitalWrite(pin_phase_b_lo, LOW);
+	digitalWrite(pin_phase_c_hi, LOW);
+	digitalWrite(pin_phase_c_lo, LOW);
 	
 	
 	
