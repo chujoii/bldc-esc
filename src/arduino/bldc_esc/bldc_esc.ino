@@ -69,6 +69,9 @@ const float max_sin_val =  1.0;
 
 const float epsilon = 0.01;
 
+float g_angle_abc_shift = -M_PI/4.0; // -360[degree]
+
+
 // -------------------------------------- pins --------------------------------------
 /* http://arduino.cc/en/Main/ArduinoBoardDuemilanove
    On boards other than the Mega, use of the Servo library disables analogWrite() (PWM) functionality on pins 9 and 10.
@@ -77,15 +80,15 @@ const float epsilon = 0.01;
    0    - rx             - 
    1    - tx             - 
    2    -      ext_int 0 - 
-   3    - pwm, ext_int 1 - 
-  [4]   -                - a_lo
-  [5]   - pwm            - a_hi
-  [6]   - pwm            - b_hi
-  [7]   -                - b_lo
-  [8]   -                - c_lo
-  [9]   - {pwm}          - c_hi
-   10   - {pwm}          - 
-   11   - pwm            - 
+  [3]   - pwm, ext_int 1 - c_lo
+   4    -                - 
+  [5]   - pwm            - c_hi
+  [6]   - pwm            - b_lo
+   7    -                - 
+   8    -                - 
+  [9]   - {pwm}          - b_hi
+  [10]  - {pwm}          - a_lo
+  [11]  - pwm            - a_hi
    12   -                - 
    13   - led            - 
 
@@ -97,12 +100,12 @@ const float epsilon = 0.01;
    A5   - scl            - 
 */
 
-const int pin_phase_a_hi = 5; // pwm
-const int pin_phase_a_lo = 4;
-const int pin_phase_b_hi = 6; // pwm
-const int pin_phase_b_lo = 7;
-const int pin_phase_c_hi = 9; // pwm
-const int pin_phase_c_lo = 8;
+const int pin_phase_a_hi = 11; // pwm
+const int pin_phase_a_lo = 10; // pwm
+const int pin_phase_b_hi = 9;  // pwm
+const int pin_phase_b_lo = 6;  // pwm
+const int pin_phase_c_hi = 5;  // pwm
+const int pin_phase_c_lo = 3;  // pwm
 
 // ///////////////////////////////////////////// sensors ////////
 
@@ -119,17 +122,9 @@ const int analog_pin_c_hall = A2;
 const int analog_min = 0;
 const int analog_max = 1023;
 // hall max min level
-int a_hall_max  = analog_min;
-int a_hall_min  = analog_max;
-int a_hall_zero = (analog_max + analog_min)/2;
-
-int b_hall_max  = analog_min;                 
-int b_hall_min  = analog_max;                 
-int b_hall_zero = (analog_max + analog_min)/2;
-
-int c_hall_max  = analog_min;                 
-int c_hall_min 	= analog_max;                 
-int c_hall_zero = (analog_max + analog_min)/2;
+int hall_max  = analog_min;
+int hall_min  = analog_max;
+int hall_zero = (analog_max + analog_min)/2;
 
 //const int analog_pin_a_optocouple = A0;
 //const int analog_pin_b_optocouple = A1;
@@ -164,8 +159,10 @@ const byte pwm_max = 254; // 254 because driver high and low
                           // input for charge bootstrap capacitor
 
 
-int delay_between_step = 1; // us
+const int delay_between_step = 1; // us
 
+const unsigned long print_dt = 100;
+unsigned long time_to_print = 0;
 
 
 #include "/home/chujoii/project/bldc-esc/src/angle-calculation.c"
@@ -217,17 +214,27 @@ boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sens
 }
 
 
-boolean read_hall_sensor(int pin_hall)
+boolean digital_read_hall_sensor(int pin_hall)
 {
 	int hall_val = analogRead(pin_hall);
-	if (a_hall_max < hall_val) {a_hall_max = hall_val;}
-	if (a_hall_min > hall_val) {a_hall_min = hall_val;}
-	a_hall_zero = (a_hall_max + a_hall_min)/2;
+	if (hall_max < hall_val) {hall_max = hall_val;}
+	if (hall_min > hall_val) {hall_min = hall_val;}
+	hall_zero = (hall_max + hall_min)/2;
 
 	//sprintf (buffer, "h = %d (%d)\t", hall_val, hall_val > a_hall_zero);
 	//Serial.print(buffer);
 
-	return hall_val > a_hall_zero;
+	return hall_val > hall_zero;
+}
+
+int analog_read_hall_sensor(int pin_hall)
+{
+	int hall_val = analogRead(pin_hall);
+	if (hall_max < hall_val) {hall_max = hall_val;}
+	if (hall_min > hall_val) {hall_min = hall_val;}
+	hall_zero = (hall_max + hall_min)/2;
+
+	return hall_val;
 }
 
 
@@ -236,34 +243,82 @@ int read_abc_current()
 	return analogRead(analog_pin_abc_current) - g_zero_abc_current;
 }
 
-/*
-void turn_analoghall(int diretcion) // not work
+float fmap(float x, float in_min, float in_max, float out_min, float out_max)
 {
-	// current state of hall sensor
-	int state_a_hall, state_b_hall, state_c_hall;
-	
-	state_a_hall = analogRead(analog_pin_a_hall);
-	state_b_hall = analogRead(analog_pin_b_hall);
-	state_c_hall = analogRead(analog_pin_c_hall);
-	
-	int u_control_a_hi = map(state_a_hall, a_hall_min, a_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-	int u_control_a_lo = map(state_a_hall, a_hall_min, a_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-
-	int u_control_b_hi = map(state_b_hall, b_hall_min, b_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-	int u_control_b_lo = map(state_b_hall, b_hall_min, b_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-
-	int u_control_c_hi = map(state_c_hall, c_hall_min, c_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-	int u_control_c_lo = map(state_c_hall, c_hall_min, c_hall_max, -pwm_max, pwm_max); // fixme: need use direction
-
-	//if (u_control_a<0)
-	digitalWrite(pin_phase_a_hi, abs(u_control_a_hi));
-	digitalWrite(pin_phase_a_lo, abs(u_control_a_lo));
-	digitalWrite(pin_phase_b_hi, abs(u_control_b_hi));
-	digitalWrite(pin_phase_b_lo, abs(u_control_b_lo));
-	digitalWrite(pin_phase_c_hi, abs(u_control_c_hi));
-	digitalWrite(pin_phase_c_lo, abs(u_control_c_lo));
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-*/
+
+void turn_analog(int direction)
+{
+	int speed;
+	speed = abs(direction);
+	
+	
+        // current state of hall sensor
+	int state_a_hall, state_b_hall, state_c_hall;
+
+
+	state_a_hall = analog_read_hall_sensor(analog_pin_a_hall);
+	state_b_hall = analog_read_hall_sensor(analog_pin_b_hall);
+	state_c_hall = analog_read_hall_sensor(analog_pin_c_hall);
+
+	float a1 = state_a_hall;
+	float b1 = state_b_hall;
+	float c1 = state_c_hall;
+	float hmin = hall_min;
+	float hmax = hall_max;
+
+	float normalize_a_hall = fmap(a1, hmin, hmax, -1.0, 1.0);
+	//float normalize_a_hall = fmap((float)state_a_hall, (float)hall_min, (float)hall_max, -1.0, 1.0);
+	float normalize_b_hall = fmap((float)state_b_hall, (float)hall_min, (float)hall_max, -1.0, 1.0);
+	float normalize_c_hall = fmap((float)state_c_hall, (float)hall_min, (float)hall_max, -1.0, 1.0);
+
+	float angle = calculation_angle_from_three_phases(normalize_a_hall, normalize_b_hall, normalize_c_hall);
+
+	//Serial.print(angle);
+	//Serial.print("\t");
+	
+	float phase_a_val = sin(angle - angle_a_shift + g_angle_abc_shift);
+	float phase_b_val = sin(angle - angle_b_shift + g_angle_abc_shift);
+	float phase_c_val = sin(angle - angle_c_shift + g_angle_abc_shift);
+
+	if (phase_a_val>0.0) {
+		digitalWrite(pin_phase_a_lo, LOW);
+		analogWrite (pin_phase_a_hi, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
+		//Serial.print("A");
+		//Serial.print((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+	} else {
+		digitalWrite(pin_phase_a_hi, LOW);
+		analogWrite (pin_phase_a_lo, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
+		//Serial.print("a");
+		//Serial.print((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+	}
+
+	if (phase_b_val>0.0) {
+		digitalWrite(pin_phase_b_lo, LOW);
+		analogWrite (pin_phase_b_hi, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
+		//Serial.print("B");
+		//Serial.print((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+	} else {
+		digitalWrite(pin_phase_b_hi, LOW);
+		analogWrite (pin_phase_b_lo, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
+		//Serial.print("b");
+		//Serial.print((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+	}
+	
+	if (phase_c_val>0.0) {
+		digitalWrite(pin_phase_c_lo, LOW);
+		analogWrite (pin_phase_c_hi, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
+		//Serial.print("C");
+		//Serial.print((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+	} else {
+		digitalWrite(pin_phase_c_hi, LOW);
+		analogWrite (pin_phase_c_lo, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
+		//Serial.print("c");
+		//Serial.print((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+	}
+}
+
 
 
 
@@ -279,9 +334,9 @@ void turn_digital(int direction)
 	boolean state_a_hall, state_b_hall, state_c_hall;
 	byte state_abc_hall = 0;
 
-	state_a_hall = read_hall_sensor(analog_pin_a_hall);
-	state_b_hall = read_hall_sensor(analog_pin_b_hall);
-	state_c_hall = read_hall_sensor(analog_pin_c_hall);
+	state_a_hall = digital_read_hall_sensor(analog_pin_a_hall);
+	state_b_hall = digital_read_hall_sensor(analog_pin_b_hall);
+	state_c_hall = digital_read_hall_sensor(analog_pin_c_hall);
 	
 	state_abc_hall = (state_c_hall<<2) | (state_b_hall<<1) | state_a_hall;
 	
@@ -437,16 +492,26 @@ void setup()
 
 void loop()
 {
-	turn_digital(10);
+	//turn_digital(10);
+	turn_analog(20);
 
 	//sprintf (buffer, "current = %d\t", read_abc_current());
 	//Serial.print(buffer);
 
 	// current state of hall sensor
 	int state_a_hall, state_b_hall, state_c_hall;
-	
 
-	//Serial.println();
-	//delay(100);
+
+
+
+	
+	
+	if (millis() > time_to_print){
+		time_to_print = millis() + print_dt;
+		g_angle_abc_shift = g_angle_abc_shift + 0.001;
+		//Serial.print(g_angle_abc_shift);
+		//Serial.println();
+	}
+	
 	delayMicroseconds(delay_between_step);
 }
