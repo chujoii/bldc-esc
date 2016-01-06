@@ -43,6 +43,11 @@
 
 #include <math.h>
 
+
+boolean debugging = true;
+char buffer [50];
+
+
 // pins:     [1 2] 3 4 5 6 7 8 9 10 11 12 13 A0 A1 A2 A3 A4 A5
 // free pin: [1 2]                     12 13          A3 A4 A5
 // used pin: [1 2] 3 4 5 6 7 8 9 10 11       A0 A1 A2 A3 A4 A5
@@ -59,20 +64,20 @@ const int pin_c_lo = 11;
 // global interrupt pin
 int pin_global_interrupt = 2;
 
-float angle_a_shift =   0.0;  
-float angle_b_shift = 120.0;
-float angle_c_shift = 240.0;
+const float angle_a_shift = 0.0;            //  0.0[degree]
+const float angle_b_shift = M_PI * 2.0/3.0; //120.0[degree]
+const float angle_c_shift = M_PI * 4.0/3.0; //240.0[degree]
 
-const float point_of_symmetry_sin_x_plus  =  90.0;
-const float point_of_symmetry_sin_x_minus = 270.0;
-const float point_of_zero_cross_sin_x     = 180.0;
-const float point_of_cycle_min            =   0.0;
-const float point_of_cycle_max            = 360.0;
-
-const float epsilon = 1.0;
+const float point_of_symmetry_sin_x_plus  = M_PI / 2.0;     // 90.0[degree]
+const float point_of_symmetry_sin_x_minus = M_PI * 3.0/2.0; //270.0[degree]
+const float point_of_zero_cross_sin_x     = M_PI;           //180.0[degree]
+const float point_of_cycle_min            = 0.0;            //  0.0[degree]
+const float point_of_cycle_max            = M_PI * 2.0;     //360.0[degree]
 
 const float min_sin_val = -1.0;
 const float max_sin_val =  1.0;
+
+const float epsilon = 0.01;
 
 // ///////////////////////////////////////////// sensors ////////
 
@@ -119,8 +124,8 @@ int optocouple_threshold_level = 128; // fixme: need experiments
 //const int analog_pin_a_current = A3;
 //const int analog_pin_b_current = A4;
 //const int analog_pin_c_current = A5;
-//const int analog_pin_abc_current = A3;
-
+const int analog_pin_abc_current = A3;
+int g_zero_abc_current = 0;
 
 
 
@@ -179,6 +184,12 @@ boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sens
 	return ((light_current - dark_current) > sensor_threshold_level);
 }
 
+
+int read_abc_current()
+{
+	return analogRead(analog_pin_abc_current) - g_zero_abc_current;
+
+}
 
 /*
 void turn_analoghall(int diretcion) // not work
@@ -354,14 +365,25 @@ void setup()
 	pinMode(pin_a_cotrol_optocouple, OUTPUT);
 	pinMode(pin_b_cotrol_optocouple, OUTPUT);
 	pinMode(pin_c_cotrol_optocouple, OUTPUT);
+
+
+	delay(1000);
+
+	Serial.begin(115200);
 	
 	//analog_hall_level_detect();
+	g_zero_abc_current = read_abc_current();
+
 }
 
 
 void loop()
 {
-	turn_digital(1);
+	//turn_digital(1);
 
+	sprintf (buffer, "current = %d\n", read_abc_current());
+	Serial.print(buffer);
+
+	delay(1000);
 	delayMicroseconds(delay_between_step);
 }

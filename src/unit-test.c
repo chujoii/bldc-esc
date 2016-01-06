@@ -48,24 +48,25 @@
 //#define DEBUG
 
 
-float angle_a_shift =   0.0;  
-float angle_b_shift = 120.0;
-float angle_c_shift = 240.0;
+const float angle_a_shift = 0.0;            //  0.0[degree]
+const float angle_b_shift = M_PI * 2.0/3.0; //120.0[degree]
+const float angle_c_shift = M_PI * 4.0/3.0; //240.0[degree]
 
-const float point_of_symmetry_sin_x_plus  =  90.0;
-const float point_of_symmetry_sin_x_minus = 270.0;
-const float point_of_zero_cross_sin_x     = 180.0;
-const float point_of_cycle_min            =   0.0;
-const float point_of_cycle_max            = 360.0;
-
-const float epsilon = 1.0;
-
-const float test_epsilon = 6.0; // decrease for detect error in max/min values of sin(x+q) q=0,120,270: x+q=30, *90*, 150, 120, *270*, 330
-
-const float dispersion = 0.01; // for "y" from sensor   y=sin(x)
+const float point_of_symmetry_sin_x_plus  = M_PI / 2.0;     // 90.0[degree]
+const float point_of_symmetry_sin_x_minus = M_PI * 3.0/2.0; //270.0[degree]
+const float point_of_zero_cross_sin_x     = M_PI;           //180.0[degree]
+const float point_of_cycle_min            = 0.0;            //  0.0[degree]
+const float point_of_cycle_max            = M_PI * 2.0;     //360.0[degree]
 
 const float min_sin_val = -1.0;
 const float max_sin_val =  1.0;
+
+const float epsilon = 0.01;
+
+const float test_epsilon = 0.062; // (point_of_cycle_max - point_of_cycle_min) / 100.0
+
+const float dispersion = 0.002; // (max_sin_val - min_sin_val) / 1000.0      for "y" from sensor   y=sin(x)
+
 
 float constrain (float x, float minx, float maxx);
 
@@ -91,9 +92,9 @@ int unit_test_calculation_angle_from_three_phases(float test_angle)
 {
 	printf("unit_test_calculation_angle_from_three_phases\t");
 	printf("original_angle=%7.2f\t", test_angle);
-	float result = calculation_angle_from_three_phases(sin((test_angle + angle_a_shift) * (3.14/180.0)),
-							   sin((test_angle + angle_b_shift) * (3.14/180.0)),
-							   sin((test_angle + angle_c_shift) * (3.14/180.0)));
+	float result = calculation_angle_from_three_phases(sin(test_angle + angle_a_shift),
+							   sin(test_angle + angle_b_shift),
+							   sin(test_angle + angle_c_shift));
 	
 	printf("calculated_angle=%7.2f\t", result);
 	if (cycle_max_diff_from_three (test_angle, result, result, point_of_cycle_max) < test_epsilon) {
@@ -109,9 +110,9 @@ int unit_test_rnd_calculation_angle_from_three_phases(float test_angle, float di
 {
 	printf("unit_test_rnd_calculation_angle_from_three_phases\t");
 	printf("original_angle=%7.2f\t", test_angle);
-	float result = calculation_angle_from_three_phases(sin((test_angle + angle_a_shift) * (3.14/180.0)) + frandom(disp) - disp/2.0,
-							   sin((test_angle + angle_b_shift) * (3.14/180.0)) + frandom(disp) - disp/2.0,
-							   sin((test_angle + angle_c_shift) * (3.14/180.0)) + frandom(disp) - disp/2.0);
+	float result = calculation_angle_from_three_phases(sin(test_angle + angle_a_shift) + frandom(disp) - disp/2.0,
+							   sin(test_angle + angle_b_shift) + frandom(disp) - disp/2.0,
+							   sin(test_angle + angle_c_shift) + frandom(disp) - disp/2.0);
 	
 	printf("calculated_angle=%7.2f\t", result);
 	if (cycle_max_diff_from_three (test_angle, result, result, point_of_cycle_max) < test_epsilon) {
@@ -153,44 +154,46 @@ int main()
 	time_t t;
 	srand((unsigned) time(&t)); // fixme many start in one time == not unique numbers
 
-   
 	
-	counter(unit_test_calculation_angle_from_three_phases(0));
-	counter(unit_test_calculation_angle_from_three_phases(3));
-	counter(unit_test_calculation_angle_from_three_phases(30));
-	counter(unit_test_calculation_angle_from_three_phases(60));
-	counter(unit_test_calculation_angle_from_three_phases(90));
-	counter(unit_test_calculation_angle_from_three_phases(120));
-	counter(unit_test_calculation_angle_from_three_phases(150));
-	counter(unit_test_calculation_angle_from_three_phases(180));
-	counter(unit_test_calculation_angle_from_three_phases(210));
-	counter(unit_test_calculation_angle_from_three_phases(240));
-	counter(unit_test_calculation_angle_from_three_phases(270));
-	counter(unit_test_calculation_angle_from_three_phases(300));
-	counter(unit_test_calculation_angle_from_three_phases(330));
-	counter(unit_test_calculation_angle_from_three_phases(360));
+	counter(unit_test_calculation_angle_from_three_phases(0));               // 0[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI/60));         // 3[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI/6.0));        // 30[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI/3.0));        // 60[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI/2.0));        // 90[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 2.0/3.0));  // 120[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 5.0/6.0));  // 150[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI));            // 180[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 7.0/6.0));  // 210[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 4.0/3.0));  // 240[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 3.0/2.0));  // 270[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 5.0/3.0));  // 300[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 11.0/6.0)); // 330[degree]
+	counter(unit_test_calculation_angle_from_three_phases(M_PI * 2.0));      // 360[degree]
 	
 	int i;
 	for(i = 0; i < 1000; ++i)
 	{
-		counter(unit_test_rnd_calculation_angle_from_three_phases(0, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(3, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(30, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(60, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(90, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(120, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(150, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(180, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(210, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(240, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(270, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(300, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(330, dispersion));
-		counter(unit_test_rnd_calculation_angle_from_three_phases(360, dispersion));
+		counter(unit_test_rnd_calculation_angle_from_three_phases(0, dispersion)); // 0[degree]
+
+
+		counter(unit_test_rnd_calculation_angle_from_three_phases(0,               dispersion)); // 0[degree]  
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/60,         dispersion)); // 3[degree]  
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/6.0,        dispersion)); // 30[degree] 
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/3.0,        dispersion)); // 60[degree] 
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/2.0,        dispersion)); // 90[degree] 
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 2.0/3.0,  dispersion)); // 120[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 5.0/6.0,  dispersion)); // 150[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI,            dispersion)); // 180[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 7.0/6.0,  dispersion)); // 210[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 4.0/3.0,  dispersion)); // 240[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 3.0/2.0,  dispersion)); // 270[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 5.0/3.0,  dispersion)); // 300[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 11.0/6.0, dispersion)); // 330[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 2.0,      dispersion)); // 360[degree]
 	}
-	
-	counter(unit_test_cycle_max_diff_from_three(10.0, 20.0, 30.0,       20.0)); // 20-10=10 30-20=10 *30-10=20* -> maxdiff = 20
-	counter(unit_test_cycle_max_diff_from_three(30.0, 32.0, 330.0,      62.0)); // 32-30=2 330-32=min(62 298)=62 330-30=min(60 300)=60 -> maxdiff = 61
+
+	counter(unit_test_cycle_max_diff_from_three(0.1, 0.2, 0.3,      0.2)); // 0.2-0.1=0.1   0.3-0.2=0.1   0.3-0.1=0.2 -> maxdiff = 0.2
+	counter(unit_test_cycle_max_diff_from_three(0.1, 0.2, 6.2,      0.283185)); // 0.2-0.1=0.1   6.2-0.1=min(0.183185 6.1)=0.183185   6.2-0.2=min(0.283185 6.0)=0.283185 -> maxdiff = 0.283185
 	
 
 

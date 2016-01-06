@@ -79,7 +79,7 @@ float cycle_max_diff_from_three (float a, float b, float c, float cycle)
 float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2, float epsilon)
 {
 	float min_angle_diff = point_of_cycle_max;
-	float result_angle = 0.0;
+	float result_angle = point_of_cycle_min;
 	float tmp_diff;
 	
 	tmp_diff = cycle_max_diff_from_three(a1, b1, c1, point_of_cycle_max);
@@ -163,10 +163,10 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	// x = ?
 
 
-	// all value in degree
+	// all value in radian
 	//
 	// Each arc sine gives two solutions for the period.
-	// for example real_motor_angle = 230 (degree)
+	// for example real_motor_angle = 230 [degree] = 4 [rad]
 	// and we need calculate motor_angle
 	//
 	// read a, b, c from sensors:
@@ -178,16 +178,16 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	// x[rad]  = x[grad] * (3.14/180)
         // x[grad] = x[rad]  * (180/3.14)
 	//
-	float angle_a_1 = asin(constrain(a, min_sin_val, max_sin_val)) * (180/3.14);
-	float angle_b_1 = asin(constrain(b, min_sin_val, max_sin_val)) * (180/3.14);
-	float angle_c_1 = asin(constrain(c, min_sin_val, max_sin_val)) * (180/3.14);
+	float angle_a_1 = asin(constrain(a, min_sin_val, max_sin_val));
+	float angle_b_1 = asin(constrain(b, min_sin_val, max_sin_val));
+	float angle_c_1 = asin(constrain(c, min_sin_val, max_sin_val));
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
-	// angle_a_1= -50.38	angle_b_1=-129.79	angle_c_1=-173.04
+	// angle_a_1= -50.38[degree]	angle_b_1=-129.79[degree]	angle_c_1=-173.04[degree]
 
 	DEBUG_PRINT(("a-0\tb-120\tc-240\n"));
-	angle_a_1 = angle_a_1 - angle_a_shift; // - 0
-	angle_b_1 = angle_b_1 - angle_b_shift; // - 120
-	angle_c_1 = angle_c_1 - angle_c_shift; // - 240
+	angle_a_1 = angle_a_1 - angle_a_shift; // - 0[degree] = 0[rad]
+	angle_b_1 = angle_b_1 - angle_b_shift; // - 120[degree] = pi*2/3[rad]
+	angle_c_1 = angle_c_1 - angle_c_shift; // - 240[degree] = pi*4/3[rad]
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
 
 	
@@ -196,11 +196,11 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	// 
 	//
 	DEBUG_PRINT(("cycle constrain\n"));
-	angle_a_1 = cycle_constrain_angle(angle_a_1, 0.0, point_of_cycle_max);
-	angle_b_1 = cycle_constrain_angle(angle_b_1, 0.0, point_of_cycle_max);
-	angle_c_1 = cycle_constrain_angle(angle_c_1, 0.0, point_of_cycle_max);
+	angle_a_1 = cycle_constrain_angle(angle_a_1, point_of_cycle_min, point_of_cycle_max);
+	angle_b_1 = cycle_constrain_angle(angle_b_1, point_of_cycle_min, point_of_cycle_max);
+	angle_c_1 = cycle_constrain_angle(angle_c_1, point_of_cycle_min, point_of_cycle_max);
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
-	// angle_a_1= 309.62	angle_b_1= 230.21	angle_c_1= 186.96
+	// angle_a_1= 309.62[degree]	angle_b_1= 230.21[degree]	angle_c_1= 186.96[degree]
 	//
 	float angle_a_2;
 	float angle_b_2;
@@ -229,12 +229,12 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 		DEBUG_PRINT(("c biger\t\t"));
 		angle_c_2 = (point_of_symmetry_sin_x_minus - angle_c_shift) * 2 - angle_c_1;
 	}
-	DEBUG_PRINT(("%7.2f\n", cycle_constrain_angle(point_of_zero_cross_sin_x - angle_c_shift, 0.0, 360)));
+	DEBUG_PRINT(("%7.2f\n", cycle_constrain_angle(point_of_zero_cross_sin_x - angle_c_shift, point_of_cycle_min, point_of_cycle_max)));
 	DEBUG_PRINT(("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n", angle_a_2, angle_b_2, angle_c_2));
 
-	angle_a_2 = cycle_constrain_angle(angle_a_2, 0.0, point_of_cycle_max);
-	angle_b_2 = cycle_constrain_angle(angle_b_2, 0.0, point_of_cycle_max);
-	angle_c_2 = cycle_constrain_angle(angle_c_2, 0.0, point_of_cycle_max);
+	angle_a_2 = cycle_constrain_angle(angle_a_2, point_of_cycle_min, point_of_cycle_max);
+	angle_b_2 = cycle_constrain_angle(angle_b_2, point_of_cycle_min, point_of_cycle_max);
+	angle_c_2 = cycle_constrain_angle(angle_c_2, point_of_cycle_min, point_of_cycle_max);
 	DEBUG_PRINT(("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n\n", angle_a_2, angle_b_2, angle_c_2));
 	// fixme need change math function asin to table function
 	// fixme float -> int
