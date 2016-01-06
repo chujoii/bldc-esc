@@ -115,18 +115,21 @@ const int analog_pin_c_hall = A2;
 //const int digital_pin_b_hall = 7;
 //const int digital_pin_c_hall = 8;
 
+
+const int analog_min = 0;
+const int analog_max = 1023;
 // hall max min level
-int a_hall_max;
-int a_hall_min;
-int a_hall_zero;
+int a_hall_max  = analog_min;
+int a_hall_min  = analog_max;
+int a_hall_zero = (analog_max + analog_min)/2;
 
-int b_hall_max;
-int b_hall_min; 
-int b_hall_zero;
+int b_hall_max  = analog_min;                 
+int b_hall_min  = analog_max;                 
+int b_hall_zero = (analog_max + analog_min)/2;
 
-int c_hall_max;
-int c_hall_min;
-int c_hall_zero;
+int c_hall_max  = analog_min;                 
+int c_hall_min 	= analog_max;                 
+int c_hall_zero = (analog_max + analog_min)/2;
 
 //const int analog_pin_a_optocouple = A0;
 //const int analog_pin_b_optocouple = A1;
@@ -214,10 +217,23 @@ boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sens
 }
 
 
+boolean read_hall_sensor(int pin_hall)
+{
+	int hall_val = analogRead(pin_hall);
+	if (a_hall_max < hall_val) {a_hall_max = hall_val;}
+	if (a_hall_min > hall_val) {a_hall_min = hall_val;}
+	a_hall_zero = (a_hall_max + a_hall_min)/2;
+
+	//sprintf (buffer, "h = %d (%d)\t", hall_val, hall_val > a_hall_zero);
+	//Serial.print(buffer);
+
+	return hall_val > a_hall_zero;
+}
+
+
 int read_abc_current()
 {
 	return analogRead(analog_pin_abc_current) - g_zero_abc_current;
-
 }
 
 /*
@@ -263,24 +279,39 @@ void turn_digital(int direction)
 	boolean state_a_hall, state_b_hall, state_c_hall;
 	byte state_abc_hall = 0;
 
-
-	state_a_hall = read_optic_sensor (pin_a_cotrol_optocouple, analog_pin_a_optocouple, optocouple_delay, optocouple_threshold_level);
-	state_b_hall = read_optic_sensor (pin_b_cotrol_optocouple, analog_pin_b_optocouple, optocouple_delay, optocouple_threshold_level);
-	state_c_hall = read_optic_sensor (pin_c_cotrol_optocouple, analog_pin_c_optocouple, optocouple_delay, optocouple_threshold_level);
+	state_a_hall = read_hall_sensor(analog_pin_a_hall);
+	state_b_hall = read_hall_sensor(analog_pin_b_hall);
+	state_c_hall = read_hall_sensor(analog_pin_c_hall);
 	
-	
-	if (state_a_hall) {state_abc_hall = state_abc_hall & B100;};
-	if (state_b_hall) {state_abc_hall = state_abc_hall & B010;};
-	if (state_c_hall) {state_abc_hall = state_abc_hall & B001;};
+	state_abc_hall = (state_c_hall<<2) | (state_b_hall<<1) | state_a_hall;
 	
 	/*
 	  Switches commutation for rotor rotation
+
+
+
+	  ahall   ---___
+
+	  bhall   __---_
+
+	  chall   -___--
+
+	          __   
+	  aphase    -__-
+
+                    __
+	  bphase  _-  -_
+
+	              __
+	  cphase  -__-
+
 
 	  ahi           bhi           chi
 	  alo           blo           clo
 	  
 
 	  hall        phase     switches
+          cab
 	  101         a-b       a-hi b-lo
 	  001         a-c       a-hi c-lo
 	  011         b-c       b-hi c-lo
@@ -296,73 +327,71 @@ void turn_digital(int direction)
 
 
 	
-	
 	switch (state_abc_hall) {
 	case B101:
-		// a-hi b-lo
+		//a-hi b-lo
 		analogWrite(pin_phase_a_hi, speed);
-		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
-		analogWrite(pin_phase_b_lo, speed); // digitalWrite(pin_phase_b_lo, HIGH)
+		digitalWrite(pin_phase_b_lo, HIGH);
 		analogWrite(pin_phase_c_hi, 0);
-		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
+		digitalWrite(pin_phase_c_lo, LOW);
 		break;
 	case B001:
 		// a-hi c-lo
 		analogWrite(pin_phase_a_hi, speed);
-		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
-		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		digitalWrite(pin_phase_b_lo, LOW);
 		analogWrite(pin_phase_c_hi, 0);
-		analogWrite(pin_phase_c_lo, speed); // digitalWrite(pin_phase_c_lo, HIGH)
+		digitalWrite(pin_phase_c_lo, HIGH);
 		break;
 	case B011:
 		// b-hi c-lo
 		analogWrite(pin_phase_a_hi, 0);
-		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, speed);
-		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		digitalWrite(pin_phase_b_lo, LOW);
 		analogWrite(pin_phase_c_hi, 0);
-		analogWrite(pin_phase_c_lo, speed); // digitalWrite(pin_phase_c_lo, HIGH)
+		digitalWrite(pin_phase_c_lo, HIGH);
 		break;
 	case B010:
 		// b-hi a-lo
 		analogWrite(pin_phase_a_hi, 0);
-		analogWrite(pin_phase_a_lo, speed); // digitalWrite(pin_phase_a_lo, HIGH)
+		digitalWrite(pin_phase_a_lo, HIGH);
 		analogWrite(pin_phase_b_hi, speed);
-		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		digitalWrite(pin_phase_b_lo, LOW);
 		analogWrite(pin_phase_c_hi, 0);
-		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
+		digitalWrite(pin_phase_c_lo, LOW);
 		break;
 	case B110:
 		// c-hi a-lo
 		analogWrite(pin_phase_a_hi, 0);
-		analogWrite(pin_phase_a_lo, speed); // digitalWrite(pin_phase_a_lo, HIGH)
+		digitalWrite(pin_phase_a_lo, HIGH);
 		analogWrite(pin_phase_b_hi, 0);
-		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		digitalWrite(pin_phase_b_lo, LOW);
 		analogWrite(pin_phase_c_hi, speed);
-		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
+		digitalWrite(pin_phase_c_lo, LOW);
 		break;
 	case B100:
 		// c-hi b-lo
 		analogWrite(pin_phase_a_hi, 0);
-		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
-		analogWrite(pin_phase_b_lo, speed); // digitalWrite(pin_phase_b_lo, HIGH)
+		digitalWrite(pin_phase_b_lo, HIGH);
 		analogWrite(pin_phase_c_hi, speed);
-		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
+		digitalWrite(pin_phase_c_lo, LOW);
 		break;
-	default: 
+	default:
 		// 000 111 error
 		// fixme
 		analogWrite(pin_phase_a_hi, 0);
-		analogWrite(pin_phase_a_lo, 0); // digitalWrite(pin_phase_a_lo, LOW)
+		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
-		analogWrite(pin_phase_b_lo, 0); // digitalWrite(pin_phase_b_lo, LOW)
+		digitalWrite(pin_phase_b_lo, LOW);
 		analogWrite(pin_phase_c_hi, 0);
-		analogWrite(pin_phase_c_lo, 0); // digitalWrite(pin_phase_c_lo, LOW)
+		digitalWrite(pin_phase_c_lo, LOW);
 	}
-	
 }
 			
 
@@ -390,11 +419,11 @@ void setup()
 	digitalWrite(pin_phase_c_lo, LOW);
 	
 	
-	
+	/*
 	pinMode(pin_a_cotrol_optocouple, OUTPUT);
 	pinMode(pin_b_cotrol_optocouple, OUTPUT);
 	pinMode(pin_c_cotrol_optocouple, OUTPUT);
-
+	*/
 
 	delay(1000);
 
@@ -408,11 +437,16 @@ void setup()
 
 void loop()
 {
-	//turn_digital(1);
+	turn_digital(10);
 
-	sprintf (buffer, "current = %d\n", read_abc_current());
-	Serial.print(buffer);
+	//sprintf (buffer, "current = %d\t", read_abc_current());
+	//Serial.print(buffer);
 
-	delay(1000);
+	// current state of hall sensor
+	int state_a_hall, state_b_hall, state_c_hall;
+	
+
+	//Serial.println();
+	//delay(100);
 	delayMicroseconds(delay_between_step);
 }
