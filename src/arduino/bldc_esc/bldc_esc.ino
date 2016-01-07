@@ -311,25 +311,42 @@ int search_pinout(int speed, unsigned int waiting_time, int change_limit, char t
 
 	
 	boolean one_or_two = true;
+
+	unsigned int delay_time = waiting_time;
+	unsigned int timer = millis() + waiting_time;
 	
 	// wait for stop changes
-	while(abs(x - old_x) + abs(y - old_y) + abs(z - old_z) > change_limit){
-		if (one_or_two) {turn_digital(speed, phase_num_1);} else {turn_digital(speed, phase_num_2);}
+	while((abs(x - old_x) + abs(y - old_y) + abs(z - old_z) > change_limit) && (delay_time > 0)){
+		if (one_or_two) {
+			turn_digital(speed, phase_num_1);
+			one_or_two = !one_or_two;
+		} else {
+			turn_digital(speed, phase_num_2);
+			one_or_two = !one_or_two;
+		}
 		old_x = x;
 		old_y = y;
 		old_z = z;
-		delay(waiting_time);
+		delay(delay_time);
 		x = analog_read_hall_sensor(analog_pin_x_hall);
 		y = analog_read_hall_sensor(analog_pin_y_hall);
 		z = analog_read_hall_sensor(analog_pin_z_hall);
 		//sprintf (buffer, "x=%d\ty=%d\tz=%d\tdiff=%d", x, y, z, abs(x - old_x) + abs(y - old_y) + abs(z - old_z));
 		//Serial.println(buffer);
-		delay(waiting_time);
+		delay(delay_time);
+
+		if (millis() > timer){
+			delay_time--;
+			timer = millis() + waiting_time;
+		}
 	}
 
+	Serial.println(delay_time);
+	
 	if (x > y && x > z) {return analog_pin_x_hall;}
 	if (y > x && y > z) {return analog_pin_y_hall;}
 	if (z > x && z > y) {return analog_pin_z_hall;}
+	return analog_pin_z_hall; // strange
 }
 
 
@@ -572,29 +589,29 @@ void setup()
 	Serial.begin(115200);
 	
 	//analog_hall_level_detect();
+
 	g_zero_abc_current = read_abc_current();
 
 
-	
-	analog_pin_a_hall = search_pinout(10, 100, 1, 'a');
-	sprintf (buffer, "for phase A sensor pin = %d", analog_pin_a_hall);
-	Serial.println(buffer);
-
-	analog_pin_b_hall = search_pinout(10, 100, 1, 'b');
-	sprintf (buffer, "for phase B sensor pin = %d", analog_pin_b_hall);
-	Serial.println(buffer);
-
-	analog_pin_c_hall = search_pinout(10, 100, 1, 'c');
-	sprintf (buffer, "for phase C sensor pin = %d", analog_pin_c_hall);
-	Serial.println(buffer);
-
-	
+	do {
+		analog_pin_a_hall = search_pinout(10, 30, 1, 'a');
+		sprintf (buffer, "for phase A sensor pin = %d", analog_pin_a_hall);
+		Serial.println(buffer);
+		
+		analog_pin_b_hall = search_pinout(10, 30, 1, 'b');
+		sprintf (buffer, "for phase B sensor pin = %d", analog_pin_b_hall);
+		Serial.println(buffer);
+		
+		analog_pin_c_hall = search_pinout(10, 30, 1, 'c');
+		sprintf (buffer, "for phase C sensor pin = %d", analog_pin_c_hall);
+		Serial.println(buffer);
+	} while ((analog_pin_a_hall == analog_pin_b_hall) || (analog_pin_b_hall == analog_pin_c_hall) || (analog_pin_c_hall == analog_pin_a_hall));
+	stop_motor();
 }
 
 
 void loop()
 {
-	stop_motor();
 	//turn_digital(10, digital_read_all_hall_sensors());
 	//turn_analog(20);
 
@@ -616,7 +633,5 @@ void loop()
 		//Serial.println();
 	}
 	*/
-	//Serial.println();
-	delay(100);
 	delayMicroseconds(delay_between_step);
 }
