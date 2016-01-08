@@ -44,7 +44,7 @@
 #include <math.h>
 
 
-boolean debugging = true;
+const boolean debugging = true;
 char buffer [50];
 
 
@@ -52,7 +52,7 @@ char buffer [50];
 
 
 // global interrupt pin
-int pin_global_interrupt = 2;
+const int pin_global_interrupt = 2;
 
 const float angle_a_shift = 0.0;            //  0.0[degree]
 const float angle_b_shift = M_PI * 2.0/3.0; //120.0[degree]
@@ -118,17 +118,14 @@ int analog_pin_a_hall = analog_pin_x_hall;
 int analog_pin_b_hall = analog_pin_y_hall;
 int analog_pin_c_hall = analog_pin_z_hall;
 
-//const int digital_pin_a_hall = 4;
-//const int digital_pin_b_hall = 7;
-//const int digital_pin_c_hall = 8;
-
 
 const int analog_min = 0;
 const int analog_max = 1023;
+
 // hall max min level
-int hall_max  = analog_min;
-int hall_min  = analog_max;
-int hall_zero = (analog_max + analog_min)/2;
+int g_hall_max  = analog_min;
+int g_hall_min  = analog_max;
+int g_hall_zero = (analog_max + analog_min)/2;
 
 //const int analog_pin_a_optocouple = A0;
 //const int analog_pin_b_optocouple = A1;
@@ -166,7 +163,7 @@ const byte pwm_max = 254; // 254 because driver high and low
 const int delay_between_step = 1; // us
 
 const unsigned long print_dt = 100;
-unsigned long time_to_print = 0;
+unsigned long g_time_to_print = 0;
 
 
 #include "/home/chujoii/project/bldc-esc/src/angle-calculation.c"
@@ -220,15 +217,7 @@ boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sens
 
 boolean digital_read_hall_sensor(int pin_hall)
 {
-	int hall_val = analogRead(pin_hall);
-	if (hall_max < hall_val) {hall_max = hall_val;}
-	if (hall_min > hall_val) {hall_min = hall_val;}
-	hall_zero = (hall_max + hall_min)/2;
-
-	//sprintf (buffer, "h = %d (%d)\t", hall_val, hall_val > hall_zero);
-	//Serial.print(buffer);
-
-	return hall_val > hall_zero;
+	return analog_read_hall_sensor(pin_hall) > (g_hall_max + g_hall_min)/2; // g_hall_zero
 }
 
 
@@ -252,9 +241,8 @@ byte digital_read_all_hall_sensors()
 int analog_read_hall_sensor(int pin_hall)
 {
 	int hall_val = analogRead(pin_hall);
-	if (hall_max < hall_val) {hall_max = hall_val;}
-	if (hall_min > hall_val) {hall_min = hall_val;}
-	hall_zero = (hall_max + hall_min)/2;
+	if (g_hall_max < hall_val) {g_hall_max = hall_val;}
+	if (g_hall_min > hall_val) {g_hall_min = hall_val;}
 
 	return hall_val;
 }
@@ -374,9 +362,9 @@ void turn_analog(int direction)
 	state_b_hall = analog_read_hall_sensor(analog_pin_b_hall);
 	state_c_hall = analog_read_hall_sensor(analog_pin_c_hall);
 
-	float normalize_a_hall = fmap((float)state_a_hall, (float)hall_min, (float)hall_max, -1.0, 1.0);
-	float normalize_b_hall = fmap((float)state_b_hall, (float)hall_min, (float)hall_max, -1.0, 1.0);
-	float normalize_c_hall = fmap((float)state_c_hall, (float)hall_min, (float)hall_max, -1.0, 1.0);
+	float normalize_a_hall = fmap((float)state_a_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
+	float normalize_b_hall = fmap((float)state_b_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
+	float normalize_c_hall = fmap((float)state_c_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
 
 	float angle = calculation_angle_from_three_phases(normalize_a_hall, normalize_b_hall, normalize_c_hall);
 
@@ -626,8 +614,8 @@ void loop()
 
 	
 	/*
-	if (millis() > time_to_print){
-		time_to_print = millis() + print_dt;
+	if (millis() > g_time_to_print){
+		g_time_to_print = millis() + print_dt;
 		g_angle_abc_shift = g_angle_abc_shift + 0.001;
 		//Serial.print(g_angle_abc_shift);
 		//Serial.println();
