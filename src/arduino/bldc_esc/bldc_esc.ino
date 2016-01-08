@@ -77,12 +77,15 @@ const float max_sin_val =  1.0;
 
 const float epsilon = 0.01;
 
-float g_angle_abc_shift = M_PI/6.0; // M_PI/6.0 = 30[degree] for ccw     or     M_PI*7.0/6.0 = 210[degree] for cw
+const float   g_analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
+const float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
+const boolean g_digital_abc_shift_cw  = true;         // !=0 true for cw
+const boolean g_digital_abc_shift_ccw = false;        // ==0 false for ccw
+float g_analog_abc_fine_tune_angle_shift = 0.0;                       // to fine-tune the angle of shift
 
 float g_old_analog_angle = 0.0;
 byte g_old_digital_angle = 0;
 
-boolean g_clockwise = false; // false for ccw    or    true for cw
 
 long int g_turn_counter = 0;
 
@@ -225,6 +228,10 @@ void analog_hall_level_detect() // need rotate rotor by hand ~10 sec
 }
 */
 
+boolean sign (int x)
+{
+	if (x>=0) {return true;} else {return false;}
+}
 
 boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sensor_delay, int sensor_threshold_level)
 {
@@ -370,11 +377,18 @@ void stop_motor()
 	digitalWrite(pin_phase_c_lo, LOW);
 }
 
-void turn_analog(int direction)
+void turn_analog(int velocity)
 {
-	int speed;
-	speed = abs(direction);
+	int speed; // speed = scalar absolute value (magnitude) of velocity
+	speed = abs(velocity);
+
+	float angle_shift;
 	
+	if (velocity>0) {
+		angle_shift = g_analog_abc_shift_cw  + g_analog_abc_fine_tune_angle_shift;
+	} else {
+		angle_shift = g_analog_abc_shift_ccw + g_analog_abc_fine_tune_angle_shift;
+	}
 	
         // current state of hall sensor
 	float state_a_hall, state_b_hall, state_c_hall;
@@ -393,9 +407,9 @@ void turn_analog(int direction)
 	//DEBUGA_PRINT(angle);
 	//DEBUGA_PRINT("\t");
 	
-	float phase_a_val = sin(angle + angle_a_shift + g_angle_abc_shift);
-	float phase_b_val = sin(angle + angle_b_shift + g_angle_abc_shift);
-	float phase_c_val = sin(angle + angle_c_shift + g_angle_abc_shift);
+	float phase_a_val = sin(angle + angle_a_shift + angle_shift);
+	float phase_b_val = sin(angle + angle_b_shift + angle_shift);
+	float phase_c_val = sin(angle + angle_c_shift + angle_shift);
 
 	if (phase_a_val>0.0) {
 		digitalWrite(pin_phase_a_lo, LOW);
@@ -450,7 +464,7 @@ void turn_analog(int direction)
 
 
 
-void turn_digital(int direction, byte digital_angle)
+void turn_digital(int velocity, byte digital_angle)
 {
 	/*
 	  digital_angle:
@@ -462,9 +476,8 @@ void turn_digital(int direction, byte digital_angle)
 	  B100 = 4 -bC
 	*/
 	
-	byte speed;
-	
-	speed = abs(direction);
+	byte speed; // speed = scalar absolute value (magnitude) of velocity
+	speed = abs(velocity);
 
 	
 	/*
@@ -507,7 +520,7 @@ void turn_digital(int direction, byte digital_angle)
 	 */
 
 
-	if (g_clockwise){
+	if (sign(velocity) == g_digital_abc_shift_cw){
 		// fixme
 		switch (digital_angle) {
 		case B101:
@@ -623,14 +636,14 @@ void turn_digital(int direction, byte digital_angle)
 void find_best_angle_shift(){
 		if (abs(g_turn_counter - g_old_turn_counter) > g_best_turn_counter) {
 			g_best_turn_counter = abs(g_turn_counter - g_old_turn_counter);
-			g_best_angle_abc_shift = g_angle_abc_shift;
+			g_best_angle_abc_shift = g_analog_abc_fine_tune_angle_shift;
 		}
 		
 
-		g_angle_abc_shift = g_angle_abc_shift + 0.01;
+		g_analog_abc_fine_tune_angle_shift = g_analog_abc_fine_tune_angle_shift + 0.01;
 
 		
-		//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+		//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_analog_abc_fine_tune_angle_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
 
 		//DEBUGA_PRINT("best_angle_shift = "); DEBUGA_PRINT(g_best_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
 
@@ -647,7 +660,7 @@ void find_best_angle_shift(){
 
 
 		// simple 2 column
-		DEBUGA_PRINT(g_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+		DEBUGA_PRINT(g_analog_abc_fine_tune_angle_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
 		sprintf (buffer, "%ld", g_turn_counter - g_old_turn_counter);
 		DEBUGA_PRINT(buffer);
 		
@@ -724,8 +737,8 @@ void loop()
 
 		//find_best_angle_shift();
 
-		//g_angle_abc_shift = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
-		//Serial.print("angle_shift = "); Serial.print(g_angle_abc_shift); Serial.print("\t"); // strange sprintf not work
+		//g_analog_abc_fine_tune_angle_shift = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
+		//Serial.print("angle_shift = "); Serial.print(g_analog_abc_fine_tune_angle_shift); Serial.print("\t"); // strange sprintf not work
 
 		
 		//Serial.println();
