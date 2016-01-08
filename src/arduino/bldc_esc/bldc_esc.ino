@@ -44,7 +44,15 @@
 #include <math.h>
 
 
-const boolean debugging = true;
+//#define DEBUGA
+
+
+#ifdef DEBUGA
+ #define DEBUGA_PRINT(x)  Serial.print (x)
+#else
+ #define DEBUGA_PRINT(x)
+#endif
+
 char buffer [50];
 
 
@@ -69,7 +77,21 @@ const float max_sin_val =  1.0;
 
 const float epsilon = 0.01;
 
-float g_angle_abc_shift = -M_PI/4.0; // -360[degree]
+float g_angle_abc_shift = M_PI/6.0; // M_PI/6.0 = 30[degree] for ccw     or     M_PI*7.0/6.0 = 210[degree] for cw
+
+float g_old_analog_angle = 0.0;
+byte g_old_digital_angle = 0;
+
+boolean g_clockwise = false; // false for ccw    or    true for cw
+
+long int g_turn_counter = 0;
+
+// fixme
+float g_best_angle_abc_shift = 0;
+long int g_best_turn_counter = 0;
+long int g_old_turn_counter = 0;
+
+
 
 
 // -------------------------------------- pins --------------------------------------
@@ -162,7 +184,7 @@ const byte pwm_max = 254; // 254 because driver high and low
 
 const int delay_between_step = 1; // us
 
-const unsigned long print_dt = 100;
+const unsigned long print_dt = 200;
 unsigned long g_time_to_print = 0;
 
 
@@ -368,57 +390,70 @@ void turn_analog(int direction)
 
 	float angle = calculation_angle_from_three_phases(normalize_a_hall, normalize_b_hall, normalize_c_hall);
 
-	//Serial.print(angle);
-	//Serial.print("\t");
+	//DEBUGA_PRINT(angle);
+	//DEBUGA_PRINT("\t");
 	
-	float phase_a_val = sin(angle - angle_a_shift + g_angle_abc_shift);
-	float phase_b_val = sin(angle - angle_b_shift + g_angle_abc_shift);
-	float phase_c_val = sin(angle - angle_c_shift + g_angle_abc_shift);
+	float phase_a_val = sin(angle + angle_a_shift + g_angle_abc_shift);
+	float phase_b_val = sin(angle + angle_b_shift + g_angle_abc_shift);
+	float phase_c_val = sin(angle + angle_c_shift + g_angle_abc_shift);
 
 	if (phase_a_val>0.0) {
 		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite (pin_phase_a_hi, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
-		Serial.print("A");
-		//Serial.print((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+		if (phase_a_val<0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(A");}
+		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	} else {
 		digitalWrite(pin_phase_a_hi, LOW);
 		analogWrite (pin_phase_a_lo, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
-		Serial.print("a");
-		//Serial.print((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+		if (phase_a_val>0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(a");}
+		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	}
 
 	if (phase_b_val>0.0) {
 		digitalWrite(pin_phase_b_lo, LOW);
 		analogWrite (pin_phase_b_hi, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
-		Serial.print("B");
-		//Serial.print((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+		if (phase_b_val<0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("B");}
+		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	} else {
 		digitalWrite(pin_phase_b_hi, LOW);
 		analogWrite (pin_phase_b_lo, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
-		Serial.print("b");
-		//Serial.print((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+		if (phase_b_val>0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("b");}
+		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	}
 	
 	if (phase_c_val>0.0) {
 		digitalWrite(pin_phase_c_lo, LOW);
 		analogWrite (pin_phase_c_hi, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
-		Serial.print("C");
-		//Serial.print((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+		if (phase_c_val<0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("C)\t");}
+		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	} else {
 		digitalWrite(pin_phase_c_hi, LOW);
 		analogWrite (pin_phase_c_lo, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
-		Serial.print("c");
-		//Serial.print((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));Serial.print("\t");
+		if (phase_c_val>0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("c)\t");}
+		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	}
+
+	// fixme: need minimum 3 measurement by each turn:
+	// what happend if number of measurement less than 3?
+	// rigth answer motor stop because control become incorrect
+	//
+	//  g_old_analog_angle < 120[degree]     &&  angle > 240[degree]
+	if (g_old_analog_angle < angle_b_shift   &&  angle > angle_c_shift){ g_turn_counter++;}
+	//
+	//  g_old_analog_angle > 240[degree]     &&  angle < 120[degree]
+	if (g_old_analog_angle > angle_c_shift   &&  angle < angle_b_shift){ g_turn_counter--;}
+	
+	g_old_analog_angle = angle;
+
 }
 
 
 
 
-void turn_digital(int direction, byte state_abc_hall)
+void turn_digital(int direction, byte digital_angle)
 {
 	/*
-	  state_abc_hall:
+	  digital_angle:
 	  B101 = 5 Ab-
 	  B001 = 1 A-c
 	  B011 = 3 -Bc
@@ -458,7 +493,7 @@ void turn_digital(int direction, byte state_abc_hall)
 	  
 
 	  hall        phase     switches
-          cab
+
 	  101         a-b       a-hi b-lo
 	  001         a-c       a-hi c-lo
 	  011         b-c       b-hi c-lo
@@ -472,12 +507,44 @@ void turn_digital(int direction, byte state_abc_hall)
 	 */
 
 
+	if (g_clockwise){
+		// fixme
+		switch (digital_angle) {
+		case B101:
+			digital_angle = B001;
+			break;
+		case B001:
+			digital_angle = B011;
+			break;
+		case B011:
+			digital_angle = B010;
+			break;
+		case B010:
+			digital_angle = B110;
+			break;
+		case B110:
+			digital_angle = B100;
+			break;
+		case B100:
+			digital_angle = B101;
+			break;
+		}
+	}
+
+
+
+
+
+
+
+
 
 	
-	switch (state_abc_hall) {
+	
+	switch (digital_angle) {
 	case B101:
 		//a-hi b-lo
-		//Serial.println("Ab-");
+		DEBUGA_PRINT("[Ab-]\t");
 		analogWrite(pin_phase_a_hi, speed);
 		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
@@ -487,7 +554,7 @@ void turn_digital(int direction, byte state_abc_hall)
 		break;
 	case B001:
 		// a-hi c-lo
-		//Serial.println("A-c");
+		DEBUGA_PRINT("[A-c]\t");
 		analogWrite(pin_phase_a_hi, speed);
 		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
@@ -497,7 +564,7 @@ void turn_digital(int direction, byte state_abc_hall)
 		break;
 	case B011:
 		// b-hi c-lo
-		//Serial.println("-Bc");
+		DEBUGA_PRINT("[-Bc]\t");
 		analogWrite(pin_phase_a_hi, 0);
 		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, speed);
@@ -507,7 +574,7 @@ void turn_digital(int direction, byte state_abc_hall)
 		break;
 	case B010:
 		// b-hi a-lo
-		//Serial.println("aB-");
+		DEBUGA_PRINT("[aB-]\t");
 		analogWrite(pin_phase_a_hi, 0);
 		digitalWrite(pin_phase_a_lo, HIGH);
 		analogWrite(pin_phase_b_hi, speed);
@@ -517,7 +584,7 @@ void turn_digital(int direction, byte state_abc_hall)
 		break;
 	case B110:
 		// c-hi a-lo
-		//Serial.println("a-C");
+		DEBUGA_PRINT("[a-C]\t");
 		analogWrite(pin_phase_a_hi, 0);
 		digitalWrite(pin_phase_a_lo, HIGH);
 		analogWrite(pin_phase_b_hi, 0);
@@ -527,7 +594,7 @@ void turn_digital(int direction, byte state_abc_hall)
 		break;
 	case B100:
 		// c-hi b-lo
-		//Serial.println("-bC");
+		DEBUGA_PRINT("[-bC]\t");
 		analogWrite(pin_phase_a_hi, 0);
 		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
@@ -538,7 +605,7 @@ void turn_digital(int direction, byte state_abc_hall)
 	default:
 		// 000 111 error
 		// fixme
-		//Serial.println("---");
+		DEBUGA_PRINT("[---]\t");
 		analogWrite(pin_phase_a_hi, 0);
 		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite(pin_phase_b_hi, 0);
@@ -546,8 +613,47 @@ void turn_digital(int direction, byte state_abc_hall)
 		analogWrite(pin_phase_c_hi, 0);
 		digitalWrite(pin_phase_c_lo, LOW);
 	}
+
+	if (g_old_digital_angle == B101 && digital_angle == B100){ g_turn_counter++;}
+	if (g_old_digital_angle == B100 && digital_angle == B101){ g_turn_counter--;}
+	g_old_digital_angle = digital_angle;
 }
 
+
+void find_best_angle_shift(){
+		if (abs(g_turn_counter - g_old_turn_counter) > g_best_turn_counter) {
+			g_best_turn_counter = abs(g_turn_counter - g_old_turn_counter);
+			g_best_angle_abc_shift = g_angle_abc_shift;
+		}
+		
+
+		g_angle_abc_shift = g_angle_abc_shift + 0.01;
+
+		
+		//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+
+		//DEBUGA_PRINT("best_angle_shift = "); DEBUGA_PRINT(g_best_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+
+		//sprintf (buffer, "turn_diff = %d\t", abs(g_turn_counter - g_old_turn_counter));
+		//DEBUGA_PRINT(buffer);
+		
+		//sprintf (buffer, "best_turn = %d\t", g_best_turn_counter);
+		//DEBUGA_PRINT(buffer);
+
+
+		//sprintf (buffer, "turn = %d\t", g_turn_counter);
+		//DEBUGA_PRINT(buffer);
+
+
+
+		// simple 2 column
+		DEBUGA_PRINT(g_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+		sprintf (buffer, "%ld", g_turn_counter - g_old_turn_counter);
+		DEBUGA_PRINT(buffer);
+		
+		
+		g_old_turn_counter = g_turn_counter;
+}
 
 
 			
@@ -580,7 +686,7 @@ void setup()
 
 	g_zero_abc_current = read_abc_current();
 
-
+	
 	do {
 		analog_pin_a_hall = search_pinout(10, 30, 1, 'a');
 		sprintf (buffer, "for phase A sensor pin = %d", analog_pin_a_hall);
@@ -594,32 +700,39 @@ void setup()
 		sprintf (buffer, "for phase C sensor pin = %d", analog_pin_c_hall);
 		Serial.println(buffer);
 	} while ((analog_pin_a_hall == analog_pin_b_hall) || (analog_pin_b_hall == analog_pin_c_hall) || (analog_pin_c_hall == analog_pin_a_hall));
+
+
+
+	
+	
 	stop_motor();
 }
 
 
 void loop()
 {
+	turn_analog(20);
 	//turn_digital(10, digital_read_all_hall_sensors());
-	//turn_analog(20);
-
-	//sprintf (buffer, "current = %d\t", read_abc_current());
-	//Serial.print(buffer);
-
-	// current state of hall sensor
-	int state_a_hall, state_b_hall, state_c_hall;
 
 
-
-
-	
-	/*
 	if (millis() > g_time_to_print){
 		g_time_to_print = millis() + print_dt;
-		g_angle_abc_shift = g_angle_abc_shift + 0.001;
-		//Serial.print(g_angle_abc_shift);
+		
+
+		//sprintf (buffer, "current = %d\t", read_abc_current());
+		//DEBUGA_PRINT(buffer);
+
+		//find_best_angle_shift();
+
+		//g_angle_abc_shift = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
+		//Serial.print("angle_shift = "); Serial.print(g_angle_abc_shift); Serial.print("\t"); // strange sprintf not work
+
+		
 		//Serial.println();
 	}
-	*/
+
+	
+	//Serial.println();
+	//delay(200);
 	delayMicroseconds(delay_between_step);
 }
