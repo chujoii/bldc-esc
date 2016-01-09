@@ -44,6 +44,7 @@
 #include <math.h>
 
 
+
 //#define DEBUGA
 
 
@@ -58,9 +59,6 @@ char buffer [50];
 
 
 
-
-// global interrupt pin
-const int pin_global_interrupt = 2;
 
 const float angle_a_shift = 0.0;            //  0.0[degree]
 const float angle_b_shift = M_PI * 2.0/3.0; //120.0[degree]
@@ -77,15 +75,16 @@ const float max_sin_val =  1.0;
 
 const float epsilon = 0.01;
 
-const float   g_analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
-const float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
 const boolean g_digital_abc_shift_cw  = true;         // !=0 true for cw
 const boolean g_digital_abc_shift_ccw = false;        // ==0 false for ccw
-float g_analog_abc_fine_tune_angle_shift = 0.0;                       // to fine-tune the angle of shift
+const float   g_analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
+const float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
+float g_analog_abc_fine_tune_angle_shift = 0.0;       // to fine-tune the angle of shift
 
 float g_old_analog_angle = 0.0;
 byte g_old_digital_angle = 0;
 
+float g_old_analog_abc_fine_tune_angle_shift = 0;
 
 long int g_turn_counter = 0;
 
@@ -94,6 +93,46 @@ float g_best_angle_abc_shift = 0;
 long int g_best_turn_counter = 0;
 long int g_old_turn_counter = 0;
 
+// ----------------------------------- limit, ctrl --------------------------------
+
+const byte pwm_min = 0;
+const byte pwm_max = 254; // 254 because driver high and low
+                          // transistors - ir2101 does not contains
+                          // generator, and use pwm from high logic
+                          // input for charge bootstrap capacitor
+
+
+
+const int analog_min = 0;
+const int analog_max = 1023;
+
+
+
+//int g_old_velocity_ctrl = pwm_min;
+int g_velocity_ctrl = pwm_min;
+
+//int g_old_limit_velocity_ctrl = pwm_max;
+int g_limit_speed_ctrl = pwm_max;
+
+
+
+const int hard_limit_voltage = pwm_max;
+
+//int g_old_voltage_ctrl = pwm_min;
+int g_voltage_ctrl = pwm_min;   // motor not run in the start
+
+//int g_old_limit_voltage_ctrl = pwm_max;
+int g_limit_voltage_ctrl = pwm_max;
+
+
+
+const int hard_limit_current = analog_max/2;
+
+//int g_old_current_ctrl = pwm_min;
+int g_current_ctrl = pwm_min;
+
+//int g_old_limit_current_ctrl = pwm_max;
+int g_limit_current_ctrl = pwm_max;
 
 
 
@@ -144,8 +183,6 @@ int analog_pin_b_hall = analog_pin_y_hall;
 int analog_pin_c_hall = analog_pin_z_hall;
 
 
-const int analog_min = 0;
-const int analog_max = 1023;
 
 // hall max min level
 int g_hall_max  = analog_min;
@@ -178,18 +215,15 @@ int g_zero_abc_current = 0;
 
 
 
-const byte pwm_min = 0;
-const byte pwm_max = 254; // 254 because driver high and low
-                          // transistors - ir2101 does not contains
-                          // generator, and use pwm from high logic
-                          // input for charge bootstrap capacitor
-
 
 const int delay_between_step = 1; // us
 
 const unsigned long print_dt = 200;
 unsigned long g_time_to_print = 0;
 
+char g_cmd_line [50];
+int g_cmd_line_max_length = 50;
+int g_cmd_line_length = 0;
 
 #include "/home/chujoii/project/bldc-esc/src/angle-calculation.c"
 
@@ -367,7 +401,7 @@ int search_pinout(int speed, unsigned int waiting_time, int change_limit, char t
 }
 
 
-void stop_motor()
+void free_rotation()
 {
 	digitalWrite(pin_phase_a_hi, LOW);
 	digitalWrite(pin_phase_a_lo, LOW);
@@ -682,7 +716,7 @@ void setup()
 	pinMode(pin_phase_c_lo, OUTPUT);
 	
 	
-	stop_motor();
+	free_rotation();
 	
 	
 	/*
@@ -699,7 +733,7 @@ void setup()
 
 	g_zero_abc_current = read_abc_current();
 
-	
+	/*
 	do {
 		analog_pin_a_hall = search_pinout(10, 30, 1, 'a');
 		sprintf (buffer, "for phase A sensor pin = %d", analog_pin_a_hall);
@@ -713,19 +747,18 @@ void setup()
 		sprintf (buffer, "for phase C sensor pin = %d", analog_pin_c_hall);
 		Serial.println(buffer);
 	} while ((analog_pin_a_hall == analog_pin_b_hall) || (analog_pin_b_hall == analog_pin_c_hall) || (analog_pin_c_hall == analog_pin_a_hall));
-
-
+	*/
 
 	
-	
-	stop_motor();
+	free_rotation();
 }
 
 
 void loop()
 {
-	turn_analog(20);
+	turn_analog(g_voltage_ctrl);
 	//turn_digital(10, digital_read_all_hall_sensors());
+
 
 
 	if (millis() > g_time_to_print){
@@ -738,9 +771,10 @@ void loop()
 		//find_best_angle_shift();
 
 		//g_analog_abc_fine_tune_angle_shift = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
-		//Serial.print("angle_shift = "); Serial.print(g_analog_abc_fine_tune_angle_shift); Serial.print("\t"); // strange sprintf not work
+		//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw  + g_analog_abc_fine_tune_angle_shift); Serial.print("\t"); // only for cw (velocity > 0)
 
-		
+		read_ctrl();
+			
 		//Serial.println();
 	}
 
