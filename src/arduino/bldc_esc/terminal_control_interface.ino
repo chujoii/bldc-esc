@@ -66,7 +66,7 @@ void exec_cmd(char *cmd, int cmd_len)
 	case 'h': // help
 	case 'H':
 		Serial.print("h\t help\n");
-		Serial.print("if print only one char, then printed current value of requested parameter\n");
+		Serial.print("if print only one char, then current value of requested parameter will be printed\n");
 		Serial.print("a 0.1\tangle in radian -6.3 .. 6.3\n");
 		Serial.print("s 2\tvelocity -32768 .. 32767\n");
 		Serial.print("S 3\tlimit speed 0 .. 32767\n");
@@ -79,15 +79,16 @@ void exec_cmd(char *cmd, int cmd_len)
 		if (cmd_len > 2) {
 			g_analog_abc_fine_tune_angle_shift = atof(&cmd[2]);
 		} else {
-			Serial.print("angle = ");
+			Serial.print("angle shift = ");
 			// fixme: if ... g_analog_abc_shift_ccw
 			Serial.print(g_analog_abc_shift_cw);
 			Serial.print("(constanta) + ");
 			Serial.print(g_analog_abc_fine_tune_angle_shift);
-			Serial.println("(you shif)");
+			Serial.println("(you angle shif)");
 		}
 		break;
 	case 's': // velocity
+		main_ctrl_parameter = 's';
 		if (cmd_len > 2) {
 		g_velocity_ctrl = atoi(&cmd[2]);
 		} else {
@@ -104,6 +105,7 @@ void exec_cmd(char *cmd, int cmd_len)
 		}
 		break;
 	case 'v': // voltage
+		main_ctrl_parameter = 'v';
 		if (cmd_len > 2) {
 		g_voltage_ctrl = atoi(&cmd[2]);
 		} else {
@@ -120,6 +122,7 @@ void exec_cmd(char *cmd, int cmd_len)
 		}
 		break;
 	case 'i': // current
+		main_ctrl_parameter = 'i';
 		if (cmd_len > 2) {
 		g_current_ctrl = atoi(&cmd[2]);
 		} else {
