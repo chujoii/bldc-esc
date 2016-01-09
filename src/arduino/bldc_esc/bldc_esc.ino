@@ -87,6 +87,10 @@ byte g_old_digital_angle = 0;
 float g_old_analog_abc_fine_tune_angle_shift = 0;
 
 long int g_turn_counter = 0;
+unsigned long g_old_turn_timer_us = 0;
+unsigned long g_turn_timer_us = 0;
+unsigned long g_halfturn_timer_us = 0;
+
 
 // fixme
 float g_best_angle_abc_shift = 0;
@@ -317,7 +321,8 @@ void loop()
 		//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw  + g_analog_abc_fine_tune_angle_shift); Serial.print("\t"); // only for cw (velocity > 0)
 
 		read_ctrl();
-			
+
+		Serial.print("rpm = "); Serial.println(get_rpm());
 		//Serial.println();
 	}
 

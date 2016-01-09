@@ -42,41 +42,6 @@
 */
 
 
-/*
-void analog_hall_level_detect() // need rotate rotor by hand ~10 sec
-{
-	int startt = millis();
-	
-	// current state of hall sensor
-	int state_a_hall, state_b_hall, state_c_hall;
-	
-	state_a_hall = analogRead(analog_pin_a_hall);
-	state_b_hall = analogRead(analog_pin_b_hall);
-	state_c_hall = analogRead(analog_pin_c_hall);
-
-	a_hall_max = state_a_hall;
-	a_hall_min = state_a_hall;
-	b_hall_max = state_b_hall;
-	b_hall_min = state_b_hall;
-	c_hall_max = state_c_hall;
-	c_hall_min = state_c_hall;
-	
-	while ((millis() - startt) < 10000){
-		state_a_hall = analogRead(analog_pin_a_hall);
-		state_b_hall = analogRead(analog_pin_b_hall);
-		state_c_hall = analogRead(analog_pin_c_hall);
-		if (state_a_hall < a_hall_min) {a_hall_min = state_a_hall;} else {if (state_a_hall > a_hall_max) {a_hall_max = state_a_hall;}}
-		if (state_b_hall < b_hall_min) {b_hall_min = state_b_hall;} else {if (state_b_hall > b_hall_max) {b_hall_max = state_b_hall;}}
-		if (state_c_hall < c_hall_min) {c_hall_min = state_c_hall;} else {if (state_c_hall > c_hall_max) {c_hall_max = state_c_hall;}}
-	}
-	
-	a_hall_zero = (a_hall_max - a_hall_min)>>1; // /2
-	b_hall_zero = (b_hall_max - b_hall_min)>>1; // /2
-	c_hall_zero = (c_hall_max - c_hall_min)>>1; // /2
-	
-}
-*/
-
 boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sensor_delay, int sensor_threshold_level)
 {
 	int dark_current = analogRead(pin_sensor_input);
@@ -148,4 +113,12 @@ float analog_read_angle ()
 int read_abc_current()
 {
 	return analogRead(analog_pin_abc_current) - g_zero_abc_current;
+}
+
+
+
+int get_rpm(){
+	unsigned long full_turn_time = g_turn_timer_us - g_old_turn_timer_us;
+	unsigned long half_turn_time = g_halfturn_timer_us - g_old_turn_timer_us;
+	return (int) (60000000 / max(half_turn_time, full_turn_time));
 }

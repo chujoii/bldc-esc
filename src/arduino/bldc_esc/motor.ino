@@ -187,10 +187,20 @@ void turn_analog(int velocity, float angle)
 	// rigth answer motor stop because control become incorrect
 	//
 	//  g_old_analog_angle < 120[degree]     &&  angle > 240[degree]
-	if (g_old_analog_angle < angle_b_shift   &&  angle > angle_c_shift){ g_turn_counter++;}
+	if (g_old_analog_angle < angle_b_shift   &&  angle > angle_c_shift){
+		g_turn_counter++;
+		g_old_turn_timer_us = g_turn_timer_us;
+		g_turn_timer_us = micros();
+	}
 	//
 	//  g_old_analog_angle > 240[degree]     &&  angle < 120[degree]
-	if (g_old_analog_angle > angle_c_shift   &&  angle < angle_b_shift){ g_turn_counter--;}
+	if (g_old_analog_angle > angle_c_shift   &&  angle < angle_b_shift){
+		g_turn_counter--;
+		g_old_turn_timer_us = g_turn_timer_us;
+		g_turn_timer_us = micros();
+	}
+
+	g_halfturn_timer_us = micros();
 	
 	g_old_analog_angle = angle;
 
@@ -362,8 +372,19 @@ void turn_digital(int velocity, byte digital_angle)
 		digitalWrite(pin_phase_c_lo, LOW);
 	}
 
-	if (g_old_digital_angle == B101 && digital_angle == B100){ g_turn_counter++;}
-	if (g_old_digital_angle == B100 && digital_angle == B101){ g_turn_counter--;}
+	if (g_old_digital_angle == B101 && digital_angle == B100){
+		g_turn_counter++;
+		g_old_turn_timer_us = g_turn_timer_us;
+		g_turn_timer_us = micros();
+	}
+	if (g_old_digital_angle == B100 && digital_angle == B101){
+		g_turn_counter--;
+		g_old_turn_timer_us = g_turn_timer_us;
+		g_turn_timer_us = micros();
+	}
+	
+	g_halfturn_timer_us = micros();
+	
 	g_old_digital_angle = digital_angle;
 }
 
