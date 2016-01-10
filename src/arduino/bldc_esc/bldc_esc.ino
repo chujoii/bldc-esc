@@ -77,14 +77,13 @@ const float epsilon = 0.01;
 
 const boolean g_digital_abc_shift_cw  = true;         // !=0 true for cw
 const boolean g_digital_abc_shift_ccw = false;        // ==0 false for ccw
-const float   g_analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
-const float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
-float g_analog_abc_fine_tune_angle_shift = 0.0;       // to fine-tune the angle of shift
+float   g_analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
+float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
+
 
 float g_old_analog_angle = 0.0;
 byte g_old_digital_angle = 0;
 
-float g_old_analog_abc_fine_tune_angle_shift = 0;
 
 long int g_turn_counter = 0;
 unsigned long g_old_turn_timer_us = 0;
@@ -99,7 +98,8 @@ long int g_old_turn_counter = 0;
 
 // ----------------------------------- limit, ctrl --------------------------------
 
-char main_ctrl_parameter = 'v';
+char g_main_ctrl_parameter = 'u';
+int g_old_ctrl_value = 0;
 
 const byte pwm_min = 0;
 const byte pwm_max = 254; // 254 because driver high and low
@@ -116,6 +116,9 @@ const int analog_max = 1023;
 
 //int g_old_velocity_ctrl = pwm_min;
 int g_velocity_ctrl = pwm_min;
+float g_velocity_ctrl_proportional = 0.1;
+float g_velocity_ctrl_integral = 0.0;
+float g_velocity_ctrl_derivative = 0.0;
 
 //int g_old_limit_velocity_ctrl = pwm_max;
 int g_limit_speed_ctrl = pwm_max;
@@ -126,6 +129,9 @@ const int hard_limit_voltage = pwm_max;
 
 //int g_old_voltage_ctrl = pwm_min;
 int g_voltage_ctrl = pwm_min;   // motor not run in the start
+float g_voltage_ctrl_proportional = 0.1;
+float g_voltage_ctrl_integral = 0.0;
+float g_voltage_ctrl_derivative = 0.0;
 
 //int g_old_limit_voltage_ctrl = pwm_max;
 int g_limit_voltage_ctrl = pwm_max;
@@ -136,6 +142,9 @@ const int hard_limit_current = analog_max/2;
 
 //int g_old_current_ctrl = pwm_min;
 int g_current_ctrl = pwm_min;
+float g_current_ctrl_proportional = 0.1;
+float g_current_ctrl_integral = 0.0;
+float g_current_ctrl_derivative = 0.0;
 
 //int g_old_limit_current_ctrl = pwm_max;
 int g_limit_current_ctrl = pwm_max;
@@ -303,7 +312,7 @@ void setup()
 
 void loop()
 {
-	turn_analog(g_voltage_ctrl, analog_read_angle());
+	turn_analog(apply_pid(), analog_read_angle());
 	//turn_digital(10, digital_read_angle());
 
 
@@ -312,13 +321,13 @@ void loop()
 		g_time_to_print = millis() + print_dt;
 		
 
-		//sprintf (buffer, "current = %d\t", read_abc_current());
-		//DEBUGA_PRINT(buffer);
+		sprintf (buffer, "current = %d\t", read_abc_current());
+		Serial.print(buffer);
 
 		//find_best_angle_shift();
 
-		//g_analog_abc_fine_tune_angle_shift = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
-		//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw  + g_analog_abc_fine_tune_angle_shift); Serial.print("\t"); // only for cw (velocity > 0)
+		//g_analog_abc_shift_cw = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
+		//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw); Serial.print("\t"); // only for cw (velocity > 0)
 
 		read_ctrl();
 

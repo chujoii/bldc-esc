@@ -136,9 +136,9 @@ void turn_analog(int velocity, float angle)
 	float angle_shift;
 	
 	if (velocity>0) {
-		angle_shift = g_analog_abc_shift_cw  + g_analog_abc_fine_tune_angle_shift;
+		angle_shift = g_analog_abc_shift_cw;
 	} else {
-		angle_shift = g_analog_abc_shift_ccw + g_analog_abc_fine_tune_angle_shift;
+		angle_shift = g_analog_abc_shift_ccw;
 	}
 	
 	
@@ -392,14 +392,14 @@ void turn_digital(int velocity, byte digital_angle)
 void find_best_angle_shift(){
 		if (abs(g_turn_counter - g_old_turn_counter) > g_best_turn_counter) {
 			g_best_turn_counter = abs(g_turn_counter - g_old_turn_counter);
-			g_best_angle_abc_shift = g_analog_abc_fine_tune_angle_shift;
+			g_best_angle_abc_shift = g_analog_abc_shift_cw;
 		}
 		
 
-		g_analog_abc_fine_tune_angle_shift = g_analog_abc_fine_tune_angle_shift + 0.01;
+		g_analog_abc_shift_cw = g_analog_abc_shift_cw + 0.01;
 
 		
-		//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_analog_abc_fine_tune_angle_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+		//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
 
 		//DEBUGA_PRINT("best_angle_shift = "); DEBUGA_PRINT(g_best_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
 
@@ -416,7 +416,7 @@ void find_best_angle_shift(){
 
 
 		// simple 2 column
-		DEBUGA_PRINT(g_analog_abc_fine_tune_angle_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+		DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
 		sprintf (buffer, "%ld", g_turn_counter - g_old_turn_counter);
 		DEBUGA_PRINT(buffer);
 		

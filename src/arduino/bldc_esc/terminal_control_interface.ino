@@ -59,83 +59,156 @@ void read_ctrl()
 	}
 }
 
+
+
+
 void exec_cmd(char *cmd, int cmd_len)
 {
+	Serial.print("cmd_len = "); Serial.println(cmd_len);
 	// char + space = 2
 	switch (cmd[0]) {
 	case 'h': // help
 	case 'H':
 		Serial.print("h\t help\n");
 		Serial.print("if print only one char, then current value of requested parameter will be printed\n");
-		Serial.print("a 0.1\tangle in radian -6.3 .. 6.3\n");
+		Serial.print("a 0.1\tangle shift for cw  in radian -6.3 .. 6.3\n");
+		Serial.print("A 0.1\tangle shift for ccw in radian -6.3 .. 6.3\n");
 		Serial.print("s 2\tvelocity -32768 .. 32767\n");
 		Serial.print("S 3\tlimit speed 0 .. 32767\n");
-		Serial.print("v 4\tvoltage (pwm) 0 .. 254\n");
-		Serial.print("V 5\tlimit voltage (pwm) 0 .. 254\n");
+		Serial.print("u 4\tvoltage (pwm) 0 .. 254\n");
+		Serial.print("U 5\tlimit voltage (pwm) 0 .. 254\n");
 		Serial.print("i 6\tcurrent -512 .. 512\n");
 		Serial.print("I 7\tlimit current 0 .. 512\n");
+		Serial.print("x 0.8 0.9 1.0\tproportional integral derivative coefficient for active parameter\n");
 		break;
-	case 'a': // angle
-		if (cmd_len > 2) {
-			g_analog_abc_fine_tune_angle_shift = atof(&cmd[2]);
+	case 'a': // angle cw
+		if (cmd_len > 1) {
+			g_analog_abc_shift_cw = atof(&cmd[2]);
 		} else {
 			Serial.print("angle shift = ");
-			// fixme: if ... g_analog_abc_shift_ccw
-			Serial.print(g_analog_abc_shift_cw);
-			Serial.print("(constanta) + ");
-			Serial.print(g_analog_abc_fine_tune_angle_shift);
-			Serial.println("(you angle shif)");
+			Serial.println(g_analog_abc_shift_cw);
+		}
+		break;
+	case 'A': // angle ccw
+		if (cmd_len > 1) {
+			g_analog_abc_shift_ccw = atof(&cmd[2]);
+		} else {
+			Serial.print("angle shift = ");
+			Serial.println(g_analog_abc_shift_ccw);
 		}
 		break;
 	case 's': // velocity
-		main_ctrl_parameter = 's';
-		if (cmd_len > 2) {
-		g_velocity_ctrl = atoi(&cmd[2]);
+		if (cmd_len > 1) {
+			g_velocity_ctrl = atoi(&cmd[2]);
+			g_main_ctrl_parameter = 's';
 		} else {
 			Serial.print("velocity = ");
 			Serial.println(g_velocity_ctrl);
 		}
 		break;
 	case 'S': // limit speed
-		if (cmd_len > 2) {
+		if (cmd_len > 1) {
 		g_limit_speed_ctrl = atoi(&cmd[2]);
 		} else {
 			Serial.print("limit speed = ");
 			Serial.println(g_limit_speed_ctrl);
 		}
 		break;
-	case 'v': // voltage
-		main_ctrl_parameter = 'v';
-		if (cmd_len > 2) {
-		g_voltage_ctrl = atoi(&cmd[2]);
+	case 'u': // voltage
+		if (cmd_len > 1) {
+			g_voltage_ctrl = atoi(&cmd[2]);
+			g_main_ctrl_parameter = 'u';
 		} else {
 			Serial.print("voltage = ");
 			Serial.println(g_voltage_ctrl);
 		}
 		break;
-	case 'V': // limit velocity
-		if (cmd_len > 2) {
-		g_limit_voltage_ctrl = atoi(&cmd[2]);
+	case 'U': // limit voltage
+		if (cmd_len > 1) {
+			g_limit_voltage_ctrl = atoi(&cmd[2]);
 		} else {
 			Serial.print("limit velocity = ");
 			Serial.println(g_limit_voltage_ctrl);
 		}
 		break;
 	case 'i': // current
-		main_ctrl_parameter = 'i';
-		if (cmd_len > 2) {
-		g_current_ctrl = atoi(&cmd[2]);
+		if (cmd_len > 1) {
+			g_current_ctrl = atoi(&cmd[2]);
+			g_main_ctrl_parameter = 'i';
 		} else {
 			Serial.print("current = ");
 			Serial.println(g_current_ctrl);
 		}
 		break;
 	case 'I': // limit current
-		if (cmd_len > 2) {
-		g_limit_current_ctrl = atoi(&cmd[2]);
+		if (cmd_len > 1) {
+			g_limit_current_ctrl = atoi(&cmd[2]);
 		} else {
 			Serial.print("limit current = ");
 			Serial.println(g_limit_current_ctrl);
+		}
+		break;
+	case 'x': // proportional integral derivative coefficient for active parameter
+		if (cmd_len > 1) {
+			float a,b,c;
+
+			int i= 2;
+			
+			a = atof(&cmd[i]);
+			
+			while (cmd[i] != ' ' && i < cmd_len){i++;}
+			b = atof(&cmd[i++]);
+
+			while (cmd[i] != ' ' && i < cmd_len){i++;}
+			c = atof(&cmd[i]);
+
+			switch (g_main_ctrl_parameter){
+			case 's':
+				g_velocity_ctrl_proportional = a;
+				g_velocity_ctrl_integral     = b;
+				g_velocity_ctrl_derivative   = c;
+				break;
+			case 'u':
+				g_voltage_ctrl_proportional = a;
+				g_voltage_ctrl_integral     = b;
+				g_voltage_ctrl_derivative   = c;
+				break;
+			case 'i':
+				g_current_ctrl_proportional = a;
+				g_current_ctrl_integral     = b;
+				g_current_ctrl_derivative   = c;
+				break;
+			}
+		} else {
+			switch (g_main_ctrl_parameter){
+			case 's':
+				Serial.print("for velocity");
+				Serial.print("\tproportional = ");
+				Serial.print(g_velocity_ctrl_proportional);
+				Serial.print("\tintegral = ");
+				Serial.print(g_velocity_ctrl_integral);
+				Serial.print("\tderivative = ");
+				Serial.println(g_velocity_ctrl_derivative);
+				break;
+			case 'u':
+				Serial.print("for voltage");
+				Serial.print("\tproportional = ");
+				Serial.print(g_voltage_ctrl_proportional);
+				Serial.print("\tintegral = ");
+				Serial.print(g_voltage_ctrl_integral);
+				Serial.print("\tderivative = ");
+				Serial.println(g_voltage_ctrl_derivative);
+				break;
+			case 'i':
+				Serial.print("for current");
+				Serial.print("\tproportional = ");
+				Serial.print(g_current_ctrl_proportional);
+				Serial.print("\tintegral = ");
+				Serial.print(g_current_ctrl_integral);
+				Serial.print("\tderivative = ");
+				Serial.println(g_current_ctrl_derivative);
+				break;
+			}
 		}
 		break;
 	default:
