@@ -41,6 +41,25 @@
  Code:
 */
 
+
+void search_phases_sensor_pinout(int speed, unsigned int waiting_time, int change_limit)
+{
+	do {
+		analog_pin_a_hall = search_pinout(speed, waiting_time, change_limit, 'a');
+		sprintf (buffer, "for phase A sensor pin = %d", analog_pin_a_hall);
+		Serial.println(buffer);
+		
+		analog_pin_b_hall = search_pinout(speed, waiting_time, change_limit, 'b');
+		sprintf (buffer, "for phase B sensor pin = %d", analog_pin_b_hall);
+		Serial.println(buffer);
+		
+		analog_pin_c_hall = search_pinout(speed, waiting_time, change_limit, 'c');
+		sprintf (buffer, "for phase C sensor pin = %d", analog_pin_c_hall);
+		Serial.println(buffer);
+	} while ((analog_pin_a_hall == analog_pin_b_hall) || (analog_pin_b_hall == analog_pin_c_hall) || (analog_pin_c_hall == analog_pin_a_hall));
+}
+
+
 int search_pinout(int speed, unsigned int waiting_time, int change_limit, char test_phase)
 {
 	int phase_num_1, phase_num_2;
@@ -128,7 +147,7 @@ void free_rotation()
 	digitalWrite(pin_phase_c_lo, LOW);
 }
 
-void turn_analog(int velocity, float angle)
+void turn_analog(int velocity, float angle, float angle_shift_cw, float angle_shift_ccw)
 {
 	int speed; // speed = scalar absolute value (magnitude) of velocity
 	speed = abs(velocity);
@@ -136,9 +155,9 @@ void turn_analog(int velocity, float angle)
 	float angle_shift;
 	
 	if (velocity>0) {
-		angle_shift = g_analog_abc_shift_cw;
+		angle_shift = angle_shift_cw;
 	} else {
-		angle_shift = g_analog_abc_shift_ccw;
+		angle_shift = angle_shift_ccw;
 	}
 	
 	
@@ -149,36 +168,36 @@ void turn_analog(int velocity, float angle)
 	if (phase_a_val>0.0) {
 		digitalWrite(pin_phase_a_lo, LOW);
 		analogWrite (pin_phase_a_hi, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
-		if (phase_a_val<0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(A");}
+		//if (phase_a_val<0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(A");}
 		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	} else {
 		digitalWrite(pin_phase_a_hi, LOW);
 		analogWrite (pin_phase_a_lo, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
-		if (phase_a_val>0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(a");}
+		//if (phase_a_val>0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(a");}
 		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	}
 
 	if (phase_b_val>0.0) {
 		digitalWrite(pin_phase_b_lo, LOW);
 		analogWrite (pin_phase_b_hi, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
-		if (phase_b_val<0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("B");}
+		//if (phase_b_val<0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("B");}
 		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	} else {
 		digitalWrite(pin_phase_b_hi, LOW);
 		analogWrite (pin_phase_b_lo, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
-		if (phase_b_val>0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("b");}
+		//if (phase_b_val>0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("b");}
 		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	}
 	
 	if (phase_c_val>0.0) {
 		digitalWrite(pin_phase_c_lo, LOW);
 		analogWrite (pin_phase_c_hi, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
-		if (phase_c_val<0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("C)\t");}
+		//if (phase_c_val<0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("C)\t");}
 		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	} else {
 		digitalWrite(pin_phase_c_hi, LOW);
 		analogWrite (pin_phase_c_lo, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
-		if (phase_c_val>0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("c)\t");}
+		//if (phase_c_val>0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("c)\t");}
 		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
 	}
 

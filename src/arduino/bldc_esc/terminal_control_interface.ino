@@ -79,6 +79,8 @@ void exec_cmd(char *cmd, int cmd_len)
 		Serial.print("U 5\tlimit voltage (pwm) 0 .. 254\n");
 		Serial.print("i 6\tcurrent -512 .. 512\n");
 		Serial.print("I 7\tlimit current 0 .. 512\n");
+		Serial.print("g a\talgorithm: a - analog, d - digital\n");
+		Serial.print("f 10 30 2\tsearch sensor pinout: speed, waiting_time[ms], change_limit\n");
 		Serial.print("x 0.8 0.9 1.0\tproportional integral derivative coefficient for active parameter\n");
 		break;
 	case 'a': // angle cw
@@ -147,6 +149,28 @@ void exec_cmd(char *cmd, int cmd_len)
 			Serial.print("limit current = ");
 			Serial.println(g_limit_current_ctrl);
 		}
+		break;
+	case 'g': // algorithm: a - analog, d - digital
+		if (cmd[2] == 'd') {g_algorithm = 'd';}
+		else               {g_algorithm = 'a';}
+		break;
+	case 'f': // search sensor pinout
+		int speed = 10; // fixme what happend if atoi return 0? or speed set to 255 and motor burn?
+		int waiting_time = 30; // fixme what happend if atoi return 0?
+		int change_limit = 2; // fixme what happend if atoi return 0?
+		
+		int i= 2;
+		
+		a = atoi(&cmd[i]);
+		
+		while (cmd[i] != ' ' && i < cmd_len){i++;}
+		b = atoi(&cmd[i++]);
+		
+		while (cmd[i] != ' ' && i < cmd_len){i++;}
+		c = atoi(&cmd[i]);
+		
+		search_phases_sensor_pinout(speed, waiting_time, change_limit);
+		free_rotation();
 		break;
 	case 'x': // proportional integral derivative coefficient for active parameter
 		if (cmd_len > 1) {

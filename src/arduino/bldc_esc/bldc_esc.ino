@@ -228,7 +228,8 @@ int g_hall_zero = (analog_max + analog_min)/2;
 const int analog_pin_abc_current = A3;
 int g_zero_abc_current = 0;
 
-
+char g_algorithm = 'a'; // a - analog
+                        // d - digital
 
 
 const int delay_between_step = 1; // us
@@ -289,31 +290,16 @@ void setup()
 
 	g_zero_abc_current = read_abc_current();
 
-	/*
-	do {
-		analog_pin_a_hall = search_pinout(10, 30, 1, 'a');
-		sprintf (buffer, "for phase A sensor pin = %d", analog_pin_a_hall);
-		Serial.println(buffer);
-		
-		analog_pin_b_hall = search_pinout(10, 30, 1, 'b');
-		sprintf (buffer, "for phase B sensor pin = %d", analog_pin_b_hall);
-		Serial.println(buffer);
-		
-		analog_pin_c_hall = search_pinout(10, 30, 1, 'c');
-		sprintf (buffer, "for phase C sensor pin = %d", analog_pin_c_hall);
-		Serial.println(buffer);
-	} while ((analog_pin_a_hall == analog_pin_b_hall) || (analog_pin_b_hall == analog_pin_c_hall) || (analog_pin_c_hall == analog_pin_a_hall));
-	*/
-
-	
-	free_rotation();
 }
 
 
 void loop()
 {
-	turn_analog(apply_pid(), analog_read_angle());
-	//turn_digital(10, digital_read_angle());
+	if (g_algorithm == 'd'){
+		turn_digital(apply_pid(), digital_read_angle());
+	} else {
+		turn_analog(apply_pid(), analog_read_angle(), g_analog_abc_shift_cw, g_analog_abc_shift_ccw);
+	}
 
 
 
@@ -331,8 +317,25 @@ void loop()
 
 		read_ctrl();
 
-		Serial.print("rpm = "); Serial.println(get_rpm());
-		//Serial.println();
+		Serial.print("rpm = "); Serial.print(get_rpm());
+		
+		
+		//Serial.print("old_turn_time = "); Serial.print(g_old_turn_timer_us);
+		Serial.print("\tturn_time = "); Serial.print((g_turn_timer_us - g_old_turn_timer_us)/1000);
+		Serial.print("\thalf_turn_time = "); Serial.print((g_halfturn_timer_us - g_old_turn_timer_us)/1000);
+		Serial.print("\tmax_turn_time = "); Serial.print((max(g_turn_timer_us - g_old_turn_timer_us, g_halfturn_timer_us - g_old_turn_timer_us))/1000);
+
+
+		Serial.print("\told_angle = "); Serial.print(g_old_analog_angle);
+		Serial.print("\tangle = "); Serial.print(analog_read_angle());
+
+
+		Serial.print("\tturn_counter = "); Serial.print(g_turn_counter);
+
+
+
+		
+	        Serial.println();
 	}
 
 	
