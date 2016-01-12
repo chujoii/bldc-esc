@@ -133,7 +133,10 @@ const int hard_limit_voltage = pwm_max;
 int g_voltage_ctrl = pwm_min;   // motor not run in the start
 float g_voltage_ctrl_proportional = 0.1;
 float g_voltage_ctrl_integral = 0.0;
+float g_voltage_ctrl_integral_old_val = 0.0;
 float g_voltage_ctrl_derivative = 0.0;
+float g_voltage_ctrl_derivative_old_val = 0.0;
+unsigned long g_voltage_ctrl_derivative_old_t = 0.0;
 
 //int g_old_limit_voltage_ctrl = pwm_max;
 int g_limit_voltage_ctrl = pwm_max;
@@ -146,7 +149,10 @@ const int hard_limit_current = analog_max/2;
 int g_current_ctrl = pwm_min;
 float g_current_ctrl_proportional = 0.1;
 float g_current_ctrl_integral = 0.0;
+float g_current_ctrl_integral_old_val = 0.0;
 float g_current_ctrl_derivative = 0.0;
+float g_current_ctrl_derivative_old_val = 0.0;
+unsigned long g_current_ctrl_derivative_old_t = 0.0;
 
 //int g_old_limit_current_ctrl = pwm_max;
 int g_limit_current_ctrl = pwm_max;

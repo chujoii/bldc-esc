@@ -44,7 +44,34 @@
 
 float pid_regulator(float error, float proportional, float integral, float derivative)
 {
-	return error * proportional;
+
+	float sum;
+	float diff; // (now_val - old) / (now_t - oldt)
+	unsigned long now_t = micros();
+	
+	switch (g_main_ctrl_parameter){ // fixme too many global var
+	case 's': // velocity
+		sum = error + g_voltage_ctrl_integral_old_val;
+		diff = (error - g_voltage_ctrl_derivative_old_val) / (now_t - g_voltage_ctrl_derivative_old_t);
+		g_voltage_ctrl_derivative_old_val = error;
+		g_voltage_ctrl_derivative_old_t = now_t;
+		break;
+	case 'u': // voltage
+		sum = 0.0;
+		diff = 0.0;
+		break;
+	case 'i': // current
+		sum = error + g_current_ctrl_integral_old_val;
+		diff = (error - g_current_ctrl_derivative_old_val) / (now_t - g_current_ctrl_derivative_old_t);
+		g_current_ctrl_derivative_old_val = error;
+		g_current_ctrl_derivative_old_t = now_t;
+	break;
+	default:
+		sum = 0.0;
+		diff = 0.0;
+	}
+
+	return  proportional * error + integral * sum + derivative * diff;
 }
 
 
@@ -58,15 +85,14 @@ int apply_pid()
 	case 's': // velocity
 		result = pid_regulator(g_velocity_ctrl - get_rpm(), g_velocity_ctrl_proportional, g_velocity_ctrl_integral, g_velocity_ctrl_derivative);
 		//Serial.print("velo_ctrl = ");Serial.print(g_velocity_ctrl);Serial.print("\trpm = "); Serial.print(get_rpm()); Serial.print("\tveloctrl-rpm = ");Serial.print(g_velocity_ctrl - get_rpm());
-		//Serial.print("\tvelocity = ");
 		break;
 	case 'u': // voltage
 		result = pid_regulator(g_voltage_ctrl - g_old_ctrl_value, g_voltage_ctrl_proportional, g_voltage_ctrl_integral, g_voltage_ctrl_derivative);
-		Serial.print("voltage = ");
+		//Serial.print("voltage = ");
 		break;
 	case 'i': // current
 		result = pid_regulator(g_current_ctrl - read_abc_current(), g_current_ctrl_proportional, g_current_ctrl_integral, g_current_ctrl_derivative);
-		Serial.print("current = ");
+		//Serial.print("current_ctrl = ");Serial.print(g_current_ctrl);Serial.print("\ti = "); Serial.print(read_abc_current()); Serial.print("\tcurrent_ctl - i = ");Serial.print(g_current_ctrl - read_abc_current());
 		break;
 	default:
 		result = g_old_ctrl_value;
@@ -77,10 +103,10 @@ int apply_pid()
 	if (read_abc_current() > g_limit_current_ctrl){ // fixme abs(read_abc_current()) ?
 		// limit exceeded
 		result = g_old_ctrl_value + pid_regulator(g_limit_current_ctrl - read_abc_current(), 1.0, 0.0, 0.0); // fixme magic number
-		Serial.print("limit: current = "); 
+		//Serial.print("\tlimit: current "); 
 	}
 
-	Serial.println(result);
+	//Serial.print("\tresult = ");Serial.println(result);
 	
 	g_old_ctrl_value = result;
 	return constrain(result, pwm_min, hard_limit_voltage);

@@ -42,7 +42,7 @@
 */
 
 
-void search_phases_sensor_pinout(int speed, unsigned int waiting_time, int change_limit)
+void search_phases_sensor_pinout(int speed, unsigned long waiting_time, int change_limit)
 {
 	do {
 		g_analog_pin_a_hall = search_pinout(speed, waiting_time, change_limit, 'a');
@@ -60,7 +60,7 @@ void search_phases_sensor_pinout(int speed, unsigned int waiting_time, int chang
 }
 
 
-int search_pinout(int speed, unsigned int waiting_time, int change_limit, char test_phase)
+int search_pinout(int speed, unsigned long waiting_time, int change_limit, char test_phase)
 {
 	int phase_num_1, phase_num_2;
 	
@@ -99,8 +99,8 @@ int search_pinout(int speed, unsigned int waiting_time, int change_limit, char t
 	
 	boolean one_or_two = true;
 
-	unsigned int delay_time = waiting_time;
-	unsigned int timer = millis() + waiting_time;
+	unsigned long delay_time = waiting_time;
+	unsigned long timer = millis() + waiting_time;
 	
 	// wait for stop changes
 	while((abs(x - old_x) + abs(y - old_y) + abs(z - old_z) > change_limit) && (delay_time > 0)){

@@ -153,19 +153,17 @@ void sensor_statistic(int n, int lim)
 	
 	a = g_hall_max;
 	b = max(max(g_a_hall_value, g_b_hall_value), g_c_hall_value);
-	if (abs(a-b)<lim) { 
-		if (a<b) {m=1;} else {m=n;} // if b=maximal -> element have more weigth
-		c = a + ((b - a) / (m + 1));
-		g_hall_max = c;
-	}
+	if ((a<b) || (abs(a-b)<lim)) {m=1;} else {m=n;} // if b=maximal -> element have more weigth
+	c = a + ((b - a) / (m + 1));
+	g_hall_max = c;
+		
 
 	a = g_hall_min;
 	b = min(min(g_a_hall_value, g_b_hall_value), g_c_hall_value);
-	if (abs(a-b)<lim) {
-		if (a>b) {m=1;} else {m=n;} // if b=minimal  -> element have more weigth
-		c = a + ((b - a) / (m + 1));
-		g_hall_min = c;
-	}
+	if ((a>b) || (abs(a-b)<lim)) {m=1;} else {m=n;} // if b=minimal  -> element have more weigth
+	c = a + ((b - a) / (m + 1));
+	g_hall_min = c;
+		
 	
 	g_hall_zero = (g_hall_max + g_hall_min)/2;
 }
