@@ -45,18 +45,18 @@
 void search_phases_sensor_pinout(int speed, unsigned int waiting_time, int change_limit)
 {
 	do {
-		analog_pin_a_hall = search_pinout(speed, waiting_time, change_limit, 'a');
-		sprintf (buffer, "for phase A sensor pin = %d", analog_pin_a_hall);
+		g_analog_pin_a_hall = search_pinout(speed, waiting_time, change_limit, 'a');
+		sprintf (buffer, "for phase A sensor pin = %d", g_analog_pin_a_hall);
 		Serial.println(buffer);
 		
-		analog_pin_b_hall = search_pinout(speed, waiting_time, change_limit, 'b');
-		sprintf (buffer, "for phase B sensor pin = %d", analog_pin_b_hall);
+		g_analog_pin_b_hall = search_pinout(speed, waiting_time, change_limit, 'b');
+		sprintf (buffer, "for phase B sensor pin = %d", g_analog_pin_b_hall);
 		Serial.println(buffer);
 		
-		analog_pin_c_hall = search_pinout(speed, waiting_time, change_limit, 'c');
-		sprintf (buffer, "for phase C sensor pin = %d", analog_pin_c_hall);
+		g_analog_pin_c_hall = search_pinout(speed, waiting_time, change_limit, 'c');
+		sprintf (buffer, "for phase C sensor pin = %d", g_analog_pin_c_hall);
 		Serial.println(buffer);
-	} while ((analog_pin_a_hall == analog_pin_b_hall) || (analog_pin_b_hall == analog_pin_c_hall) || (analog_pin_c_hall == analog_pin_a_hall));
+	} while ((g_analog_pin_a_hall == g_analog_pin_b_hall) || (g_analog_pin_b_hall == g_analog_pin_c_hall) || (g_analog_pin_c_hall == g_analog_pin_a_hall));
 }
 
 
@@ -105,16 +105,20 @@ int search_pinout(int speed, unsigned int waiting_time, int change_limit, char t
 	// wait for stop changes
 	while((abs(x - old_x) + abs(y - old_y) + abs(z - old_z) > change_limit) && (delay_time > 0)){
 		if (one_or_two) {
-			turn_digital(speed, phase_num_1);
+			turn_digital(abs(speed), phase_num_1, sign(speed));
 			one_or_two = !one_or_two;
 		} else {
-			turn_digital(speed, phase_num_2);
+			turn_digital(abs(speed), phase_num_2, sign(speed));
 			one_or_two = !one_or_two;
 		}
 		old_x = x;
 		old_y = y;
 		old_z = z;
 		delay(delay_time);
+
+		sync_sensor_measurement();
+		sensor_statistic(statistic_mean);
+
 		x = analog_read_hall_sensor(analog_pin_x_hall);
 		y = analog_read_hall_sensor(analog_pin_y_hall);
 		z = analog_read_hall_sensor(analog_pin_z_hall);
@@ -147,18 +151,9 @@ void free_rotation()
 	digitalWrite(pin_phase_c_lo, LOW);
 }
 
-void turn_analog(int velocity, float angle, float angle_shift_cw, float angle_shift_ccw)
+void turn_analog(int speed, float angle, float angle_shift)
 {
-	int speed; // speed = scalar absolute value (magnitude) of velocity
-	speed = abs(velocity);
-
-	float angle_shift;
-	
-	if (velocity>0) {
-		angle_shift = angle_shift_cw;
-	} else {
-		angle_shift = angle_shift_ccw;
-	}
+	// speed = scalar absolute value (magnitude) of velocity
 	
 	
 	float phase_a_val = sin(angle + angle_a_shift + angle_shift);
@@ -228,7 +223,7 @@ void turn_analog(int velocity, float angle, float angle_shift_cw, float angle_sh
 
 
 
-void turn_digital(int velocity, byte digital_angle)
+void turn_digital(byte speed, byte digital_angle, boolean angle_shift)
 {
 	/*
 	  digital_angle:
@@ -240,8 +235,8 @@ void turn_digital(int velocity, byte digital_angle)
 	  B100 = 4 -bC
 	*/
 	
-	byte speed; // speed = scalar absolute value (magnitude) of velocity
-	speed = abs(velocity);
+	// speed = scalar absolute value (magnitude) of velocity
+	
 
 	
 	/*
@@ -284,7 +279,7 @@ void turn_digital(int velocity, byte digital_angle)
 	 */
 
 
-	if (sign(velocity) == g_digital_abc_shift_cw){
+	if (angle_shift){
 		// fixme
 		switch (digital_angle) {
 		case B101:

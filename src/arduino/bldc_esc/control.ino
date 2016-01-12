@@ -83,3 +83,15 @@ int apply_pid()
 	return constrain(result, pwm_min, hard_limit_voltage);
 
 }
+
+
+
+float calculate_analog_angle_shift_by_velocity(int velocity)
+{
+	if (velocity>0) {
+		return g_analog_abc_shift_cw;
+	} else {
+		return g_analog_abc_shift_ccw;
+	}
+
+}

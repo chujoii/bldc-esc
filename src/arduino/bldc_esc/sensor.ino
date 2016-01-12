@@ -66,9 +66,9 @@ byte digital_read_angle()
 	boolean state_a_hall, state_b_hall, state_c_hall;
 	byte state_abc_hall = 0;
 
-	state_a_hall = digital_read_hall_sensor(analog_pin_a_hall);
-	state_b_hall = digital_read_hall_sensor(analog_pin_b_hall);
-	state_c_hall = digital_read_hall_sensor(analog_pin_c_hall);
+	state_a_hall = digital_read_hall_sensor(g_analog_pin_a_hall);
+	state_b_hall = digital_read_hall_sensor(g_analog_pin_b_hall);
+	state_c_hall = digital_read_hall_sensor(g_analog_pin_c_hall);
 	
 	state_abc_hall = (state_c_hall<<2) | (state_b_hall<<1) | state_a_hall;
 	
@@ -78,11 +78,15 @@ byte digital_read_angle()
 
 int analog_read_hall_sensor(int pin_hall)
 {
-	int hall_val = analogRead(pin_hall);
-	if (g_hall_max < hall_val) {g_hall_max = hall_val;}
-	if (g_hall_min > hall_val) {g_hall_min = hall_val;}
-
-	return hall_val;
+	// switch not work: ‘g_analog_pin_a_hall’ cannot appear in a constant-expression
+	if (pin_hall == g_analog_pin_a_hall){
+		return g_a_hall_value;
+	}
+	if (pin_hall == g_analog_pin_b_hall){
+		return g_b_hall_value;
+	}
+	// if (pin_hall == g_analog_pin_c_hall){
+	return g_c_hall_value;
 }
 
 
@@ -91,10 +95,9 @@ float analog_read_angle ()
 	// current state of hall sensor
 	float state_a_hall, state_b_hall, state_c_hall;
 	
-
-	state_a_hall = analog_read_hall_sensor(analog_pin_a_hall);
-	state_b_hall = analog_read_hall_sensor(analog_pin_b_hall);
-	state_c_hall = analog_read_hall_sensor(analog_pin_c_hall);
+	state_a_hall = analog_read_hall_sensor(g_analog_pin_a_hall);
+	state_b_hall = analog_read_hall_sensor(g_analog_pin_b_hall);
+	state_c_hall = analog_read_hall_sensor(g_analog_pin_c_hall);
 
 	float normalize_a_hall = fmap((float)state_a_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
 	float normalize_b_hall = fmap((float)state_b_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
@@ -121,4 +124,47 @@ int get_rpm(){
 	unsigned long full_turn_time = g_turn_timer_us - g_old_turn_timer_us;
 	unsigned long half_turn_time = g_halfturn_timer_us - g_old_turn_timer_us;
 	return (int) (60000000 / max(half_turn_time, full_turn_time));
+}
+
+
+
+void sync_sensor_measurement()
+{
+	// fixme: reading sensors must be simultaneously
+
+	g_a_hall_value = analogRead(g_analog_pin_a_hall);
+	g_b_hall_value = analogRead(g_analog_pin_b_hall);
+	g_c_hall_value = analogRead(g_analog_pin_c_hall);
+	
+	g_abc_current = analogRead(analog_pin_abc_current) - g_zero_abc_current;
+}
+
+
+void sensor_statistic(int n)
+{
+	float a, b, c;
+	float m;
+	// (a * n + b) / (n + 1)       =       a + ((b - a) / (n + 1))
+
+	a = g_hall_max;
+	b = max(max(g_a_hall_value, g_b_hall_value), g_c_hall_value);
+	if (a<b) {m=1;} else {m=n;} // if b=maximal -> element have more weigth
+	c = a + ((b - a) / (m + 1));
+	
+	g_hall_max = c;
+
+	a = g_hall_min;
+	if (a>b) {m=1;} else {m=n;} // if b=minimal  -> element have more weigth
+	b = min(min(g_a_hall_value, g_b_hall_value), g_c_hall_value);
+	c = a + ((b - a) / (m + 1));
+	
+	g_hall_min = c;
+	
+	g_hall_zero = (g_hall_max + g_hall_min)/2;
+}
+
+void analog_hall_level_detect_first_run()
+{
+	g_hall_max = max(max(g_a_hall_value, g_b_hall_value), g_c_hall_value);
+	g_hall_min = min(min(g_a_hall_value, g_b_hall_value), g_c_hall_value);
 }

@@ -64,6 +64,8 @@ void read_ctrl()
 
 void exec_cmd(char *cmd, int cmd_len)
 {
+	int i; // counter
+
 	Serial.print("cmd_len = "); Serial.println(cmd_len);
 	// char + space = 2
 	switch (cmd[0]) {
@@ -155,19 +157,19 @@ void exec_cmd(char *cmd, int cmd_len)
 		else               {g_algorithm = 'a';}
 		break;
 	case 'f': // search sensor pinout
-		int speed = 10; // fixme what happend if atoi return 0? or speed set to 255 and motor burn?
-		int waiting_time = 30; // fixme what happend if atoi return 0?
-		int change_limit = 2; // fixme what happend if atoi return 0?
+		int speed;        // fixme what happend if atoi return 0? or speed set to 255 and motor or driver burn?
+		int waiting_time; // fixme what happend if atoi return 0?
+		int change_limit; // fixme what happend if atoi return 0?
 		
-		int i= 2;
+		i = 2;
 		
-		a = atoi(&cmd[i]);
-		
-		while (cmd[i] != ' ' && i < cmd_len){i++;}
-		b = atoi(&cmd[i++]);
+		speed = constrain(atoi(&cmd[i]), pwm_min, g_limit_speed_ctrl);
 		
 		while (cmd[i] != ' ' && i < cmd_len){i++;}
-		c = atoi(&cmd[i]);
+		waiting_time = constrain(atoi(&cmd[i++]), 0, 20);
+		
+		while (cmd[i] != ' ' && i < cmd_len){i++;}
+		change_limit = constrain(atoi(&cmd[i]), 1, analog_max * 3);
 		
 		search_phases_sensor_pinout(speed, waiting_time, change_limit);
 		free_rotation();
@@ -176,7 +178,7 @@ void exec_cmd(char *cmd, int cmd_len)
 		if (cmd_len > 1) {
 			float a,b,c;
 
-			int i= 2;
+			i = 2;
 			
 			a = atof(&cmd[i]);
 			
