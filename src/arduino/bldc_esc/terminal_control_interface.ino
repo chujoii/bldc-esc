@@ -53,7 +53,9 @@ void read_ctrl()
 			g_cmd_line[g_cmd_line_length++] = incoming_byte;
 		} else {
 			exec_cmd(g_cmd_line, g_cmd_line_length - 1);
-			//g_cmd_line = ""; // fixme: need reset command line for next command
+			for (int i = 0; i < g_cmd_line_max_length; i++){ // fixme: maybe need reset command line only from 0 to g_cmd_line_length
+				g_cmd_line[i]='\0';
+			}
 			g_cmd_line_length = 0;
 		}
 	}
@@ -153,26 +155,36 @@ void exec_cmd(char *cmd, int cmd_len)
 		}
 		break;
 	case 'g': // algorithm: a - analog, d - digital
-		if (cmd[2] == 'd') {g_algorithm = 'd';}
-		else               {g_algorithm = 'a';}
+		if (cmd_len > 1) {
+			if (cmd[2] == 'd') {g_algorithm = 'd';}
+			else               {g_algorithm = 'a';}
+		} else {
+			Serial.print("algorithm = ");Serial.print(g_algorithm);Serial.print("\n");
+		}
 		break;
 	case 'f': // search sensor pinout
-		int speed;        // fixme what happend if atoi return 0? or speed set to 255 and motor or driver burn?
-		int waiting_time; // fixme what happend if atoi return 0?
-		int change_limit; // fixme what happend if atoi return 0?
+		if (cmd_len > 1) {
+			int speed;        // fixme what happend if atoi return 0? or speed set to 255 and motor or driver burn?
+			int waiting_time; // fixme what happend if atoi return 0?
+			int change_limit; // fixme what happend if atoi return 0?
+			
+			i = 2;
+			
+			speed = constrain(atoi(&cmd[i]), pwm_min, g_limit_speed_ctrl);
+			
+			while (cmd[i] != ' ' && i < cmd_len){i++;}
+			waiting_time = constrain(atoi(&cmd[i++]), 0, 20);
 		
-		i = 2;
-		
-		speed = constrain(atoi(&cmd[i]), pwm_min, g_limit_speed_ctrl);
-		
-		while (cmd[i] != ' ' && i < cmd_len){i++;}
-		waiting_time = constrain(atoi(&cmd[i++]), 0, 20);
-		
-		while (cmd[i] != ' ' && i < cmd_len){i++;}
-		change_limit = constrain(atoi(&cmd[i]), 1, analog_max * 3);
-		
-		search_phases_sensor_pinout(speed, waiting_time, change_limit);
-		free_rotation();
+			while (cmd[i] != ' ' && i < cmd_len){i++;}
+			change_limit = constrain(atoi(&cmd[i]), 1, analog_max * 3);
+			
+			search_phases_sensor_pinout(speed, waiting_time, change_limit);
+			free_rotation();
+		} else {
+			Serial.print("pin a hall = A");Serial.print(g_analog_pin_a_hall - 14);
+			Serial.print("\tpin b hall = A");Serial.print(g_analog_pin_b_hall - 14);
+			Serial.print("\tpin c hall = A");Serial.println(g_analog_pin_c_hall - 14);
+		}
 		break;
 	case 'x': // proportional integral derivative coefficient for active parameter
 		if (cmd_len > 1) {

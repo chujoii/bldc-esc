@@ -140,28 +140,37 @@ void sync_sensor_measurement()
 }
 
 
-void sensor_statistic(int n)
+void sensor_statistic(int n, int lim)
 {
+	// n   - mean coefficient
+	// lim - difference betwin new element, and stoded extremum, so only if new near extremum it can influence to extremum
 	float a, b, c;
 	float m;
 	// (a * n + b) / (n + 1)       =       a + ((b - a) / (n + 1))
 
+	
+	
+	
 	a = g_hall_max;
 	b = max(max(g_a_hall_value, g_b_hall_value), g_c_hall_value);
-	if (a<b) {m=1;} else {m=n;} // if b=maximal -> element have more weigth
-	c = a + ((b - a) / (m + 1));
-	
-	g_hall_max = c;
+	if (abs(a-b)<lim) { 
+		if (a<b) {m=1;} else {m=n;} // if b=maximal -> element have more weigth
+		c = a + ((b - a) / (m + 1));
+		g_hall_max = c;
+	}
 
 	a = g_hall_min;
-	if (a>b) {m=1;} else {m=n;} // if b=minimal  -> element have more weigth
 	b = min(min(g_a_hall_value, g_b_hall_value), g_c_hall_value);
-	c = a + ((b - a) / (m + 1));
-	
-	g_hall_min = c;
+	if (abs(a-b)<lim) {
+		if (a>b) {m=1;} else {m=n;} // if b=minimal  -> element have more weigth
+		c = a + ((b - a) / (m + 1));
+		g_hall_min = c;
+	}
 	
 	g_hall_zero = (g_hall_max + g_hall_min)/2;
 }
+
+
 
 void analog_hall_level_detect_first_run()
 {

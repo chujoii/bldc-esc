@@ -113,6 +113,7 @@ const int analog_min = 0;
 const int analog_max = 1023;
 
 const int statistic_mean = 1000;
+const int value_err = 20;
 
 
 //int g_old_velocity_ctrl = pwm_min;
@@ -203,6 +204,7 @@ int g_b_hall_value = 0;
 int g_c_hall_value = 0;
 
 
+
 // hall max min level
 float g_hall_max  = analog_min;
 float g_hall_min  = analog_max;
@@ -290,12 +292,12 @@ void setup()
 
 	sync_sensor_measurement();
 	analog_hall_level_detect_first_run();
-	sensor_statistic(1.0);
+	sensor_statistic(1.0, value_err);
 
 	int i = 0;
 	while (millis()<1000){ // delay(1000);
 		sync_sensor_measurement();
-		sensor_statistic(i++);
+		sensor_statistic(i++, value_err);
 	}
 
 	Serial.begin(115200);
@@ -307,7 +309,7 @@ void setup()
 void loop()
 {
 	sync_sensor_measurement();
-	sensor_statistic(statistic_mean);
+	sensor_statistic(statistic_mean, value_err);
 	
 	int velocity = apply_pid();
 	
@@ -349,13 +351,13 @@ void loop()
 
 
 		//Serial.print("\tturn_counter = "); Serial.print(g_turn_counter);
-
-		Serial.print("\ta_hall = "); Serial.print(g_a_hall_value);
-		Serial.print("\tb_hall = "); Serial.print(g_b_hall_value);
-		Serial.print("\tc_hall = "); Serial.print(g_c_hall_value);
+		
+		//Serial.print("\ta_hall = "); Serial.print(g_a_hall_value);
+		//Serial.print("\tb_hall = "); Serial.print(g_b_hall_value);
+		//Serial.print("\tc_hall = "); Serial.print(g_c_hall_value);
 		Serial.print("\tmax = "); Serial.print(g_hall_max);
 		Serial.print("\tmin = "); Serial.print(g_hall_min);
-		Serial.print("\tzero = "); Serial.print(g_hall_zero);
+		//Serial.print("\tzero = "); Serial.print(g_hall_zero);
 
 	        Serial.println();
 	}

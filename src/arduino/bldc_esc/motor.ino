@@ -117,7 +117,7 @@ int search_pinout(int speed, unsigned int waiting_time, int change_limit, char t
 		delay(delay_time);
 
 		sync_sensor_measurement();
-		sensor_statistic(statistic_mean);
+		sensor_statistic(statistic_mean, value_err);
 
 		x = analog_read_hall_sensor(analog_pin_x_hall);
 		y = analog_read_hall_sensor(analog_pin_y_hall);
