@@ -173,25 +173,23 @@ int main()
 	counter(unit_test_calculation_angle_from_three_phases(M_PI * 2.0));      // 360[degree]
 	
 	int i;
-	for(i = 0; i < 1000; ++i)
-	{
-		counter(unit_test_rnd_calculation_angle_from_three_phases(0, dispersion)); // 0[degree]
-
-
-		counter(unit_test_rnd_calculation_angle_from_three_phases(0,               dispersion)); // 0[degree]  
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/60,         dispersion)); // 3[degree]  
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/6.0,        dispersion)); // 30[degree] 
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/3.0,        dispersion)); // 60[degree] 
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/2.0,        dispersion)); // 90[degree] 
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 2.0/3.0,  dispersion)); // 120[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 5.0/6.0,  dispersion)); // 150[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI,            dispersion)); // 180[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 7.0/6.0,  dispersion)); // 210[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 4.0/3.0,  dispersion)); // 240[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 3.0/2.0,  dispersion)); // 270[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 5.0/3.0,  dispersion)); // 300[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 11.0/6.0, dispersion)); // 330[degree]
-		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 2.0,      dispersion)); // 360[degree]
+	for(i = 0; i < 1000; ++i) { // angles like before, but with small noize
+		counter(unit_test_rnd_calculation_angle_from_three_phases(4.01,            dispersion)); // ~230[degree]
+		
+		counter(unit_test_rnd_calculation_angle_from_three_phases(0,               dispersion)); // ~0[degree]  
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/60,         dispersion)); // ~3[degree]  
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/6.0,        dispersion)); // ~30[degree] 
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/3.0,        dispersion)); // ~60[degree] 
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI/2.0,        dispersion)); // ~90[degree] 
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 2.0/3.0,  dispersion)); // ~120[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 5.0/6.0,  dispersion)); // ~150[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI,            dispersion)); // ~180[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 7.0/6.0,  dispersion)); // ~210[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 4.0/3.0,  dispersion)); // ~240[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 3.0/2.0,  dispersion)); // ~270[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 5.0/3.0,  dispersion)); // ~300[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 11.0/6.0, dispersion)); // ~330[degree]
+		counter(unit_test_rnd_calculation_angle_from_three_phases(M_PI * 2.0,      dispersion)); // ~360[degree]
 	}
 
 	counter(unit_test_cycle_max_diff_from_three(0.1, 0.2, 0.3,      0.2)); // 0.2-0.1=0.1   0.3-0.2=0.1   0.3-0.1=0.2 -> maxdiff = 0.2
