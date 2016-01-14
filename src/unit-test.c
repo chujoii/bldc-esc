@@ -154,6 +154,8 @@ int main()
 	time_t t;
 	srand((unsigned) time(&t)); // fixme many start in one time == not unique numbers
 
+
+	counter(unit_test_calculation_angle_from_three_phases(4.01));         // 230[degree] see drawings/calculation_angle_from_three_phases.svg
 	
 	counter(unit_test_calculation_angle_from_three_phases(0));               // 0[degree]
 	counter(unit_test_calculation_angle_from_three_phases(M_PI/60));         // 3[degree]

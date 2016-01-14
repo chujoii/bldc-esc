@@ -157,6 +157,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 
 float calculation_angle_from_three_phases(float a, float b, float c) // int prev_angle, int prev_step)
 {
+	// see drawings/calculation_angle_from_three_phases.svg
 	// a = sin(x +   0 + radomerror)
 	// b = sin(x + 120 + radomerror)
 	// c = sin(x + 240 + radomerror)
@@ -178,16 +179,17 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	// x[rad]  = x[grad] * (3.14/180)
         // x[grad] = x[rad]  * (180/3.14)
 	//
+	DEBUG_PRINT(("\n"));
 	float angle_a_1 = asin(constrain(a, min_sin_val, max_sin_val));
 	float angle_b_1 = asin(constrain(b, min_sin_val, max_sin_val));
 	float angle_c_1 = asin(constrain(c, min_sin_val, max_sin_val));
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
 	// angle_a_1= -50.38[degree]	angle_b_1=-129.79[degree]	angle_c_1=-173.04[degree]
 
-	DEBUG_PRINT(("a-0\tb-120\tc-240\n"));
-	angle_a_1 = angle_a_1 - angle_a_shift; // - 0[degree] = 0[rad]
-	angle_b_1 = angle_b_1 - angle_b_shift; // - 120[degree] = pi*2/3[rad]
-	angle_c_1 = angle_c_1 - angle_c_shift; // - 240[degree] = pi*4/3[rad]
+	DEBUG_PRINT(("a-0\tb-120\tc-240\n"));  // -0 -120 -240 but not +0 +120 +240, because for example sin(x+5) shifted to -5 by "x" axis
+	angle_a_1 = angle_a_1 - angle_a_shift; //   0[degree] = 0[rad]
+	angle_b_1 = angle_b_1 - angle_b_shift; // 120[degree] = pi*2/3[rad]
+	angle_c_1 = angle_c_1 - angle_c_shift; // 240[degree] = pi*4/3[rad]
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
 
 	
