@@ -109,8 +109,7 @@ int apply_pid()
 	//Serial.print("\tresult = ");Serial.println(result);
 	
 	g_old_ctrl_value = result;
-	return constrain(result, pwm_min, hard_limit_voltage);
-
+	return constrain(result, -hard_limit_voltage, hard_limit_voltage);
 }
 
 
