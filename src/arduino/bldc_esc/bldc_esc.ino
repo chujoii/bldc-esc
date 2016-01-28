@@ -200,13 +200,9 @@ const int PIN_PHASE_C_LO = 3;  // pwm
 // ///////////////////////////////////////////// sensors ////////
 
 // Hall a, b, c (or other type of sensor: for example optic)
-const int PIN_ANALOG_X_HALL = A0;
-const int PIN_ANALOG_Y_HALL = A1;
-const int PIN_ANALOG_Z_HALL = A2;
-
-int g_analog_pin_a_hall = PIN_ANALOG_X_HALL;
-int g_analog_pin_b_hall = PIN_ANALOG_Y_HALL;
-int g_analog_pin_c_hall = PIN_ANALOG_Z_HALL;
+const int PIN_ANALOG_A_HALL = A0;
+const int PIN_ANALOG_B_HALL = A1;
+const int PIN_ANALOG_C_HALL = A2;
 
 int g_a_hall_value = 0;
 int g_b_hall_value = 0;

@@ -66,9 +66,9 @@ byte digital_read_angle()
 	boolean state_a_hall, state_b_hall, state_c_hall;
 	byte state_abc_hall = 0;
 
-	state_a_hall = digital_read_hall_sensor(g_analog_pin_a_hall);
-	state_b_hall = digital_read_hall_sensor(g_analog_pin_b_hall);
-	state_c_hall = digital_read_hall_sensor(g_analog_pin_c_hall);
+	state_a_hall = digital_read_hall_sensor(PIN_ANALOG_A_HALL);
+	state_b_hall = digital_read_hall_sensor(PIN_ANALOG_B_HALL);
+	state_c_hall = digital_read_hall_sensor(PIN_ANALOG_C_HALL);
 	
 	state_abc_hall = (state_c_hall<<2) | (state_b_hall<<1) | state_a_hall;
 	
@@ -78,14 +78,14 @@ byte digital_read_angle()
 
 int analog_read_hall_sensor(int pin_hall)
 {
-	// switch not work: ‘g_analog_pin_a_hall’ cannot appear in a constant-expression
-	if (pin_hall == g_analog_pin_a_hall){
+	// switch not work: ‘PIN_ANALOG_A_HALL’ cannot appear in a constant-expression
+	if (pin_hall == PIN_ANALOG_A_HALL){
 		return g_a_hall_value;
 	}
-	if (pin_hall == g_analog_pin_b_hall){
+	if (pin_hall == PIN_ANALOG_B_HALL){
 		return g_b_hall_value;
 	}
-	// if (pin_hall == g_analog_pin_c_hall){
+	// if (pin_hall == PIN_ANALOG_C_HALL){
 	return g_c_hall_value;
 }
 
@@ -95,9 +95,9 @@ float analog_read_angle ()
 	// current state of hall sensor
 	float state_a_hall, state_b_hall, state_c_hall;
 	
-	state_a_hall = analog_read_hall_sensor(g_analog_pin_a_hall);
-	state_b_hall = analog_read_hall_sensor(g_analog_pin_b_hall);
-	state_c_hall = analog_read_hall_sensor(g_analog_pin_c_hall);
+	state_a_hall = analog_read_hall_sensor(PIN_ANALOG_A_HALL);
+	state_b_hall = analog_read_hall_sensor(PIN_ANALOG_B_HALL);
+	state_c_hall = analog_read_hall_sensor(PIN_ANALOG_C_HALL);
 
 	float normalize_a_hall = fmap((float)state_a_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
 	float normalize_b_hall = fmap((float)state_b_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
@@ -137,9 +137,9 @@ void sync_sensor_measurement()
 {
 	// fixme: reading sensors must be simultaneously
 
-	g_a_hall_value = analogRead(g_analog_pin_a_hall);
-	g_b_hall_value = analogRead(g_analog_pin_b_hall);
-	g_c_hall_value = analogRead(g_analog_pin_c_hall);
+	g_a_hall_value = analogRead(PIN_ANALOG_A_HALL);
+	g_b_hall_value = analogRead(PIN_ANALOG_B_HALL);
+	g_c_hall_value = analogRead(PIN_ANALOG_C_HALL);
 	
 	g_abc_current = analogRead(PIN_ANALOG_ABC_CURRENT) - g_zero_abc_current;
 }

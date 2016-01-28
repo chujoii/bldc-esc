@@ -44,19 +44,26 @@
 
 void search_phases_sensor_pinout(int speed, unsigned long waiting_time, int change_limit)
 {
+	// function only seach pinout
+	// not apply finded pins
+	
+	int plausible_pin_analog_a_hall;
+	int plausible_pin_analog_b_hall;
+	int plausible_pin_analog_c_hall;
+	
 	do {
-		g_analog_pin_a_hall = search_pinout(speed, waiting_time, change_limit, 'a');
-		sprintf (buffer, "for phase A sensor pin = %d", g_analog_pin_a_hall);
+		plausible_pin_analog_a_hall = search_pinout(speed, waiting_time, change_limit, 'a');
+		sprintf (buffer, "for phase A sensor pin = %d", plausible_pin_analog_a_hall);
 		Serial.println(buffer);
 		
-		g_analog_pin_b_hall = search_pinout(speed, waiting_time, change_limit, 'b');
-		sprintf (buffer, "for phase B sensor pin = %d", g_analog_pin_b_hall);
+		plausible_pin_analog_b_hall = search_pinout(speed, waiting_time, change_limit, 'b');
+		sprintf (buffer, "for phase B sensor pin = %d", plausible_pin_analog_b_hall);
 		Serial.println(buffer);
 		
-		g_analog_pin_c_hall = search_pinout(speed, waiting_time, change_limit, 'c');
-		sprintf (buffer, "for phase C sensor pin = %d", g_analog_pin_c_hall);
+		plausible_pin_analog_c_hall = search_pinout(speed, waiting_time, change_limit, 'c');
+		sprintf (buffer, "for phase C sensor pin = %d", plausible_pin_analog_c_hall);
 		Serial.println(buffer);
-	} while ((g_analog_pin_a_hall == g_analog_pin_b_hall) || (g_analog_pin_b_hall == g_analog_pin_c_hall) || (g_analog_pin_c_hall == g_analog_pin_a_hall));
+	} while ((plausible_pin_analog_a_hall == plausible_pin_analog_b_hall) || (plausible_pin_analog_b_hall == plausible_pin_analog_c_hall) || (plausible_pin_analog_c_hall == plausible_pin_analog_a_hall));
 }
 
 
@@ -64,9 +71,9 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 {
 	int phase_num_1, phase_num_2;
 	
-	int old_x = analog_read_hall_sensor(PIN_ANALOG_X_HALL);
-	int old_y = analog_read_hall_sensor(PIN_ANALOG_Y_HALL);
-	int old_z = analog_read_hall_sensor(PIN_ANALOG_Z_HALL);
+	int old_x = analog_read_hall_sensor(PIN_ANALOG_A_HALL);
+	int old_y = analog_read_hall_sensor(PIN_ANALOG_B_HALL);
+	int old_z = analog_read_hall_sensor(PIN_ANALOG_C_HALL);
 
 	
 	int x = old_x + change_limit;
@@ -119,9 +126,9 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 		sync_sensor_measurement();
 		sensor_statistic(STATISTIC_MEAN, VALUE_ERR);
 
-		x = analog_read_hall_sensor(PIN_ANALOG_X_HALL);
-		y = analog_read_hall_sensor(PIN_ANALOG_Y_HALL);
-		z = analog_read_hall_sensor(PIN_ANALOG_Z_HALL);
+		x = analog_read_hall_sensor(PIN_ANALOG_A_HALL);
+		y = analog_read_hall_sensor(PIN_ANALOG_B_HALL);
+		z = analog_read_hall_sensor(PIN_ANALOG_C_HALL);
 		//sprintf (buffer, "x=%d\ty=%d\tz=%d\tdiff=%d", x, y, z, abs(x - old_x) + abs(y - old_y) + abs(z - old_z));
 		//Serial.println(buffer);
 		delay(delay_time);
@@ -134,10 +141,10 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 
 	Serial.println(delay_time);
 	
-	if (x > y && x > z) {return PIN_ANALOG_X_HALL;}
-	if (y > x && y > z) {return PIN_ANALOG_Y_HALL;}
-	if (z > x && z > y) {return PIN_ANALOG_Z_HALL;}
-	return PIN_ANALOG_Z_HALL; // strange
+	if (x > y && x > z) {return PIN_ANALOG_A_HALL;}
+	if (y > x && y > z) {return PIN_ANALOG_B_HALL;}
+	if (z > x && z > y) {return PIN_ANALOG_C_HALL;}
+	return PIN_ANALOG_C_HALL; // strange
 }
 
 

@@ -181,9 +181,9 @@ void exec_cmd(char *cmd, int cmd_len)
 			search_phases_sensor_pinout(speed, waiting_time, change_limit);
 			free_rotation();
 		} else {
-			Serial.print("pin a hall = A");Serial.print(g_analog_pin_a_hall - 14);
-			Serial.print("\tpin b hall = A");Serial.print(g_analog_pin_b_hall - 14);
-			Serial.print("\tpin c hall = A");Serial.println(g_analog_pin_c_hall - 14);
+			Serial.print("pin a hall = A");Serial.print(PIN_ANALOG_A_HALL - 14);
+			Serial.print("\tpin b hall = A");Serial.print(PIN_ANALOG_B_HALL - 14);
+			Serial.print("\tpin c hall = A");Serial.println(PIN_ANALOG_C_HALL - 14);
 		}
 		break;
 	case 'x': // proportional integral derivative coefficient for active parameter
