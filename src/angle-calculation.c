@@ -52,9 +52,9 @@
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
 
-const unsigned char t_sin[256] = {0, 1, 3, 4, 6, 7, 9, 10, 12, 14, 15, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 32, 34, 35, 37, 39, 40, 42, 43, 45, 46, 48, 49, 51, 52, 54, 56, 57, 59, 60, 62, 63, 65, 66, 68, 69, 71, 72, 74, 75, 77, 78, 80, 81, 83, 84, 86, 87, 89, 90, 92, 93, 94, 96, 97, 99, 100, 102, 103, 105, 106, 107, 109, 110, 112, 113, 115, 116, 117, 119, 120, 121, 123, 124, 126, 127, 128, 130, 131, 132, 134, 135, 136, 138, 139, 140, 142, 143, 144, 145, 147, 148, 149, 151, 152, 153, 154, 156, 157, 158, 159, 161, 162, 163, 164, 165, 167, 168, 169, 170, 171, 172, 174, 175, 176, 177, 178, 179, 180, 181, 182, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 208, 209, 210, 211, 212, 213, 214, 215, 215, 216, 217, 218, 219, 219, 220, 221, 222, 223, 223, 224, 225, 226, 226, 227, 228, 228, 229, 230, 230, 231, 232, 232, 233, 234, 234, 235, 235, 236, 237, 237, 238, 238, 239, 239, 240, 240, 241, 241, 242, 242, 243, 243, 244, 244, 245, 245, 246, 246, 246, 247, 247, 248, 248, 248, 249, 249, 249, 250, 250, 250, 250, 251, 251, 251, 251, 252, 252, 252, 252, 253, 253, 253, 253, 253, 253, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254, 254};
+unsigned char T_SIN[256] = {0x0, 0x1, 0x3, 0x4, 0x6, 0x7, 0x9, 0xa, 0xc, 0xe, 0xf, 0x11, 0x12, 0x14, 0x15, 0x17, 0x19, 0x1a, 0x1c, 0x1d, 0x1f, 0x20, 0x22, 0x23, 0x25, 0x27, 0x28, 0x2a, 0x2b, 0x2d, 0x2e, 0x30, 0x31, 0x33, 0x34, 0x36, 0x38, 0x39, 0x3b, 0x3c, 0x3e, 0x3f, 0x41, 0x42, 0x44, 0x45, 0x47, 0x48, 0x4a, 0x4b, 0x4d, 0x4e, 0x50, 0x51, 0x53, 0x54, 0x56, 0x57, 0x59, 0x5a, 0x5c, 0x5d, 0x5e, 0x60, 0x61, 0x63, 0x64, 0x66, 0x67, 0x69, 0x6a, 0x6b, 0x6d, 0x6e, 0x70, 0x71, 0x73, 0x74, 0x75, 0x77, 0x78, 0x79, 0x7b, 0x7c, 0x7e, 0x7f, 0x80, 0x82, 0x83, 0x84, 0x86, 0x87, 0x88, 0x8a, 0x8b, 0x8c, 0x8e, 0x8f, 0x90, 0x91, 0x93, 0x94, 0x95, 0x97, 0x98, 0x99, 0x9a, 0x9c, 0x9d, 0x9e, 0x9f, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xae, 0xaf, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdb, 0xdc, 0xdd, 0xde, 0xdf, 0xdf, 0xe0, 0xe1, 0xe2, 0xe2, 0xe3, 0xe4, 0xe4, 0xe5, 0xe6, 0xe6, 0xe7, 0xe8, 0xe8, 0xe9, 0xea, 0xea, 0xeb, 0xeb, 0xec, 0xed, 0xed, 0xee, 0xee, 0xef, 0xef, 0xf0, 0xf0, 0xf1, 0xf1, 0xf2, 0xf2, 0xf3, 0xf3, 0xf4, 0xf4, 0xf5, 0xf5, 0xf6, 0xf6, 0xf6, 0xf7, 0xf7, 0xf8, 0xf8, 0xf8, 0xf9, 0xf9, 0xf9, 0xfa, 0xfa, 0xfa, 0xfa, 0xfb, 0xfb, 0xfb, 0xfb, 0xfc, 0xfc, 0xfc, 0xfc, 0xfd, 0xfd, 0xfd, 0xfd, 0xfd, 0xfd, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe};
 
-const unsigned char t_asin[256] = {0, 0, 1, 1, 2, 3, 3, 4, 5, 5, 6, 6, 7, 8, 8, 9, 10, 10, 11, 12, 12, 13, 13, 14, 15, 15, 16, 17, 17, 18, 19, 19, 20, 20, 21, 22, 22, 23, 24, 24, 25, 26, 26, 27, 28, 28, 29, 29, 30, 31, 31, 32, 33, 33, 34, 35, 35, 36, 37, 37, 38, 39, 39, 40, 41, 41, 42, 43, 43, 44, 44, 45, 46, 46, 47, 48, 48, 49, 50, 50, 51, 52, 52, 53, 54, 54, 55, 56, 57, 57, 58, 59, 59, 60, 61, 61, 62, 63, 63, 64, 65, 65, 66, 67, 67, 68, 69, 70, 70, 71, 72, 72, 73, 74, 74, 75, 76, 77, 77, 78, 79, 79, 80, 81, 82, 82, 83, 84, 85, 85, 86, 87, 88, 88, 89, 90, 91, 91, 92, 93, 94, 94, 95, 96, 97, 97, 98, 99, 100, 100, 101, 102, 103, 104, 104, 105, 106, 107, 108, 108, 109, 110, 111, 112, 113, 113, 114, 115, 116, 117, 118, 118, 119, 120, 121, 122, 123, 124, 125, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 161, 162, 163, 164, 165, 167, 168, 169, 170, 172, 173, 174, 176, 177, 179, 180, 181, 183, 184, 186, 188, 189, 191, 192, 194, 196, 198, 200, 202, 204, 206, 208, 211, 213, 216, 218, 222, 225, 229, 233, 239, 254};
+unsigned char T_ASIN[256] = {0x0, 0x0, 0x1, 0x1, 0x2, 0x3, 0x3, 0x4, 0x5, 0x5, 0x6, 0x6, 0x7, 0x8, 0x8, 0x9, 0xa, 0xa, 0xb, 0xc, 0xc, 0xd, 0xd, 0xe, 0xf, 0xf, 0x10, 0x11, 0x11, 0x12, 0x13, 0x13, 0x14, 0x14, 0x15, 0x16, 0x16, 0x17, 0x18, 0x18, 0x19, 0x1a, 0x1a, 0x1b, 0x1c, 0x1c, 0x1d, 0x1d, 0x1e, 0x1f, 0x1f, 0x20, 0x21, 0x21, 0x22, 0x23, 0x23, 0x24, 0x25, 0x25, 0x26, 0x27, 0x27, 0x28, 0x29, 0x29, 0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x30, 0x31, 0x32, 0x32, 0x33, 0x34, 0x34, 0x35, 0x36, 0x36, 0x37, 0x38, 0x39, 0x39, 0x3a, 0x3b, 0x3b, 0x3c, 0x3d, 0x3d, 0x3e, 0x3f, 0x3f, 0x40, 0x41, 0x41, 0x42, 0x43, 0x43, 0x44, 0x45, 0x46, 0x46, 0x47, 0x48, 0x48, 0x49, 0x4a, 0x4a, 0x4b, 0x4c, 0x4d, 0x4d, 0x4e, 0x4f, 0x4f, 0x50, 0x51, 0x52, 0x52, 0x53, 0x54, 0x55, 0x55, 0x56, 0x57, 0x58, 0x58, 0x59, 0x5a, 0x5b, 0x5b, 0x5c, 0x5d, 0x5e, 0x5e, 0x5f, 0x60, 0x61, 0x61, 0x62, 0x63, 0x64, 0x64, 0x65, 0x66, 0x67, 0x68, 0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6c, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x96, 0x97, 0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa7, 0xa8, 0xa9, 0xaa, 0xac, 0xad, 0xae, 0xb0, 0xb1, 0xb3, 0xb4, 0xb5, 0xb7, 0xb8, 0xba, 0xbc, 0xbd, 0xbf, 0xc0, 0xc2, 0xc4, 0xc6, 0xc8, 0xca, 0xcc, 0xce, 0xd0, 0xd3, 0xd5, 0xd8, 0xda, 0xde, 0xe1, 0xe5, 0xe9, 0xef, 0xfe};
 
 
 float cycle_constrain_angle (float x, float xmin, float xmax)
@@ -78,11 +78,11 @@ float cycle_max_diff_from_three (float a, float b, float c, float cycle)
 
 float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2, float epsilon)
 {
-	float min_angle_diff = point_of_cycle_max;
-	float result_angle = point_of_cycle_min;
+	float min_angle_diff = POINT_OF_CYCLE_SIN_X_MAX;
+	float result_angle = POINT_OF_CYCLE_SIN_X_MIN;
 	float tmp_diff;
 	
-	tmp_diff = cycle_max_diff_from_three(a1, b1, c1, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a1, b1, c1, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a1;
@@ -91,7 +91,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 	DEBUG_PRINT(("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b1, c1, tmp_diff, min_angle_diff, result_angle));
 	if (tmp_diff < epsilon) {return result_angle;}
 	
-	tmp_diff = cycle_max_diff_from_three(a1, b1, c2, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a1, b1, c2, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a1;
@@ -100,7 +100,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 	DEBUG_PRINT(("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b1, c2, tmp_diff, min_angle_diff, result_angle));
 	if (tmp_diff < epsilon) {return result_angle;}
 	
-	tmp_diff = cycle_max_diff_from_three(a1, b2, c1, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a1, b2, c1, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a1;
@@ -109,7 +109,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 	DEBUG_PRINT(("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b2, c1, tmp_diff, min_angle_diff, result_angle));
 	if (tmp_diff < epsilon) {return result_angle;}
 	
-	tmp_diff = cycle_max_diff_from_three(a1, b2, c2, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a1, b2, c2, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a1;
@@ -118,7 +118,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 	DEBUG_PRINT(("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a1, b2, c2, tmp_diff, min_angle_diff, result_angle));
 	if (tmp_diff < epsilon) {return result_angle;}
 	
-	tmp_diff = cycle_max_diff_from_three(a2, b1, c1, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a2, b1, c1, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a2;
@@ -127,7 +127,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 	DEBUG_PRINT(("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a2, b1, c1, tmp_diff, min_angle_diff, result_angle));
 	if (tmp_diff < epsilon) {return result_angle;}
 	
-	tmp_diff = cycle_max_diff_from_three(a2, b1, c2, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a2, b1, c2, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a2;
@@ -136,7 +136,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 	DEBUG_PRINT(("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a2, b1, c2, tmp_diff, min_angle_diff, result_angle));
 	if (tmp_diff < epsilon) {return result_angle;}
 	
-	tmp_diff = cycle_max_diff_from_three(a2, b2, c1, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a2, b2, c1, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a2;
@@ -145,7 +145,7 @@ float examine_angles(float a1, float a2, float b1, float b2, float c1, float c2,
 	DEBUG_PRINT(("a=%7.2f\tb=%7.2f\tc=%7.2f\tdiff=%7.2f\tmin=%7.2f\ta=%7.2f\n", a2, b2, c1, tmp_diff, min_angle_diff, result_angle));
 	if (tmp_diff < epsilon) {return result_angle;}
 	
-	tmp_diff = cycle_max_diff_from_three(a2, b2, c2, point_of_cycle_max);
+	tmp_diff = cycle_max_diff_from_three(a2, b2, c2, POINT_OF_CYCLE_SIN_X_MAX);
 	if (tmp_diff < min_angle_diff){
 		min_angle_diff = tmp_diff;
 		result_angle = a2;
@@ -180,16 +180,16 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
         // x[grad] = x[rad]  * (180/3.14)
 	//
 	DEBUG_PRINT(("\n"));
-	float angle_a_1 = asin(constrain(a, min_sin_val, max_sin_val));
-	float angle_b_1 = asin(constrain(b, min_sin_val, max_sin_val));
-	float angle_c_1 = asin(constrain(c, min_sin_val, max_sin_val));
+	float angle_a_1 = asin(constrain(a, SIN_VAL_MIN, SIN_VAL_MAX));
+	float angle_b_1 = asin(constrain(b, SIN_VAL_MIN, SIN_VAL_MAX));
+	float angle_c_1 = asin(constrain(c, SIN_VAL_MIN, SIN_VAL_MAX));
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
 	// angle_a_1= -50.38[degree]	angle_b_1=-129.79[degree]	angle_c_1=-173.04[degree]
 
 	DEBUG_PRINT(("a-0\tb-120\tc-240\n"));  // -0 -120 -240 but not +0 +120 +240, because for example sin(x+5) shifted to -5 by "x" axis
-	angle_a_1 = angle_a_1 - angle_a_shift; //   0[degree] = 0[rad]
-	angle_b_1 = angle_b_1 - angle_b_shift; // 120[degree] = pi*2/3[rad]
-	angle_c_1 = angle_c_1 - angle_c_shift; // 240[degree] = pi*4/3[rad]
+	angle_a_1 = angle_a_1 - SHIFT_ANGLE_A; //   0[degree] = 0[rad]
+	angle_b_1 = angle_b_1 - SHIFT_ANGLE_B; // 120[degree] = pi*2/3[rad]
+	angle_c_1 = angle_c_1 - SHIFT_ANGLE_C; // 240[degree] = pi*4/3[rad]
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
 
 	
@@ -198,9 +198,9 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	// 
 	//
 	DEBUG_PRINT(("cycle constrain\n"));
-	angle_a_1 = cycle_constrain_angle(angle_a_1, point_of_cycle_min, point_of_cycle_max);
-	angle_b_1 = cycle_constrain_angle(angle_b_1, point_of_cycle_min, point_of_cycle_max);
-	angle_c_1 = cycle_constrain_angle(angle_c_1, point_of_cycle_min, point_of_cycle_max);
+	angle_a_1 = cycle_constrain_angle(angle_a_1, POINT_OF_CYCLE_SIN_X_MIN, POINT_OF_CYCLE_SIN_X_MAX);
+	angle_b_1 = cycle_constrain_angle(angle_b_1, POINT_OF_CYCLE_SIN_X_MIN, POINT_OF_CYCLE_SIN_X_MAX);
+	angle_c_1 = cycle_constrain_angle(angle_c_1, POINT_OF_CYCLE_SIN_X_MIN, POINT_OF_CYCLE_SIN_X_MAX);
 	DEBUG_PRINT(("angle_a_1=%7.2f\tangle_b_1=%7.2f\tangle_c_1=%7.2f\n\n", angle_a_1, angle_b_1, angle_c_1));
 	// angle_a_1= 309.62[degree]	angle_b_1= 230.21[degree]	angle_c_1= 186.96[degree]
 	//
@@ -208,35 +208,35 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 	float angle_b_2;
 	float angle_c_2;
 	DEBUG_PRINT(("symmetry\n"));
-	if (angle_a_1 < point_of_zero_cross_sin_x - angle_a_shift) {
+	if (angle_a_1 < POINT_OF_ZERO_CROSS_SIN_X - SHIFT_ANGLE_A) {
 		DEBUG_PRINT(("a smaller\t\t"));
-		angle_a_2 = (point_of_symmetry_sin_x_plus  - angle_a_shift) * 2 - angle_a_1;
+		angle_a_2 = (POINT_OF_SYMMETRY_SIN_X_PLUS  - SHIFT_ANGLE_A) * 2 - angle_a_1;
 	} else {
 		DEBUG_PRINT(("a biger\t\t"));
-		angle_a_2 = (point_of_symmetry_sin_x_minus - angle_a_shift) * 2 - angle_a_1;
+		angle_a_2 = (POINT_OF_SYMMETRY_SIN_X_MINUS - SHIFT_ANGLE_A) * 2 - angle_a_1;
 	}
 	
-	if (angle_b_1 < point_of_zero_cross_sin_x - angle_b_shift) {
+	if (angle_b_1 < POINT_OF_ZERO_CROSS_SIN_X - SHIFT_ANGLE_B) {
 		DEBUG_PRINT(("b smaller\t\t"));
-		angle_b_2 = (point_of_symmetry_sin_x_plus  - angle_b_shift) * 2 - angle_b_1;
+		angle_b_2 = (POINT_OF_SYMMETRY_SIN_X_PLUS  - SHIFT_ANGLE_B) * 2 - angle_b_1;
 	} else {
 		DEBUG_PRINT(("b biger\t\t"));
-		angle_b_2 = (point_of_symmetry_sin_x_minus - angle_b_shift) * 2 - angle_b_1;
+		angle_b_2 = (POINT_OF_SYMMETRY_SIN_X_MINUS - SHIFT_ANGLE_B) * 2 - angle_b_1;
 	}
 	
-	if (angle_c_1 < point_of_zero_cross_sin_x - angle_c_shift) {
+	if (angle_c_1 < POINT_OF_ZERO_CROSS_SIN_X - SHIFT_ANGLE_C) {
 		DEBUG_PRINT(("c smaller\t\t"));
-		angle_c_2 = (point_of_symmetry_sin_x_plus  - angle_c_shift) * 2 - angle_c_1;
+		angle_c_2 = (POINT_OF_SYMMETRY_SIN_X_PLUS  - SHIFT_ANGLE_C) * 2 - angle_c_1;
 	} else {
 		DEBUG_PRINT(("c biger\t\t"));
-		angle_c_2 = (point_of_symmetry_sin_x_minus - angle_c_shift) * 2 - angle_c_1;
+		angle_c_2 = (POINT_OF_SYMMETRY_SIN_X_MINUS - SHIFT_ANGLE_C) * 2 - angle_c_1;
 	}
-	DEBUG_PRINT(("%7.2f\n", cycle_constrain_angle(point_of_zero_cross_sin_x - angle_c_shift, point_of_cycle_min, point_of_cycle_max)));
+	DEBUG_PRINT(("%7.2f\n", cycle_constrain_angle(POINT_OF_ZERO_CROSS_SIN_X - SHIFT_ANGLE_C, POINT_OF_CYCLE_SIN_X_MIN, POINT_OF_CYCLE_SIN_X_MAX)));
 	DEBUG_PRINT(("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n", angle_a_2, angle_b_2, angle_c_2));
 
-	angle_a_2 = cycle_constrain_angle(angle_a_2, point_of_cycle_min, point_of_cycle_max);
-	angle_b_2 = cycle_constrain_angle(angle_b_2, point_of_cycle_min, point_of_cycle_max);
-	angle_c_2 = cycle_constrain_angle(angle_c_2, point_of_cycle_min, point_of_cycle_max);
+	angle_a_2 = cycle_constrain_angle(angle_a_2, POINT_OF_CYCLE_SIN_X_MIN, POINT_OF_CYCLE_SIN_X_MAX);
+	angle_b_2 = cycle_constrain_angle(angle_b_2, POINT_OF_CYCLE_SIN_X_MIN, POINT_OF_CYCLE_SIN_X_MAX);
+	angle_c_2 = cycle_constrain_angle(angle_c_2, POINT_OF_CYCLE_SIN_X_MIN, POINT_OF_CYCLE_SIN_X_MAX);
 	DEBUG_PRINT(("angle_a_2=%7.2f\tangle_b_2=%7.2f\tangle_c_2=%7.2f\n\n", angle_a_2, angle_b_2, angle_c_2));
 	// fixme need change math function asin to table function
 	// fixme float -> int
@@ -249,7 +249,7 @@ float calculation_angle_from_three_phases(float a, float b, float c) // int prev
 
 
 
-	float result = examine_angles(angle_a_1, angle_a_2, angle_b_1, angle_b_2, angle_c_1, angle_c_2, epsilon);
+	float result = examine_angles(angle_a_1, angle_a_2, angle_b_1, angle_b_2, angle_c_1, angle_c_2, EPSILON_ANGLE);
 	DEBUG_PRINT(("result angle = %7.2f\n", result));
 	return result;
 }

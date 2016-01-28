@@ -64,9 +64,9 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 {
 	int phase_num_1, phase_num_2;
 	
-	int old_x = analog_read_hall_sensor(analog_pin_x_hall);
-	int old_y = analog_read_hall_sensor(analog_pin_y_hall);
-	int old_z = analog_read_hall_sensor(analog_pin_z_hall);
+	int old_x = analog_read_hall_sensor(PIN_ANALOG_X_HALL);
+	int old_y = analog_read_hall_sensor(PIN_ANALOG_Y_HALL);
+	int old_z = analog_read_hall_sensor(PIN_ANALOG_Z_HALL);
 
 	
 	int x = old_x + change_limit;
@@ -117,11 +117,11 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 		delay(delay_time);
 
 		sync_sensor_measurement();
-		sensor_statistic(statistic_mean, value_err);
+		sensor_statistic(STATISTIC_MEAN, VALUE_ERR);
 
-		x = analog_read_hall_sensor(analog_pin_x_hall);
-		y = analog_read_hall_sensor(analog_pin_y_hall);
-		z = analog_read_hall_sensor(analog_pin_z_hall);
+		x = analog_read_hall_sensor(PIN_ANALOG_X_HALL);
+		y = analog_read_hall_sensor(PIN_ANALOG_Y_HALL);
+		z = analog_read_hall_sensor(PIN_ANALOG_Z_HALL);
 		//sprintf (buffer, "x=%d\ty=%d\tz=%d\tdiff=%d", x, y, z, abs(x - old_x) + abs(y - old_y) + abs(z - old_z));
 		//Serial.println(buffer);
 		delay(delay_time);
@@ -134,21 +134,21 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 
 	Serial.println(delay_time);
 	
-	if (x > y && x > z) {return analog_pin_x_hall;}
-	if (y > x && y > z) {return analog_pin_y_hall;}
-	if (z > x && z > y) {return analog_pin_z_hall;}
-	return analog_pin_z_hall; // strange
+	if (x > y && x > z) {return PIN_ANALOG_X_HALL;}
+	if (y > x && y > z) {return PIN_ANALOG_Y_HALL;}
+	if (z > x && z > y) {return PIN_ANALOG_Z_HALL;}
+	return PIN_ANALOG_Z_HALL; // strange
 }
 
 
 void free_rotation()
 {
-	digitalWrite(pin_phase_a_hi, LOW);
-	digitalWrite(pin_phase_a_lo, LOW);
-	digitalWrite(pin_phase_b_hi, LOW);
-	digitalWrite(pin_phase_b_lo, LOW);
-	digitalWrite(pin_phase_c_hi, LOW);
-	digitalWrite(pin_phase_c_lo, LOW);
+	digitalWrite(PIN_PHASE_A_HI, LOW);
+	digitalWrite(PIN_PHASE_A_LO, LOW);
+	digitalWrite(PIN_PHASE_B_HI, LOW);
+	digitalWrite(PIN_PHASE_B_LO, LOW);
+	digitalWrite(PIN_PHASE_C_HI, LOW);
+	digitalWrite(PIN_PHASE_C_LO, LOW);
 }
 
 void turn_analog(int speed, float angle, float angle_shift)
@@ -156,44 +156,44 @@ void turn_analog(int speed, float angle, float angle_shift)
 	// speed = scalar absolute value (magnitude) of velocity
 	
 	
-	float phase_a_val = sin(angle + angle_a_shift + angle_shift);
-	float phase_b_val = sin(angle + angle_b_shift + angle_shift);
-	float phase_c_val = sin(angle + angle_c_shift + angle_shift);
+	float phase_a_val = sin(angle + SHIFT_ANGLE_A + angle_shift);
+	float phase_b_val = sin(angle + SHIFT_ANGLE_B + angle_shift);
+	float phase_c_val = sin(angle + SHIFT_ANGLE_C + angle_shift);
 
 	if (phase_a_val>0.0) {
-		digitalWrite(pin_phase_a_lo, LOW);
-		analogWrite (pin_phase_a_hi, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
+		digitalWrite(PIN_PHASE_A_LO, LOW);
+		analogWrite (PIN_PHASE_A_HI, (int)fmap(abs(phase_a_val), 0.0, 1.0, DAC_MIN, speed));
 		//if (phase_a_val<0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(A");}
-		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
+		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, DAC_MIN, speed));DEBUGA_PRINT("\t");
 	} else {
-		digitalWrite(pin_phase_a_hi, LOW);
-		analogWrite (pin_phase_a_lo, (int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));
+		digitalWrite(PIN_PHASE_A_HI, LOW);
+		analogWrite (PIN_PHASE_A_LO, (int)fmap(abs(phase_a_val), 0.0, 1.0, DAC_MIN, speed));
 		//if (phase_a_val>0.5){DEBUGA_PRINT("(-");}else{DEBUGA_PRINT("(a");}
-		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
+		//DEBUGA_PRINT((int)fmap(abs(phase_a_val), 0.0, 1.0, DAC_MIN, speed));DEBUGA_PRINT("\t");
 	}
 
 	if (phase_b_val>0.0) {
-		digitalWrite(pin_phase_b_lo, LOW);
-		analogWrite (pin_phase_b_hi, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
+		digitalWrite(PIN_PHASE_B_LO, LOW);
+		analogWrite (PIN_PHASE_B_HI, (int)fmap(abs(phase_b_val), 0.0, 1.0, DAC_MIN, speed));
 		//if (phase_b_val<0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("B");}
-		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
+		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, DAC_MIN, speed));DEBUGA_PRINT("\t");
 	} else {
-		digitalWrite(pin_phase_b_hi, LOW);
-		analogWrite (pin_phase_b_lo, (int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));
+		digitalWrite(PIN_PHASE_B_HI, LOW);
+		analogWrite (PIN_PHASE_B_LO, (int)fmap(abs(phase_b_val), 0.0, 1.0, DAC_MIN, speed));
 		//if (phase_b_val>0.5){DEBUGA_PRINT("-");}else{DEBUGA_PRINT("b");}
-		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
+		//DEBUGA_PRINT((int)fmap(abs(phase_b_val), 0.0, 1.0, DAC_MIN, speed));DEBUGA_PRINT("\t");
 	}
 	
 	if (phase_c_val>0.0) {
-		digitalWrite(pin_phase_c_lo, LOW);
-		analogWrite (pin_phase_c_hi, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
+		digitalWrite(PIN_PHASE_C_LO, LOW);
+		analogWrite (PIN_PHASE_C_HI, (int)fmap(abs(phase_c_val), 0.0, 1.0, DAC_MIN, speed));
 		//if (phase_c_val<0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("C)\t");}
-		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
+		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, DAC_MIN, speed));DEBUGA_PRINT("\t");
 	} else {
-		digitalWrite(pin_phase_c_hi, LOW);
-		analogWrite (pin_phase_c_lo, (int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));
+		digitalWrite(PIN_PHASE_C_HI, LOW);
+		analogWrite (PIN_PHASE_C_LO, (int)fmap(abs(phase_c_val), 0.0, 1.0, DAC_MIN, speed));
 		//if (phase_c_val>0.5){DEBUGA_PRINT("-)\t");}else{DEBUGA_PRINT("c)\t");}
-		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, pwm_min, speed));DEBUGA_PRINT("\t");
+		//DEBUGA_PRINT((int)fmap(abs(phase_c_val), 0.0, 1.0, DAC_MIN, speed));DEBUGA_PRINT("\t");
 	}
 
 	// fixme: need minimum 3 measurement by each turn:
@@ -201,17 +201,19 @@ void turn_analog(int speed, float angle, float angle_shift)
 	// rigth answer motor stop because control become incorrect
 	//
 	//  g_old_analog_angle < 120[degree]     &&  angle > 240[degree]
-	if (g_old_analog_angle < angle_b_shift   &&  angle > angle_c_shift){
+	if (g_old_analog_angle < SHIFT_ANGLE_B   &&  angle > SHIFT_ANGLE_C){
 		g_turn_counter++;
 		g_old_turn_timer_us = g_turn_timer_us;
 		g_turn_timer_us = micros();
+		g_real_direction = 1;
 	}
 	//
 	//  g_old_analog_angle > 240[degree]     &&  angle < 120[degree]
-	if (g_old_analog_angle > angle_c_shift   &&  angle < angle_b_shift){
+	if (g_old_analog_angle > SHIFT_ANGLE_C   &&  angle < SHIFT_ANGLE_B){
 		g_turn_counter--;
 		g_old_turn_timer_us = g_turn_timer_us;
 		g_turn_timer_us = micros();
+		g_real_direction = -1;
 	}
 
 	g_halfturn_timer_us = micros();
@@ -317,84 +319,86 @@ void turn_digital(byte speed, byte digital_angle, boolean angle_shift)
 	case B101:
 		//a-hi b-lo
 		DEBUGA_PRINT("[Ab-]\t");
-		analogWrite(pin_phase_a_hi, speed);
-		digitalWrite(pin_phase_a_lo, LOW);
-		analogWrite(pin_phase_b_hi, 0);
-		digitalWrite(pin_phase_b_lo, HIGH);
-		analogWrite(pin_phase_c_hi, 0);
-		digitalWrite(pin_phase_c_lo, LOW);
+		analogWrite(PIN_PHASE_A_HI, speed);
+		digitalWrite(PIN_PHASE_A_LO, LOW);
+		analogWrite(PIN_PHASE_B_HI, 0);
+		digitalWrite(PIN_PHASE_B_LO, HIGH);
+		analogWrite(PIN_PHASE_C_HI, 0);
+		digitalWrite(PIN_PHASE_C_LO, LOW);
 		break;
 	case B001:
 		// a-hi c-lo
 		DEBUGA_PRINT("[A-c]\t");
-		analogWrite(pin_phase_a_hi, speed);
-		digitalWrite(pin_phase_a_lo, LOW);
-		analogWrite(pin_phase_b_hi, 0);
-		digitalWrite(pin_phase_b_lo, LOW);
-		analogWrite(pin_phase_c_hi, 0);
-		digitalWrite(pin_phase_c_lo, HIGH);
+		analogWrite(PIN_PHASE_A_HI, speed);
+		digitalWrite(PIN_PHASE_A_LO, LOW);
+		analogWrite(PIN_PHASE_B_HI, 0);
+		digitalWrite(PIN_PHASE_B_LO, LOW);
+		analogWrite(PIN_PHASE_C_HI, 0);
+		digitalWrite(PIN_PHASE_C_LO, HIGH);
 		break;
 	case B011:
 		// b-hi c-lo
 		DEBUGA_PRINT("[-Bc]\t");
-		analogWrite(pin_phase_a_hi, 0);
-		digitalWrite(pin_phase_a_lo, LOW);
-		analogWrite(pin_phase_b_hi, speed);
-		digitalWrite(pin_phase_b_lo, LOW);
-		analogWrite(pin_phase_c_hi, 0);
-		digitalWrite(pin_phase_c_lo, HIGH);
+		analogWrite(PIN_PHASE_A_HI, 0);
+		digitalWrite(PIN_PHASE_A_LO, LOW);
+		analogWrite(PIN_PHASE_B_HI, speed);
+		digitalWrite(PIN_PHASE_B_LO, LOW);
+		analogWrite(PIN_PHASE_C_HI, 0);
+		digitalWrite(PIN_PHASE_C_LO, HIGH);
 		break;
 	case B010:
 		// b-hi a-lo
 		DEBUGA_PRINT("[aB-]\t");
-		analogWrite(pin_phase_a_hi, 0);
-		digitalWrite(pin_phase_a_lo, HIGH);
-		analogWrite(pin_phase_b_hi, speed);
-		digitalWrite(pin_phase_b_lo, LOW);
-		analogWrite(pin_phase_c_hi, 0);
-		digitalWrite(pin_phase_c_lo, LOW);
+		analogWrite(PIN_PHASE_A_HI, 0);
+		digitalWrite(PIN_PHASE_A_LO, HIGH);
+		analogWrite(PIN_PHASE_B_HI, speed);
+		digitalWrite(PIN_PHASE_B_LO, LOW);
+		analogWrite(PIN_PHASE_C_HI, 0);
+		digitalWrite(PIN_PHASE_C_LO, LOW);
 		break;
 	case B110:
 		// c-hi a-lo
 		DEBUGA_PRINT("[a-C]\t");
-		analogWrite(pin_phase_a_hi, 0);
-		digitalWrite(pin_phase_a_lo, HIGH);
-		analogWrite(pin_phase_b_hi, 0);
-		digitalWrite(pin_phase_b_lo, LOW);
-		analogWrite(pin_phase_c_hi, speed);
-		digitalWrite(pin_phase_c_lo, LOW);
+		analogWrite(PIN_PHASE_A_HI, 0);
+		digitalWrite(PIN_PHASE_A_LO, HIGH);
+		analogWrite(PIN_PHASE_B_HI, 0);
+		digitalWrite(PIN_PHASE_B_LO, LOW);
+		analogWrite(PIN_PHASE_C_HI, speed);
+		digitalWrite(PIN_PHASE_C_LO, LOW);
 		break;
 	case B100:
 		// c-hi b-lo
 		DEBUGA_PRINT("[-bC]\t");
-		analogWrite(pin_phase_a_hi, 0);
-		digitalWrite(pin_phase_a_lo, LOW);
-		analogWrite(pin_phase_b_hi, 0);
-		digitalWrite(pin_phase_b_lo, HIGH);
-		analogWrite(pin_phase_c_hi, speed);
-		digitalWrite(pin_phase_c_lo, LOW);
+		analogWrite(PIN_PHASE_A_HI, 0);
+		digitalWrite(PIN_PHASE_A_LO, LOW);
+		analogWrite(PIN_PHASE_B_HI, 0);
+		digitalWrite(PIN_PHASE_B_LO, HIGH);
+		analogWrite(PIN_PHASE_C_HI, speed);
+		digitalWrite(PIN_PHASE_C_LO, LOW);
 		break;
 	default:
 		// 000 111 error
 		// fixme
 		DEBUGA_PRINT("[---]\t");
-		analogWrite(pin_phase_a_hi, 0);
-		digitalWrite(pin_phase_a_lo, LOW);
-		analogWrite(pin_phase_b_hi, 0);
-		digitalWrite(pin_phase_b_lo, LOW);
-		analogWrite(pin_phase_c_hi, 0);
-		digitalWrite(pin_phase_c_lo, LOW);
+		analogWrite(PIN_PHASE_A_HI, 0);
+		digitalWrite(PIN_PHASE_A_LO, LOW);
+		analogWrite(PIN_PHASE_B_HI, 0);
+		digitalWrite(PIN_PHASE_B_LO, LOW);
+		analogWrite(PIN_PHASE_C_HI, 0);
+		digitalWrite(PIN_PHASE_C_LO, LOW);
 	}
 
 	if (g_old_digital_angle == B101 && digital_angle == B100){
 		g_turn_counter++;
 		g_old_turn_timer_us = g_turn_timer_us;
 		g_turn_timer_us = micros();
+		g_real_direction = 1;
 	}
 	if (g_old_digital_angle == B100 && digital_angle == B101){
 		g_turn_counter--;
 		g_old_turn_timer_us = g_turn_timer_us;
 		g_turn_timer_us = micros();
+		g_real_direction = -1;
 	}
 	
 	g_halfturn_timer_us = micros();

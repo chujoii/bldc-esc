@@ -170,13 +170,13 @@ void exec_cmd(char *cmd, int cmd_len)
 			
 			i = 2;
 			
-			speed = constrain(atoi(&cmd[i]), pwm_min, g_limit_speed_ctrl);
+			speed = constrain(atoi(&cmd[i]), DAC_MIN, g_limit_speed_ctrl);
 			
 			while (cmd[i] != ' ' && i < cmd_len){i++;}
 			waiting_time = constrain(atoi(&cmd[i++]), 0, 20);
 		
 			while (cmd[i] != ' ' && i < cmd_len){i++;}
-			change_limit = constrain(atoi(&cmd[i]), 1, analog_max * 3);
+			change_limit = constrain(atoi(&cmd[i]), 1, ADC_MAX * 3);
 			
 			search_phases_sensor_pinout(speed, waiting_time, change_limit);
 			free_rotation();

@@ -45,13 +45,13 @@ void sin_tab (int max_x, int max_y)
 {
 	int x;
 
-	printf("unsigned char t_sin[256] = {");
+	printf("unsigned char T_SIN[256] = {");
 	for (x=0; x<=max_x; x++){
 		// generate sin(x); x=0..90[grad]
 		// but              x=0..255[number]
 		// x[grad] = x[number]*90/255
 		// x[rad]  = x[grad] * (3.14/180)
-		printf("%u", (unsigned char)(sin(x*90.0*3.14/(180.0*255.0)) * max_y));
+		printf("0x%x", (unsigned char)(sin(x*90.0*3.14/(180.0*255.0)) * max_y));
 		if (x<max_x){printf(", ");}
 	}
 	printf("};\n");
@@ -63,7 +63,7 @@ void asin_tab (int max_y, int max_x)
 {
 	int y;
 	
-	printf("unsigned char t_asin[256] = {");
+	printf("unsigned char T_ASIN[256] = {");
 	for (y=0; y<=max_y; y++){
 		// generate asin(y); y=0..1[val]
 		// but               y=0..255[number]
@@ -73,7 +73,7 @@ void asin_tab (int max_y, int max_x)
 		// x[grad] = x[rad]  * (180/3.14)
 		//                        x=0..90[grad]
 		// but x need in interval x=0..255[number]
-		printf("%u", (unsigned char)(asin(((float)y)/((float)max_y))*180.0*max_x/(90.0*3.14)));
+		printf("0x%x", (unsigned char)(asin(((float)y)/((float)max_y))*180.0*max_x/(90.0*3.14)));
 		if (y<max_y){printf(", ");}
 	}
 	printf("};\n");

@@ -115,7 +115,7 @@ float analog_read_angle ()
 
 int read_abc_current()
 {
-	return analogRead(analog_pin_abc_current) - g_zero_abc_current;
+	return analogRead(PIN_ANALOG_ABC_CURRENT) - g_zero_abc_current;
 }
 
 
@@ -127,6 +127,11 @@ int get_rpm(){
 }
 
 
+float angular_velocity()
+{
+	
+}
+
 
 void sync_sensor_measurement()
 {
@@ -136,7 +141,7 @@ void sync_sensor_measurement()
 	g_b_hall_value = analogRead(g_analog_pin_b_hall);
 	g_c_hall_value = analogRead(g_analog_pin_c_hall);
 	
-	g_abc_current = analogRead(analog_pin_abc_current) - g_zero_abc_current;
+	g_abc_current = analogRead(PIN_ANALOG_ABC_CURRENT) - g_zero_abc_current;
 }
 
 
