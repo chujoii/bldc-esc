@@ -84,15 +84,8 @@ float analog_read_angle (float state_a_hall, float state_b_hall, float state_c_h
 
 
 
-int read_abc_current()
-{
-	return analogRead(PIN_ANALOG_ABC_CURRENT) - g_zero_abc_current;
-}
-
-
-
-int get_rpm(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us){
-	unsigned long full_turn_time = g_turn_timer_us - old_turn_timer_us;
+int get_rpm(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us){
+	unsigned long full_turn_time = turn_timer_us - old_turn_timer_us;
 	unsigned long half_turn_time = halfturn_timer_us - old_turn_timer_us;
 	return (int) (60000000 / max(half_turn_time, full_turn_time));
 }
@@ -104,7 +97,7 @@ float angular_velocity()
 }
 
 
-void sync_sensor_measurement(int *a_hall, int *b_hall, int *c_hall)
+void sync_sensor_measurement(int *a_hall, int *b_hall, int *c_hall, int *abc_current)
 {
 	// fixme: reading sensors must be simultaneously
 
@@ -112,7 +105,7 @@ void sync_sensor_measurement(int *a_hall, int *b_hall, int *c_hall)
 	*b_hall = analogRead(PIN_ANALOG_B_HALL);
 	*c_hall = analogRead(PIN_ANALOG_C_HALL);
 	
-	g_abc_current = analogRead(PIN_ANALOG_ABC_CURRENT) - g_zero_abc_current;
+	*abc_current = analogRead(PIN_ANALOG_ABC_CURRENT);
 }
 
 

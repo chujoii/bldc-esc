@@ -42,7 +42,7 @@
 */
 
 
-void read_ctrl()
+void read_ctrl(char *algorithm)
 {
 	if (Serial.available() > 0) {
 		byte incoming_byte;
@@ -52,7 +52,7 @@ void read_ctrl()
 		if ((incoming_byte != 0xa) && (g_cmd_line_length<g_cmd_line_max_length)) {
 			g_cmd_line[g_cmd_line_length++] = incoming_byte;
 		} else {
-			exec_cmd(g_cmd_line, g_cmd_line_length - 1);
+			exec_cmd(g_cmd_line, g_cmd_line_length - 1, &(*algorithm));
 			for (int i = 0; i < g_cmd_line_max_length; i++){ // fixme: maybe need reset command line only from 0 to g_cmd_line_length
 				g_cmd_line[i]='\0';
 			}
@@ -64,7 +64,7 @@ void read_ctrl()
 
 
 
-void exec_cmd(char *cmd, int cmd_len)
+void exec_cmd(char *cmd, int cmd_len, char *algorithm)
 {
 	int i; // counter
 
@@ -156,10 +156,10 @@ void exec_cmd(char *cmd, int cmd_len)
 		break;
 	case 'g': // algorithm: a - analog, d - digital
 		if (cmd_len > 1) {
-			if (cmd[2] == 'd') {g_algorithm = 'd';}
-			else               {g_algorithm = 'a';}
+			if (cmd[2] == 'd') {*algorithm = 'd';}
+			else               {*algorithm = 'a';}
 		} else {
-			Serial.print("algorithm = ");Serial.print(g_algorithm);Serial.print("\n");
+			Serial.print("algorithm = ");Serial.print(*algorithm);Serial.print("\n");
 		}
 		break;
 	case 'f': // search sensor pinout

@@ -76,23 +76,23 @@ float pid_regulator(float error, float proportional, float integral, float deriv
 
 
 
-int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us)
+int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us, int abc_current)
 {
 	// fixme maybe array better for coefficients than variable?
 	
 	int result;
 	switch (g_main_ctrl_parameter){
 	case 's': // velocity
-		result = pid_regulator(g_velocity_ctrl - get_rpm(halfturn_timer_us, old_turn_timer_us), g_velocity_ctrl_proportional, g_velocity_ctrl_integral, g_velocity_ctrl_derivative);
-		//Serial.print("velo_ctrl = ");Serial.print(g_velocity_ctrl);Serial.print("\trpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us)); Serial.print("\tveloctrl-rpm = ");Serial.print(g_velocity_ctrl - get_rpm(halfturn_timer_us, old_turn_timer_us));
+		result = pid_regulator(g_velocity_ctrl - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us), g_velocity_ctrl_proportional, g_velocity_ctrl_integral, g_velocity_ctrl_derivative);
+		//Serial.print("velo_ctrl = ");Serial.print(g_velocity_ctrl);Serial.print("\trpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us)); Serial.print("\tveloctrl-rpm = ");Serial.print(g_velocity_ctrl - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us));
 		break;
 	case 'u': // voltage
 		result = pid_regulator(g_voltage_ctrl - g_old_ctrl_value, g_voltage_ctrl_proportional, g_voltage_ctrl_integral, g_voltage_ctrl_derivative);
 		//Serial.print("voltage = ");
 		break;
 	case 'i': // current
-		result = pid_regulator(g_current_ctrl - read_abc_current(), g_current_ctrl_proportional, g_current_ctrl_integral, g_current_ctrl_derivative);
-		//Serial.print("current_ctrl = ");Serial.print(g_current_ctrl);Serial.print("\ti = "); Serial.print(read_abc_current()); Serial.print("\tcurrent_ctl - i = ");Serial.print(g_current_ctrl - read_abc_current());
+		result = pid_regulator(g_current_ctrl - abc_current, g_current_ctrl_proportional, g_current_ctrl_integral, g_current_ctrl_derivative);
+		//Serial.print("current_ctrl = ");Serial.print(g_current_ctrl);Serial.print("\ti = "); Serial.print(abc_current); Serial.print("\tcurrent_ctl - i = ");Serial.print(g_current_ctrl - abc_current);
 		break;
 	default:
 		result = g_old_ctrl_value;
@@ -100,9 +100,9 @@ int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us)
 	
 	
 	
-	if (read_abc_current() > g_limit_current_ctrl){ // fixme abs(read_abc_current()) ?
+	if (abc_current > g_limit_current_ctrl){ // fixme abs(abc_current) ?
 		// limit exceeded
-		result = g_old_ctrl_value + pid_regulator(g_limit_current_ctrl - read_abc_current(), 1.0, 0.0, 0.0); // fixme magic number
+		result = g_old_ctrl_value + pid_regulator(g_limit_current_ctrl - abc_current, 1.0, 0.0, 0.0); // fixme magic number
 		//Serial.print("\tlimit: current "); 
 	}
 

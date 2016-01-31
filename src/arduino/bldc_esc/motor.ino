@@ -81,12 +81,14 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 	int old_x = 0;
 	int old_y = 0;
 	int old_z = 0;
+	int old_abc_current = 0;
 	
-	sync_sensor_measurement(&old_x, &old_y, &old_z);
+	sync_sensor_measurement(&old_x, &old_y, &old_z, &old_abc_current);
 
 	int x = old_x + change_limit; // only start value
 	int y = old_y + change_limit;
 	int z = old_z + change_limit;
+	int abc_current;
 
 	switch (test_phase) {
 		/*
@@ -131,7 +133,7 @@ int search_pinout(int speed, unsigned long waiting_time, int change_limit, char 
 		old_z = z;
 		delay(delay_time);
 
-		sync_sensor_measurement(&x, &y, &z);
+		sync_sensor_measurement(&x, &y, &z, &abc_current);
 		sensor_statistic(STATISTIC_MEAN, VALUE_ERR, x, y, z, &(*hall_min), &(*hall_max), &(*hall_zero));
 
 		//sprintf (buffer, "x=%d\ty=%d\tz=%d\tdiff=%d", x, y, z, abs(x - old_x) + abs(y - old_y) + abs(z - old_z));
@@ -209,7 +211,7 @@ void turn_analog(int speed, float angle, float angle_shift)
 	}
 }
 
-void turn_analog_statistic(float angle, float old_analog_angle, long int *turn_counter, unsigned long current_time_us, unsigned long *old_turn_timer_us)
+void turn_analog_statistic(float angle, float old_analog_angle, long int *turn_counter, unsigned long current_time_us, unsigned long *old_turn_timer_us, unsigned long *turn_timer_us, int *real_direction)
 {
 	// fixme: need minimum 3 measurement by each turn:
 	// what happend if number of measurement less than 3?
@@ -218,17 +220,17 @@ void turn_analog_statistic(float angle, float old_analog_angle, long int *turn_c
 	//  old_analog_angle < 120[degree]     &&  angle > 240[degree]
 	if (old_analog_angle < SHIFT_ANGLE_B   &&  angle > SHIFT_ANGLE_C){
 		(*turn_counter)++;
-		*old_turn_timer_us = g_turn_timer_us;
-		g_turn_timer_us = current_time_us;
-		g_real_direction = 1;
+		*old_turn_timer_us = *turn_timer_us;
+		*turn_timer_us = current_time_us;
+		*real_direction = 1;
 	}
 	//
 	//  old_analog_angle > 240[degree]     &&  angle < 120[degree]
 	if (old_analog_angle > SHIFT_ANGLE_C   &&  angle < SHIFT_ANGLE_B){
 		(*turn_counter)--;
-		*old_turn_timer_us = g_turn_timer_us;
-		g_turn_timer_us = current_time_us;
-		g_real_direction = -1;
+		*old_turn_timer_us = *turn_timer_us;
+		*turn_timer_us = current_time_us;
+		*real_direction = -1;
 	}
 }
 
@@ -399,56 +401,56 @@ void turn_digital(byte speed, byte digital_angle, boolean angle_shift)
 	}
 }
 
-void turn_digital_statistic(byte angle, byte old_digital_angle, long int *turn_counter, unsigned long current_time_us, unsigned long *old_turn_timer_us)
+void turn_digital_statistic(byte angle, byte old_digital_angle, long int *turn_counter, unsigned long current_time_us, unsigned long *old_turn_timer_us, unsigned long *turn_timer_us, int *real_direction)
 {
 	if (old_digital_angle == B101 && angle == B100){
 		(*turn_counter)++;
-		*old_turn_timer_us = g_turn_timer_us;
-		g_turn_timer_us = current_time_us;
-		g_real_direction = 1;
+		*old_turn_timer_us = *turn_timer_us;
+		*turn_timer_us = current_time_us;
+		*real_direction = 1;
 	}
 	if (old_digital_angle == B100 && angle == B101){
 		(*turn_counter)--;
-		*old_turn_timer_us = g_turn_timer_us;
-		g_turn_timer_us = current_time_us;
-		g_real_direction = -1;
+		*old_turn_timer_us = *turn_timer_us;
+		*turn_timer_us = current_time_us;
+		*real_direction = -1;
 	}
 }
 
 
-void find_best_angle_shift(long int turn_counter){
+void find_best_angle_shift(long int turn_counter, long int *old_turn_counter, long int *best_turn_counter, float *best_angle_abc_shift){
 	char buffer [50];
 	
-		if (abs(turn_counter - g_old_turn_counter) > g_best_turn_counter) {
-			g_best_turn_counter = abs(turn_counter - g_old_turn_counter);
-			g_best_angle_abc_shift = g_analog_abc_shift_cw;
-		}
+	if (abs(turn_counter - (*old_turn_counter)) > (*best_turn_counter)) {
+		*best_turn_counter = abs(turn_counter - (*old_turn_counter));
+		*best_angle_abc_shift = g_analog_abc_shift_cw;
+	}
 		
 
-		g_analog_abc_shift_cw = g_analog_abc_shift_cw + 0.01;
+	g_analog_abc_shift_cw = g_analog_abc_shift_cw + 0.01;
+	
+	
+	//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
+	
+	//DEBUGA_PRINT("best_angle_shift = "); DEBUGA_PRINT(g_best_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
+	
+	//sprintf (buffer, "turn_diff = %d\t", abs(turn_counter - (*old_turn_counter)));
+	//DEBUGA_PRINT(buffer);
+	
+	//sprintf (buffer, "best_turn = %d\t", g_best_turn_counter);
+	//DEBUGA_PRINT(buffer);
 
-		
-		//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
-
-		//DEBUGA_PRINT("best_angle_shift = "); DEBUGA_PRINT(g_best_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
-
-		//sprintf (buffer, "turn_diff = %d\t", abs(turn_counter - g_old_turn_counter));
-		//DEBUGA_PRINT(buffer);
-		
-		//sprintf (buffer, "best_turn = %d\t", g_best_turn_counter);
-		//DEBUGA_PRINT(buffer);
-
-
-		//sprintf (buffer, "turn = %d\t", turn_counter);
-		//DEBUGA_PRINT(buffer);
-
-
-
-		// simple 2 column
-		DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
-		sprintf (buffer, "%ld", turn_counter - g_old_turn_counter);
-		DEBUGA_PRINT(buffer);
-		
-		
-		g_old_turn_counter = turn_counter;
+	
+	//sprintf (buffer, "turn = %d\t", turn_counter);
+	//DEBUGA_PRINT(buffer);
+	
+	
+	
+	// simple 2 column
+	DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
+	sprintf (buffer, "%ld", turn_counter - (*old_turn_counter));
+	DEBUGA_PRINT(buffer);
+	
+	
+	*old_turn_counter = turn_counter;
 }
