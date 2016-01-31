@@ -55,6 +55,10 @@
 #endif
 
 
+#define CTRL_VELOCITY 0
+#define CTRL_CURRENT  1
+#define CTRL_VOLTAGE  2
+
 
 
 
@@ -85,6 +89,10 @@ float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
 
 // ----------------------------------- limit, ctrl --------------------------------
 
+
+
+
+
 char g_main_ctrl_parameter = 'u';
 int g_old_ctrl_value = 0;
 
@@ -99,6 +107,8 @@ const byte DAC_DRIVER_MAX = 254; // maximum of pwm = 254 (not 255)
 
 
 
+
+
 const int ADC_MIN = 0;
 const int ADC_MAX = 1023;
 
@@ -106,49 +116,10 @@ const int STATISTIC_MEAN = 1000;
 const int VALUE_ERR = 20;
 
 
-//int g_old_velocity_ctrl = DAC_MIN;
-int g_velocity_ctrl = DAC_MIN;
-float g_velocity_ctrl_proportional = 0.1;
-float g_velocity_ctrl_integral = 0.0;
-float g_velocity_ctrl_derivative = 0.0;
-
-//int g_old_limit_velocity_ctrl = DAC_MAX;
-int g_limit_speed_ctrl = DAC_MAX;
-
-
-
-
-
-//int g_old_voltage_ctrl = DAC_MIN;
-int g_voltage_ctrl = DAC_MIN;   // motor not run in the start
-float g_voltage_ctrl_proportional = 0.1;
-float g_voltage_ctrl_integral = 0.0;
-float g_voltage_ctrl_integral_old_val = 0.0;
-float g_voltage_ctrl_derivative = 0.0;
-float g_voltage_ctrl_derivative_old_val = 0.0;
-unsigned long g_voltage_ctrl_derivative_old_t = 0.0;
-
-//int g_old_limit_voltage_ctrl = DAC_MAX;
-int g_limit_voltage_ctrl = DAC_MAX;
 
 
 
 const int HARD_LIMIT_CURRENT = ADC_MAX/2;
-
-//int g_old_current_ctrl = DAC_MIN;
-int g_current_ctrl = DAC_MIN;
-float g_current_ctrl_proportional = 0.1;
-float g_current_ctrl_integral = 0.0;
-float g_current_ctrl_integral_old_val = 0.0;
-float g_current_ctrl_derivative = 0.0;
-float g_current_ctrl_derivative_old_val = 0.0;
-unsigned long g_current_ctrl_derivative_old_t = 0.0;
-
-//int g_old_limit_current_ctrl = DAC_MAX;
-int g_limit_current_ctrl = DAC_MAX;
-
-
-
 
 	
 
@@ -231,6 +202,27 @@ const unsigned long PRINT_DT = 200;
 char g_cmd_line [50];
 int g_cmd_line_max_length = 50;
 int g_cmd_line_length = 0;
+
+
+
+
+
+
+struct ctrl {
+	int old_value;
+	int value;
+	float coeff_proportional;
+	float coeff_integral;
+	float integral_accumulator;
+	float coeff_derivative;
+	unsigned long derivative_old_time;
+	int old_limit;
+	int limit;
+};
+struct ctrl ctrlarray[3];
+
+
+
 
 #include "/home/chujoii/project/bldc-esc/src/angle-calculation.c"
 
@@ -336,6 +328,41 @@ void loop()
 
 
 
+
+        // -------------------------------------- velocity
+	ctrlarray[CTRL_VELOCITY].old_value = DAC_MIN;
+	ctrlarray[CTRL_VELOCITY].value = DAC_MIN;
+	ctrlarray[CTRL_VELOCITY].coeff_proportional = 0.1;
+	ctrlarray[CTRL_VELOCITY].coeff_integral = 0.0;
+	ctrlarray[CTRL_VELOCITY].integral_accumulator = 0.0;
+	ctrlarray[CTRL_VELOCITY].coeff_derivative = 0.0;
+	ctrlarray[CTRL_VELOCITY].derivative_old_time = 0;
+	//ctrlarray[CTRL_VELOCITY].old_limit = DAC_MAX;
+	ctrlarray[CTRL_VELOCITY].limit = DAC_MAX; // fixme: absolute value?
+	// -------------------------------------- voltage
+	ctrlarray[CTRL_VOLTAGE].old_value = DAC_MIN;
+	ctrlarray[CTRL_VOLTAGE].value = DAC_MIN;   // motor not run in the start
+	ctrlarray[CTRL_VOLTAGE].coeff_proportional = 0.1;
+	ctrlarray[CTRL_VOLTAGE].coeff_integral = 0.0;
+	ctrlarray[CTRL_VOLTAGE].integral_accumulator = 0.0;
+	ctrlarray[CTRL_VOLTAGE].coeff_derivative = 0.0;
+	ctrlarray[CTRL_VOLTAGE].derivative_old_time = 0;
+	//int g_old_limit_voltage_ctrl = DAC_MAX;
+	ctrlarray[CTRL_VOLTAGE].limit = DAC_MAX;
+	// -------------------------------------- current
+	ctrlarray[CTRL_CURRENT].old_value = DAC_MIN;
+	ctrlarray[CTRL_CURRENT].value = DAC_MIN;
+	ctrlarray[CTRL_CURRENT].coeff_proportional = 0.1;
+	ctrlarray[CTRL_CURRENT].coeff_integral = 0.0;
+	ctrlarray[CTRL_CURRENT].integral_accumulator = 0.0;
+	ctrlarray[CTRL_CURRENT].coeff_derivative = 0.0;
+	ctrlarray[CTRL_CURRENT].derivative_old_time = 0;
+	//int g_old_limit_current_ctrl = DAC_MAX;
+	ctrlarray[CTRL_CURRENT].limit = DAC_MAX;
+
+
+	
+
 	int zero_abc_current = 0;
 	int abc_current = 0;
 
@@ -356,7 +383,7 @@ void loop()
 		
 		sensor_statistic(STATISTIC_MEAN, VALUE_ERR, value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, &hall_min, &hall_max, &hall_zero);
 		
-		int velocity = apply_pid(halfturn_timer_us, old_turn_timer_us, turn_timer_us, abc_current);
+		int velocity = apply_pid(halfturn_timer_us, old_turn_timer_us, turn_timer_us, abc_current, current_time_us);
 		
 		byte  digital_angle = 0;
 		float analog_angle = 0.0;
