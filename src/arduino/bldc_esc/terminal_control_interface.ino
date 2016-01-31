@@ -42,7 +42,7 @@
 */
 
 
-void read_ctrl(char *algorithm)
+void read_ctrl(char *algorithm,  struct ctrl *ctrlarray)
 {
 	if (Serial.available() > 0) {
 		byte incoming_byte;
@@ -52,7 +52,7 @@ void read_ctrl(char *algorithm)
 		if ((incoming_byte != 0xa) && (g_cmd_line_length<g_cmd_line_max_length)) {
 			g_cmd_line[g_cmd_line_length++] = incoming_byte;
 		} else {
-			exec_cmd(g_cmd_line, g_cmd_line_length - 1, &(*algorithm));
+			exec_cmd(g_cmd_line, g_cmd_line_length - 1, &(*algorithm), &(*ctrlarray));
 			for (int i = 0; i < g_cmd_line_max_length; i++){ // fixme: maybe need reset command line only from 0 to g_cmd_line_length
 				g_cmd_line[i]='\0';
 			}
@@ -64,7 +64,7 @@ void read_ctrl(char *algorithm)
 
 
 
-void exec_cmd(char *cmd, int cmd_len, char *algorithm)
+void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 {
 	int i; // counter
 

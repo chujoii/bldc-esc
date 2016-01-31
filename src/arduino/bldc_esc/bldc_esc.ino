@@ -55,6 +55,7 @@
 #endif
 
 
+#define NUM_OF_CTRL   3
 #define CTRL_VELOCITY 0
 #define CTRL_CURRENT  1
 #define CTRL_VOLTAGE  2
@@ -219,7 +220,6 @@ struct ctrl {
 	int old_limit;
 	int limit;
 };
-struct ctrl ctrlarray[3];
 
 
 
@@ -328,38 +328,40 @@ void loop()
 
 
 
+	struct ctrl ctrlarray[NUM_OF_CTRL];
 
-        // -------------------------------------- velocity
-	ctrlarray[CTRL_VELOCITY].old_value = DAC_MIN;
-	ctrlarray[CTRL_VELOCITY].value = DAC_MIN;
-	ctrlarray[CTRL_VELOCITY].coeff_proportional = 0.1;
-	ctrlarray[CTRL_VELOCITY].coeff_integral = 0.0;
-	ctrlarray[CTRL_VELOCITY].integral_accumulator = 0.0;
-	ctrlarray[CTRL_VELOCITY].coeff_derivative = 0.0;
-	ctrlarray[CTRL_VELOCITY].derivative_old_time = 0;
-	//ctrlarray[CTRL_VELOCITY].old_limit = DAC_MAX;
-	ctrlarray[CTRL_VELOCITY].limit = DAC_MAX; // fixme: absolute value?
-	// -------------------------------------- voltage
-	ctrlarray[CTRL_VOLTAGE].old_value = DAC_MIN;
-	ctrlarray[CTRL_VOLTAGE].value = DAC_MIN;   // motor not run in the start
-	ctrlarray[CTRL_VOLTAGE].coeff_proportional = 0.1;
-	ctrlarray[CTRL_VOLTAGE].coeff_integral = 0.0;
-	ctrlarray[CTRL_VOLTAGE].integral_accumulator = 0.0;
-	ctrlarray[CTRL_VOLTAGE].coeff_derivative = 0.0;
-	ctrlarray[CTRL_VOLTAGE].derivative_old_time = 0;
-	//int g_old_limit_voltage_ctrl = DAC_MAX;
-	ctrlarray[CTRL_VOLTAGE].limit = DAC_MAX;
-	// -------------------------------------- current
-	ctrlarray[CTRL_CURRENT].old_value = DAC_MIN;
-	ctrlarray[CTRL_CURRENT].value = DAC_MIN;
-	ctrlarray[CTRL_CURRENT].coeff_proportional = 0.1;
-	ctrlarray[CTRL_CURRENT].coeff_integral = 0.0;
-	ctrlarray[CTRL_CURRENT].integral_accumulator = 0.0;
-	ctrlarray[CTRL_CURRENT].coeff_derivative = 0.0;
-	ctrlarray[CTRL_CURRENT].derivative_old_time = 0;
-	//int g_old_limit_current_ctrl = DAC_MAX;
-	ctrlarray[CTRL_CURRENT].limit = DAC_MAX;
+	ctrlarray[CTRL_VELOCITY] = (ctrl) {.old_value            = DAC_MIN,
+					   .value                = DAC_MIN,
+					   .coeff_proportional   = 0.1,
+					   .coeff_integral       = 0.0,
+					   .integral_accumulator = 0.0,
+					   .coeff_derivative     = 0.0,
+					   .derivative_old_time  = 0,
+					   .old_limit            = DAC_MAX,
+					   .limit                = DAC_MAX // fixme: absolute value?
+	};
 
+	ctrlarray[CTRL_VOLTAGE]  = (ctrl) {.old_value            = DAC_MIN,
+				 	   .value                = DAC_MIN,   // motor not run in the start
+				 	   .coeff_proportional   = 0.1,
+				 	   .coeff_integral       = 0.0,
+				 	   .integral_accumulator = 0.0,
+				 	   .coeff_derivative     = 0.0,
+				 	   .derivative_old_time  = 0,
+				 	   .old_limit            = DAC_MAX,
+				 	   .limit                = DAC_MAX
+	}; 
+	
+	ctrlarray[CTRL_CURRENT]  = (ctrl) {.old_value            = DAC_MIN,
+				 	   .value                = DAC_MIN,
+				 	   .coeff_proportional   = 0.1,
+				 	   .coeff_integral       = 0.0,
+				 	   .integral_accumulator = 0.0,
+				 	   .coeff_derivative     = 0.0,
+				 	   .derivative_old_time  = 0,
+				 	   .old_limit            = DAC_MAX,
+				 	   .limit                = DAC_MAX
+	};
 
 	
 
@@ -383,7 +385,7 @@ void loop()
 		
 		sensor_statistic(STATISTIC_MEAN, VALUE_ERR, value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, &hall_min, &hall_max, &hall_zero);
 		
-		int velocity = apply_pid(halfturn_timer_us, old_turn_timer_us, turn_timer_us, abc_current, current_time_us);
+		int velocity = apply_pid(halfturn_timer_us, old_turn_timer_us, turn_timer_us, abc_current, current_time_us, ctrlarray);
 		
 		byte  digital_angle = 0;
 		float analog_angle = 0.0;
@@ -415,7 +417,7 @@ void loop()
 			//g_analog_abc_shift_cw = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
 			//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw); Serial.print("\t"); // only for cw (velocity > 0)
 			
-			read_ctrl(&algorithm);
+			read_ctrl(&algorithm, ctrlarray);
 			
 			Serial.print("rpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us));
 			

@@ -42,7 +42,7 @@
 */
 
 
-float pid_regulator(float error, float proportional, float integral, float derivative, unsigned long now_t)
+float pid_regulator(float error, float proportional, float integral, float derivative, unsigned long now_t, struct ctrl *ctrlarray)
 {
 
 	float sum;
@@ -77,7 +77,7 @@ float pid_regulator(float error, float proportional, float integral, float deriv
 
 
 
-int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us, int abc_current, unsigned long now_t)
+int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us, int abc_current, unsigned long now_t, struct ctrl *ctrlarray)
 {
 	// fixme maybe array better for coefficients than variable?
 	
@@ -87,20 +87,20 @@ int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, 
 	
 	if (abc_current > ctrlarray[CTRL_CURRENT].limit){ // fixme abs(abc_current) ?
 		// limit exceeded
-		result = g_old_ctrl_value + pid_regulator(ctrlarray[CTRL_CURRENT].limit - abc_current, 1.0, 0.0, 0.0, now_t); // fixme magic number
+		result = g_old_ctrl_value + pid_regulator(ctrlarray[CTRL_CURRENT].limit - abc_current, 1.0, 0.0, 0.0, now_t, ctrlarray); // fixme magic number
 		//Serial.print("\tlimit: current "); 
 	} else {
 		switch (g_main_ctrl_parameter){
 		case 's': // velocity
-			result = pid_regulator(ctrlarray[CTRL_VELOCITY].value - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us), ctrlarray[CTRL_VELOCITY].coeff_proportional, ctrlarray[CTRL_VELOCITY].coeff_integral, ctrlarray[CTRL_VELOCITY].coeff_derivative, now_t);
+			result = pid_regulator(ctrlarray[CTRL_VELOCITY].value - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us), ctrlarray[CTRL_VELOCITY].coeff_proportional, ctrlarray[CTRL_VELOCITY].coeff_integral, ctrlarray[CTRL_VELOCITY].coeff_derivative, now_t, ctrlarray);
 			//Serial.print("velo_ctrl = ");Serial.print(ctrlarray[CTRL_VELOCITY].value);Serial.print("\trpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us)); Serial.print("\tveloctrl-rpm = ");Serial.print(ctrlarray[CTRL_VELOCITY].value - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us));
 			break;
 		case 'u': // voltage
-			result = pid_regulator(ctrlarray[CTRL_VOLTAGE].value - g_old_ctrl_value, ctrlarray[CTRL_VOLTAGE].coeff_proportional, ctrlarray[CTRL_VOLTAGE].coeff_integral, ctrlarray[CTRL_VOLTAGE].coeff_derivative, now_t);
+			result = pid_regulator(ctrlarray[CTRL_VOLTAGE].value - g_old_ctrl_value, ctrlarray[CTRL_VOLTAGE].coeff_proportional, ctrlarray[CTRL_VOLTAGE].coeff_integral, ctrlarray[CTRL_VOLTAGE].coeff_derivative, now_t, ctrlarray);
 			//Serial.print("voltage = ");
 			break;
 		case 'i': // current
-			result = pid_regulator(ctrlarray[CTRL_CURRENT].value - abc_current, ctrlarray[CTRL_CURRENT].coeff_proportional, ctrlarray[CTRL_CURRENT].coeff_integral, ctrlarray[CTRL_CURRENT].coeff_derivative, now_t);
+			result = pid_regulator(ctrlarray[CTRL_CURRENT].value - abc_current, ctrlarray[CTRL_CURRENT].coeff_proportional, ctrlarray[CTRL_CURRENT].coeff_integral, ctrlarray[CTRL_CURRENT].coeff_derivative, now_t, ctrlarray);
 			//Serial.print("current_ctrl = ");Serial.print(ctrlarray[CTRL_CURRENT].value);Serial.print("\ti = "); Serial.print(abc_current); Serial.print("\tcurrent_ctl - i = ");Serial.print(ctrlarray[CTRL_CURRENT].value - abc_current);
 			break;
 		default:
