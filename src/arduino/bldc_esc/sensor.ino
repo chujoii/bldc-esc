@@ -53,55 +53,26 @@ boolean read_optic_sensor (int pin_sensor_output, int pin_sensor_input, int sens
 }
 
 
-boolean digital_read_hall_sensor(int pin_hall)
+byte digital_read_angle(int state_a_hall, int state_b_hall, int state_c_hall, int hall_zero)
 {
-	return analog_read_hall_sensor(pin_hall) > (g_hall_max + g_hall_min)/2; // g_hall_zero
-}
-
-
-
-byte digital_read_angle()
-{
-	// current state of hall sensor
-	boolean state_a_hall, state_b_hall, state_c_hall;
+	boolean b_state_a_hall, b_state_b_hall, b_state_c_hall;
 	byte state_abc_hall = 0;
 
-	state_a_hall = digital_read_hall_sensor(PIN_ANALOG_A_HALL);
-	state_b_hall = digital_read_hall_sensor(PIN_ANALOG_B_HALL);
-	state_c_hall = digital_read_hall_sensor(PIN_ANALOG_C_HALL);
+	b_state_a_hall = state_a_hall > hall_zero;
+	b_state_b_hall = state_a_hall > hall_zero;
+	b_state_c_hall = state_a_hall > hall_zero;
 	
-	state_abc_hall = (state_c_hall<<2) | (state_b_hall<<1) | state_a_hall;
+	state_abc_hall = (b_state_c_hall<<2) | (b_state_b_hall<<1) | b_state_a_hall;
 	
 	return state_abc_hall;
 }
 
 
-int analog_read_hall_sensor(int pin_hall)
+float analog_read_angle (float state_a_hall, float state_b_hall, float state_c_hall, float hall_min, float hall_max)
 {
-	// switch not work: ‘PIN_ANALOG_A_HALL’ cannot appear in a constant-expression
-	if (pin_hall == PIN_ANALOG_A_HALL){
-		return g_a_hall_value;
-	}
-	if (pin_hall == PIN_ANALOG_B_HALL){
-		return g_b_hall_value;
-	}
-	// if (pin_hall == PIN_ANALOG_C_HALL){
-	return g_c_hall_value;
-}
-
-
-float analog_read_angle ()
-{
-	// current state of hall sensor
-	float state_a_hall, state_b_hall, state_c_hall;
-	
-	state_a_hall = analog_read_hall_sensor(PIN_ANALOG_A_HALL);
-	state_b_hall = analog_read_hall_sensor(PIN_ANALOG_B_HALL);
-	state_c_hall = analog_read_hall_sensor(PIN_ANALOG_C_HALL);
-
-	float normalize_a_hall = fmap((float)state_a_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
-	float normalize_b_hall = fmap((float)state_b_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
-	float normalize_c_hall = fmap((float)state_c_hall, (float)g_hall_min, (float)g_hall_max, -1.0, 1.0);
+	float normalize_a_hall = fmap((float)state_a_hall, hall_min, hall_max, -1.0, 1.0);
+	float normalize_b_hall = fmap((float)state_b_hall, hall_min, hall_max, -1.0, 1.0);
+	float normalize_c_hall = fmap((float)state_c_hall, hall_min, hall_max, -1.0, 1.0);
 
 	float angle = calculation_angle_from_three_phases(normalize_a_hall, normalize_b_hall, normalize_c_hall);
 
@@ -120,9 +91,9 @@ int read_abc_current()
 
 
 
-int get_rpm(){
-	unsigned long full_turn_time = g_turn_timer_us - g_old_turn_timer_us;
-	unsigned long half_turn_time = g_halfturn_timer_us - g_old_turn_timer_us;
+int get_rpm(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us){
+	unsigned long full_turn_time = g_turn_timer_us - old_turn_timer_us;
+	unsigned long half_turn_time = halfturn_timer_us - old_turn_timer_us;
 	return (int) (60000000 / max(half_turn_time, full_turn_time));
 }
 
@@ -133,50 +104,45 @@ float angular_velocity()
 }
 
 
-void sync_sensor_measurement()
+void sync_sensor_measurement(int *a_hall, int *b_hall, int *c_hall)
 {
 	// fixme: reading sensors must be simultaneously
 
-	g_a_hall_value = analogRead(PIN_ANALOG_A_HALL);
-	g_b_hall_value = analogRead(PIN_ANALOG_B_HALL);
-	g_c_hall_value = analogRead(PIN_ANALOG_C_HALL);
+	*a_hall = analogRead(PIN_ANALOG_A_HALL);
+	*b_hall = analogRead(PIN_ANALOG_B_HALL);
+	*c_hall = analogRead(PIN_ANALOG_C_HALL);
 	
 	g_abc_current = analogRead(PIN_ANALOG_ABC_CURRENT) - g_zero_abc_current;
 }
 
 
-void sensor_statistic(int n, int lim)
+void sensor_statistic(int n, int lim, int a_hall_value, int b_hall_value, int c_hall_value, int *hall_min, int *hall_max, int *hall_zero)
 {
 	// n   - mean coefficient
 	// lim - difference betwin new element, and stoded extremum, so only if new near extremum it can influence to extremum
-	float a, b, c;
-	float m;
+	int a, b, c;
+	int m;
 	// (a * n + b) / (n + 1)       =       a + ((b - a) / (n + 1))
 
 	
 	
 	
-	a = g_hall_max;
-	b = max(max(g_a_hall_value, g_b_hall_value), g_c_hall_value);
+	a = *hall_max;
+	b = max(max(a_hall_value, b_hall_value), c_hall_value);
 	if ((a<b) || (abs(a-b)<lim)) {m=1;} else {m=n;} // if b=maximal -> element have more weigth
 	c = a + ((b - a) / (m + 1));
-	g_hall_max = c;
+	*hall_max = c;
 		
 
-	a = g_hall_min;
-	b = min(min(g_a_hall_value, g_b_hall_value), g_c_hall_value);
+	a = *hall_min;
+	b = min(min(a_hall_value, b_hall_value), c_hall_value);
 	if ((a>b) || (abs(a-b)<lim)) {m=1;} else {m=n;} // if b=minimal  -> element have more weigth
 	c = a + ((b - a) / (m + 1));
-	g_hall_min = c;
+	*hall_min = c;
 		
 	
-	g_hall_zero = (g_hall_max + g_hall_min)/2;
+	*hall_zero = ((*hall_max) + (*hall_min))/2;
 }
 
 
 
-void analog_hall_level_detect_first_run()
-{
-	g_hall_max = max(max(g_a_hall_value, g_b_hall_value), g_c_hall_value);
-	g_hall_min = min(min(g_a_hall_value, g_b_hall_value), g_c_hall_value);
-}

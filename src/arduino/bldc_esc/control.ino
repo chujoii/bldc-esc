@@ -76,15 +76,15 @@ float pid_regulator(float error, float proportional, float integral, float deriv
 
 
 
-int apply_pid()
+int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us)
 {
 	// fixme maybe array better for coefficients than variable?
 	
 	int result;
 	switch (g_main_ctrl_parameter){
 	case 's': // velocity
-		result = pid_regulator(g_velocity_ctrl - get_rpm(), g_velocity_ctrl_proportional, g_velocity_ctrl_integral, g_velocity_ctrl_derivative);
-		//Serial.print("velo_ctrl = ");Serial.print(g_velocity_ctrl);Serial.print("\trpm = "); Serial.print(get_rpm()); Serial.print("\tveloctrl-rpm = ");Serial.print(g_velocity_ctrl - get_rpm());
+		result = pid_regulator(g_velocity_ctrl - get_rpm(halfturn_timer_us, old_turn_timer_us), g_velocity_ctrl_proportional, g_velocity_ctrl_integral, g_velocity_ctrl_derivative);
+		//Serial.print("velo_ctrl = ");Serial.print(g_velocity_ctrl);Serial.print("\trpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us)); Serial.print("\tveloctrl-rpm = ");Serial.print(g_velocity_ctrl - get_rpm(halfturn_timer_us, old_turn_timer_us));
 		break;
 	case 'u': // voltage
 		result = pid_regulator(g_voltage_ctrl - g_old_ctrl_value, g_voltage_ctrl_proportional, g_voltage_ctrl_integral, g_voltage_ctrl_derivative);

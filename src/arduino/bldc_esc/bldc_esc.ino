@@ -54,7 +54,6 @@
  #define DEBUGA_PRINT(x)
 #endif
 
-char buffer [50];
 
 
 
@@ -81,20 +80,8 @@ float   g_analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
 float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
 
 
-float g_old_analog_angle = 0.0;
-byte g_old_digital_angle = 0;
 
 
-long int g_turn_counter = 0;
-unsigned long g_old_turn_timer_us = 0;
-unsigned long g_turn_timer_us = 0;
-unsigned long g_halfturn_timer_us = 0;
-int g_real_direction = 1; // +1 = cw;         -1 = ccw
-
-// fixme
-float g_best_angle_abc_shift = 0;
-long int g_best_turn_counter = 0;
-long int g_old_turn_counter = 0;
 
 // ----------------------------------- limit, ctrl --------------------------------
 
@@ -162,6 +149,16 @@ int g_limit_current_ctrl = DAC_MAX;
 
 
 
+
+	int g_real_direction = 1; // +1 = cw;         -1 = ccw
+	
+        // fixme
+	float g_best_angle_abc_shift = 0;
+	long int g_best_turn_counter = 0;
+	long int g_old_turn_counter = 0;
+	unsigned long g_turn_timer_us = 0;
+
+
 // -------------------------------------- pins --------------------------------------
 /* http://arduino.cc/en/Main/ArduinoBoardDuemilanove
    On boards other than the Mega, use of the Servo library disables analogWrite() (PWM) functionality on pins 9 and 10.
@@ -204,16 +201,8 @@ const int PIN_ANALOG_A_HALL = A0;
 const int PIN_ANALOG_B_HALL = A1;
 const int PIN_ANALOG_C_HALL = A2;
 
-int g_a_hall_value = 0;
-int g_b_hall_value = 0;
-int g_c_hall_value = 0;
 
 
-
-// hall max min level
-float g_hall_max  = ADC_MIN;
-float g_hall_min  = ADC_MAX;
-int g_hall_zero = (ADC_MAX + ADC_MIN)/2;
 
 //const int PIN_ANALOG_A_OPTOCOUPLE = A0;
 //const int PIN_ANALOG_B_OPTOCOUPLE = A1;
@@ -295,15 +284,25 @@ void setup()
 	*/
 
 
-	sync_sensor_measurement();
-	analog_hall_level_detect_first_run();
-	sensor_statistic(1.0, VALUE_ERR);
+	/*
+	  // fixme: acquire statistic in start - really need?
+
+	int value_analog_a_hall = 0;
+	int value_analog_b_hall = 0;
+	int value_analog_c_hall = 0;
+
+	sync_sensor_measurement(&value_analog_a_hall, &value_analog_b_hall, &value_analog_c_hall);
+	g_hall_min = min(min(value_analog_a_hall, value_analog_b_hall), value_analog_c_hall);
+	g_hall_max = max(max(value_analog_a_hall, value_analog_b_hall), value_analog_c_hall);
+	g_hall_zero = (g_hall_min + g_hall_max)/2;
+	sensor_statistic(1.0, VALUE_ERR, value_analog_a_hall, value_analog_b_hall, value_analog_c_hall);
 
 	int i = 0;
 	while (millis()<1000){ // delay(1000);
-		sync_sensor_measurement();
-		sensor_statistic(i++, VALUE_ERR);
+		sync_sensor_measurement(&value_analog_a_hall, &value_analog_b_hall, &value_analog_c_hall);
+		sensor_statistic(i++, VALUE_ERR, value_analog_a_hall, value_analog_b_hall, value_analog_c_hall);
 	}
+	*/
 
 	Serial.begin(115200);
 
@@ -313,68 +312,109 @@ void setup()
 
 void loop()
 {
-	sync_sensor_measurement();
-	sensor_statistic(STATISTIC_MEAN, VALUE_ERR);
-	
-	int velocity = apply_pid();
-	
-	byte  dangle;
-	float aangle;
-	if (g_algorithm == 'd'){
-		dangle = digital_read_angle();
-aangle = analog_read_angle();
-		turn_digital(abs(velocity), dangle, sign(velocity));
-	} else {
-dangle = digital_read_angle();
-                aangle = analog_read_angle();
-		turn_analog(abs(velocity), aangle, calculate_analog_angle_shift_by_velocity(velocity));
+
+	float old_analog_angle = 0.0;
+	byte old_digital_angle = 0;
+
+	unsigned long halfturn_timer_us = 0;
+
+
+	int value_analog_a_hall = 0;
+	int value_analog_b_hall = 0;
+	int value_analog_c_hall = 0;
+
+	// hall max min level
+	int hall_max  = ADC_MIN;
+	int hall_min  = ADC_MAX;
+	int hall_zero = (ADC_MAX + ADC_MIN)/2;
+
+
+	long int turn_counter = 0;
+	unsigned long old_turn_timer_us = 0;
+
+
+
+	while (true) {
+		unsigned long current_time_ms = millis();
+		unsigned long current_time_us = micros();
+		halfturn_timer_us = current_time_us; // fixme
+		
+		sync_sensor_measurement(&value_analog_a_hall, &value_analog_b_hall, &value_analog_c_hall); // need return three value_analog_X_hall, and current
+		sensor_statistic(STATISTIC_MEAN, VALUE_ERR, value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, &hall_min, &hall_max, &hall_zero);
+		
+		int velocity = apply_pid(halfturn_timer_us, old_turn_timer_us);
+		
+		byte  digital_angle;
+		float analog_angle;
+		if (g_algorithm == 'd'){
+			digital_angle = digital_read_angle(value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, hall_zero);
+			//analog_angle = analog_read_angle(value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, hall_min, hall_max);
+			turn_digital(abs(velocity), digital_angle, sign(velocity));
+			turn_digital_statistic(digital_angle, old_digital_angle, &turn_counter, current_time_us, &old_turn_timer_us);
+		} else {
+			//digital_angle = digital_read_angle(value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, hall_zero);
+			analog_angle = analog_read_angle(value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, hall_min, hall_max);
+			turn_analog(abs(velocity), analog_angle, calculate_analog_angle_shift_by_velocity(velocity));
+			turn_analog_statistic(analog_angle, old_analog_angle, &turn_counter, current_time_us, &old_turn_timer_us);
+		}
+		
+		
+		
+		if (current_time_ms > g_time_to_print){
+			g_time_to_print = current_time_ms + PRINT_DT;
+			
+			
+			char buffer [50];
+			
+			sprintf (buffer, "current = %d\t", read_abc_current());
+			Serial.print(buffer);
+			
+			//find_best_angle_shift();
+			
+			//g_analog_abc_shift_cw = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
+			//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw); Serial.print("\t"); // only for cw (velocity > 0)
+			
+			read_ctrl();
+			
+			Serial.print("rpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us));
+			
+			Serial.print("\tanalog_angle = ");Serial.print(analog_angle);
+			Serial.print("\tdigital_angle = ");Serial.print(digital_angle);
+			
+			//Serial.print("old_turn_time = "); Serial.print(old_turn_timer_us);
+			//Serial.print("\tturn_time = "); Serial.print((turn_timer_us - old_turn_timer_us)/1000);
+			//Serial.print("\thalf_turn_time = "); Serial.print((halfturn_timer_us - old_turn_timer_us)/1000);
+			//Serial.print("\tmax_turn_time = "); Serial.print((max(g_turn_timer_us - old_turn_timer_us, halfturn_timer_us - old_turn_timer_us))/1000);
+			
+			
+			//Serial.print("\told_angle = "); Serial.print(old_analog_angle);
+			//Serial.print("\tangle = "); Serial.print(analog_read_angle());
+			
+			
+			//Serial.print("\tturn_counter = "); Serial.print(turn_counter);
+			
+			//Serial.print("\ta_hall = "); Serial.print(a_hall_value);
+			//Serial.print("\tb_hall = "); Serial.print(b_hall_value);
+			//Serial.print("\tc_hall = "); Serial.print(c_hall_value);
+			Serial.print("\tmax = "); Serial.print(hall_max);
+			Serial.print("\tmin = "); Serial.print(hall_min);
+			//Serial.print("\tzero = "); Serial.print(hall_zero);
+			
+			Serial.println();
+		}
+		
+		
+		//Serial.println();
+		//delay(200);
+
+
+
+		if (g_algorithm == 'd'){
+			old_digital_angle = digital_angle;
+		} else {
+			old_analog_angle = analog_angle;
+		}
+		
+		delayMicroseconds(DELAY_BETWEEN_STEP_US);
 	}
-	
-	
-	
-	if (millis() > g_time_to_print){
-		g_time_to_print = millis() + PRINT_DT;
-		
-
-		sprintf (buffer, "current = %d\t", read_abc_current());
-		Serial.print(buffer);
-
-		//find_best_angle_shift();
-
-		//g_analog_abc_shift_cw = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
-		//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw); Serial.print("\t"); // only for cw (velocity > 0)
-
-		read_ctrl();
-
-		Serial.print("rpm = "); Serial.print(get_rpm());
-		
-		Serial.print("\taangle = ");Serial.print(aangle);
-		Serial.print("\tdangle = ");Serial.print(dangle);
-		
-		//Serial.print("old_turn_time = "); Serial.print(g_old_turn_timer_us);
-		//Serial.print("\tturn_time = "); Serial.print((g_turn_timer_us - g_old_turn_timer_us)/1000);
-		//Serial.print("\thalf_turn_time = "); Serial.print((g_halfturn_timer_us - g_old_turn_timer_us)/1000);
-		//Serial.print("\tmax_turn_time = "); Serial.print((max(g_turn_timer_us - g_old_turn_timer_us, g_halfturn_timer_us - g_old_turn_timer_us))/1000);
-
-
-		//Serial.print("\told_angle = "); Serial.print(g_old_analog_angle);
-		//Serial.print("\tangle = "); Serial.print(analog_read_angle());
-
-
-		//Serial.print("\tturn_counter = "); Serial.print(g_turn_counter);
-		
-		//Serial.print("\ta_hall = "); Serial.print(g_a_hall_value);
-		//Serial.print("\tb_hall = "); Serial.print(g_b_hall_value);
-		//Serial.print("\tc_hall = "); Serial.print(g_c_hall_value);
-		Serial.print("\tmax = "); Serial.print(g_hall_max);
-		Serial.print("\tmin = "); Serial.print(g_hall_min);
-		//Serial.print("\tzero = "); Serial.print(g_hall_zero);
-
-	        Serial.println();
-	}
-
-	
-	//Serial.println();
-	//delay(200);
-	delayMicroseconds(DELAY_BETWEEN_STEP_US);
 }
