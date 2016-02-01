@@ -42,70 +42,49 @@
 */
 
 
-float pid_regulator(float error, float proportional, float integral, float derivative, unsigned long now_t, struct ctrl *ctrlarray)
-{
-
-	float sum;
-	float diff; // (new_val - old_val) / (new_time - old_time)
-	
-	switch (g_main_ctrl_parameter){
-	case 's': // velocity
-		sum = error + ctrlarray[CTRL_VELOCITY].integral_accumulator;
-		diff = (error - ctrlarray[CTRL_VELOCITY].old_value) / (now_t - ctrlarray[CTRL_VELOCITY].derivative_old_time);
-		ctrlarray[CTRL_VELOCITY].old_value = error;
-		ctrlarray[CTRL_VELOCITY].derivative_old_time = now_t;
-		ctrlarray[CTRL_VELOCITY].integral_accumulator = sum;
-		break;
-	case 'u': // voltage
-		sum = 0.0; // fixme sum
-		diff = 0.0;
-		break;
-	case 'i': // current
-		sum = error + ctrlarray[CTRL_CURRENT].integral_accumulator;
-		diff = (error - ctrlarray[CTRL_CURRENT].old_value) / (now_t - ctrlarray[CTRL_CURRENT].derivative_old_time);
-		ctrlarray[CTRL_CURRENT].old_value = error;
-		ctrlarray[CTRL_CURRENT].derivative_old_time = now_t;
-		ctrlarray[CTRL_CURRENT].integral_accumulator = sum;
-	break;
-	default:
-		sum = 0.0;
-		diff = 0.0;
-	}
-
-	return  proportional * error + integral * sum + derivative * diff;
-}
-
-
-
 int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us, int abc_current, unsigned long now_t, struct ctrl *ctrlarray)
 {
 	// fixme maybe array better for coefficients than variable?
 	
 	int result;
 	
+	float error;
+
+	float diff; // (new_val - old_val) / (new_time - old_time)
 	
 	
 	if (abc_current > ctrlarray[CTRL_CURRENT].limit){ // fixme abs(abc_current) ?
 		// limit exceeded
-		result = g_old_ctrl_value + pid_regulator(ctrlarray[CTRL_CURRENT].limit - abc_current, 1.0, 0.0, 0.0, now_t, ctrlarray); // fixme magic number
+		error              = ctrlarray[CTRL_CURRENT].limit - abc_current;
+		float coeff_proportional = 1.0; // fixme: magic number
+		// coeff_integral     = 0.0;    // cannot calculate, fixme: magic number
+		// coeff_derivative   = 0.0;    // cannot calculate, fixme: magic number
+		//sum = 0.0;
+	        //diff = 0.0;
+		result = g_old_ctrl_value + (coeff_proportional * error); // + 0
 		//Serial.print("\tlimit: current "); 
 	} else {
 		switch (g_main_ctrl_parameter){
-		case 's': // velocity
-			result = pid_regulator(ctrlarray[CTRL_VELOCITY].value - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us), ctrlarray[CTRL_VELOCITY].coeff_proportional, ctrlarray[CTRL_VELOCITY].coeff_integral, ctrlarray[CTRL_VELOCITY].coeff_derivative, now_t, ctrlarray);
-			//Serial.print("velo_ctrl = ");Serial.print(ctrlarray[CTRL_VELOCITY].value);Serial.print("\trpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us)); Serial.print("\tveloctrl-rpm = ");Serial.print(ctrlarray[CTRL_VELOCITY].value - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us));
+		case CTRL_VELOCITY:
+			error = ctrlarray[CTRL_VELOCITY].value - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us);
 			break;
-		case 'u': // voltage
-			result = pid_regulator(ctrlarray[CTRL_VOLTAGE].value - g_old_ctrl_value, ctrlarray[CTRL_VOLTAGE].coeff_proportional, ctrlarray[CTRL_VOLTAGE].coeff_integral, ctrlarray[CTRL_VOLTAGE].coeff_derivative, now_t, ctrlarray);
-			//Serial.print("voltage = ");
+		case CTRL_VOLTAGE:
+			error = ctrlarray[CTRL_VOLTAGE].value - g_old_ctrl_value;
 			break;
-		case 'i': // current
-			result = pid_regulator(ctrlarray[CTRL_CURRENT].value - abc_current, ctrlarray[CTRL_CURRENT].coeff_proportional, ctrlarray[CTRL_CURRENT].coeff_integral, ctrlarray[CTRL_CURRENT].coeff_derivative, now_t, ctrlarray);
-			//Serial.print("current_ctrl = ");Serial.print(ctrlarray[CTRL_CURRENT].value);Serial.print("\ti = "); Serial.print(abc_current); Serial.print("\tcurrent_ctl - i = ");Serial.print(ctrlarray[CTRL_CURRENT].value - abc_current);
+		case CTRL_CURRENT:
+			error = ctrlarray[CTRL_CURRENT].value - abc_current;
 			break;
 		default:
-			result = g_old_ctrl_value;
+			error = 0.0;
 		}
+
+		ctrlarray[g_main_ctrl_parameter].integral_accumulator += error; // sum
+
+		diff = (error - ctrlarray[g_main_ctrl_parameter].old_value) / (now_t - ctrlarray[g_main_ctrl_parameter].derivative_old_time);
+
+		result = ctrlarray[CTRL_VELOCITY].coeff_proportional * error +
+			ctrlarray[CTRL_VELOCITY].coeff_integral      * ctrlarray[g_main_ctrl_parameter].integral_accumulator +
+			ctrlarray[CTRL_VELOCITY].coeff_derivative    * diff;
 	}
 
 	//Serial.print("\tresult = ");Serial.println(result);

@@ -106,7 +106,7 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 	case 's': // velocity
 		if (cmd_len > 1) {
 			ctrlarray[CTRL_VELOCITY].value = atoi(&cmd[2]);
-			g_main_ctrl_parameter = 's';
+			g_main_ctrl_parameter = CTRL_VELOCITY;
 		} else {
 			Serial.print("velocity = ");
 			Serial.println(ctrlarray[CTRL_VELOCITY].value);
@@ -123,7 +123,7 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 	case 'u': // voltage
 		if (cmd_len > 1) {
 			ctrlarray[CTRL_VOLTAGE].value = atoi(&cmd[2]);
-			g_main_ctrl_parameter = 'u';
+			g_main_ctrl_parameter = CTRL_VOLTAGE;
 		} else {
 			Serial.print("voltage = ");
 			Serial.println(ctrlarray[CTRL_VOLTAGE].value);
@@ -140,7 +140,7 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 	case 'i': // current
 		if (cmd_len > 1) {
 			ctrlarray[CTRL_CURRENT].value = atoi(&cmd[2]);
-			g_main_ctrl_parameter = 'i';
+			g_main_ctrl_parameter = CTRL_CURRENT;
 		} else {
 			Serial.print("current = ");
 			Serial.println(ctrlarray[CTRL_CURRENT].value);
@@ -200,53 +200,27 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 			while (cmd[i] != ' ' && i < cmd_len){i++;}
 			c = atof(&cmd[i]);
 
-			switch (g_main_ctrl_parameter){
-			case 's':
-				ctrlarray[CTRL_VELOCITY].coeff_proportional = a;
-				ctrlarray[CTRL_VELOCITY].coeff_integral     = b;
-				ctrlarray[CTRL_VELOCITY].coeff_derivative   = c;
-				break;
-			case 'u':
-				ctrlarray[CTRL_VOLTAGE].coeff_proportional = a;
-				ctrlarray[CTRL_VOLTAGE].coeff_integral     = b;
-				ctrlarray[CTRL_VOLTAGE].coeff_derivative   = c;
-				break;
-			case 'i':
-				ctrlarray[CTRL_CURRENT].coeff_proportional = a;
-				ctrlarray[CTRL_CURRENT].coeff_integral     = b;
-				ctrlarray[CTRL_CURRENT].coeff_derivative   = c;
-				break;
-			}
+			ctrlarray[g_main_ctrl_parameter].coeff_proportional = a;
+			ctrlarray[g_main_ctrl_parameter].coeff_integral     = b;
+			ctrlarray[g_main_ctrl_parameter].coeff_derivative   = c;
 		} else {
 			switch (g_main_ctrl_parameter){
 			case 's':
 				Serial.print("for velocity");
-				Serial.print("\tproportional = ");
-				Serial.print(ctrlarray[CTRL_VELOCITY].coeff_proportional);
-				Serial.print("\tintegral = ");
-				Serial.print(ctrlarray[CTRL_VELOCITY].coeff_integral);
-				Serial.print("\tderivative = ");
-				Serial.println(ctrlarray[CTRL_VELOCITY].coeff_derivative);
 				break;
 			case 'u':
 				Serial.print("for voltage");
-				Serial.print("\tproportional = ");
-				Serial.print(ctrlarray[CTRL_VOLTAGE].coeff_proportional);
-				Serial.print("\tintegral = ");
-				Serial.print(ctrlarray[CTRL_VOLTAGE].coeff_integral);
-				Serial.print("\tderivative = ");
-				Serial.println(ctrlarray[CTRL_VOLTAGE].coeff_derivative);
 				break;
 			case 'i':
 				Serial.print("for current");
-				Serial.print("\tproportional = ");
-				Serial.print(ctrlarray[CTRL_CURRENT].coeff_proportional);
-				Serial.print("\tintegral = ");
-				Serial.print(ctrlarray[CTRL_CURRENT].coeff_integral);
-				Serial.print("\tderivative = ");
-				Serial.println(ctrlarray[CTRL_CURRENT].coeff_derivative);
 				break;
 			}
+			Serial.print("\tproportional = ");
+			Serial.print(ctrlarray[g_main_ctrl_parameter].coeff_proportional);
+			Serial.print("\tintegral = ");
+			Serial.print(ctrlarray[g_main_ctrl_parameter].coeff_integral);
+			Serial.print("\tderivative = ");
+			Serial.println(ctrlarray[g_main_ctrl_parameter].coeff_derivative);
 		}
 		break;
 	default:

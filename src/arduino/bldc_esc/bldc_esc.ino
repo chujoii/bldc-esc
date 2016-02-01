@@ -94,7 +94,7 @@ float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
 
 
 
-char g_main_ctrl_parameter = 'u';
+int g_main_ctrl_parameter = CTRL_VELOCITY;
 int g_old_ctrl_value = 0;
 
 const byte DAC_MIN = 0;
