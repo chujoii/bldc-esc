@@ -418,19 +418,19 @@ void turn_digital_statistic(byte angle, byte old_digital_angle, long int *turn_c
 }
 
 
-void find_best_angle_shift(long int turn_counter, long int *old_turn_counter, long int *best_turn_counter, float *best_angle_abc_shift){
+void find_best_angle_shift(long int turn_counter, long int *old_turn_counter, long int *best_turn_counter, float *best_angle_abc_shift, float *analog_abc_shift_cw){
 	char buffer [50];
 	
 	if (abs(turn_counter - (*old_turn_counter)) > (*best_turn_counter)) {
 		*best_turn_counter = abs(turn_counter - (*old_turn_counter));
-		*best_angle_abc_shift = g_analog_abc_shift_cw;
+		*best_angle_abc_shift = *analog_abc_shift_cw;
 	}
 		
 
-	g_analog_abc_shift_cw = g_analog_abc_shift_cw + 0.01;
+	*analog_abc_shift_cw = *analog_abc_shift_cw + 0.01;
 	
 	
-	//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
+	//DEBUGA_PRINT("angle_shift = "); DEBUGA_PRINT(*analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
 	
 	//DEBUGA_PRINT("best_angle_shift = "); DEBUGA_PRINT(g_best_angle_abc_shift); DEBUGA_PRINT("\t"); // strange sprintf not work
 	
@@ -447,7 +447,7 @@ void find_best_angle_shift(long int turn_counter, long int *old_turn_counter, lo
 	
 	
 	// simple 2 column
-	DEBUGA_PRINT(g_analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
+	DEBUGA_PRINT(*analog_abc_shift_cw); DEBUGA_PRINT("\t"); // strange sprintf not work
 	sprintf (buffer, "%ld", turn_counter - (*old_turn_counter));
 	DEBUGA_PRINT(buffer);
 	

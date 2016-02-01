@@ -42,7 +42,7 @@
 */
 
 
-int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us, int abc_current, unsigned long now_t, struct ctrl *ctrlarray)
+int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us, int abc_current, unsigned long now_t, struct ctrl *ctrlarray, int main_ctrl_parameter, int *old_ctrl_value)
 {
 	// fixme maybe array better for coefficients than variable?
 	
@@ -61,15 +61,15 @@ int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, 
 		// coeff_derivative   = 0.0;    // cannot calculate, fixme: magic number
 		//sum = 0.0;
 	        //diff = 0.0;
-		result = g_old_ctrl_value + (coeff_proportional * error); // + 0
+		result = (*old_ctrl_value) + (coeff_proportional * error); // + 0
 		//Serial.print("\tlimit: current "); 
 	} else {
-		switch (g_main_ctrl_parameter){
+		switch (main_ctrl_parameter){
 		case CTRL_VELOCITY:
 			error = ctrlarray[CTRL_VELOCITY].value - get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us);
 			break;
 		case CTRL_VOLTAGE:
-			error = ctrlarray[CTRL_VOLTAGE].value - g_old_ctrl_value;
+			error = ctrlarray[CTRL_VOLTAGE].value - (*old_ctrl_value);
 			break;
 		case CTRL_CURRENT:
 			error = ctrlarray[CTRL_CURRENT].value - abc_current;
@@ -78,29 +78,20 @@ int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, 
 			error = 0.0;
 		}
 
-		ctrlarray[g_main_ctrl_parameter].integral_accumulator += error; // sum
+		ctrlarray[main_ctrl_parameter].integral_accumulator += error; // sum
 
-		diff = (error - ctrlarray[g_main_ctrl_parameter].old_value) / (now_t - ctrlarray[g_main_ctrl_parameter].derivative_old_time);
+		diff = (error - ctrlarray[main_ctrl_parameter].old_value) / (now_t - ctrlarray[main_ctrl_parameter].derivative_old_time);
 
 		result = ctrlarray[CTRL_VELOCITY].coeff_proportional * error +
-			ctrlarray[CTRL_VELOCITY].coeff_integral      * ctrlarray[g_main_ctrl_parameter].integral_accumulator +
+			ctrlarray[CTRL_VELOCITY].coeff_integral      * ctrlarray[main_ctrl_parameter].integral_accumulator +
 			ctrlarray[CTRL_VELOCITY].coeff_derivative    * diff;
 	}
 
 	//Serial.print("\tresult = ");Serial.println(result);
 	
-	g_old_ctrl_value = result;
+	*old_ctrl_value = result;
 	return constrain(result, -DAC_DRIVER_MAX, DAC_DRIVER_MAX);
 }
 
 
 
-float calculate_analog_angle_shift_by_velocity(int velocity)
-{
-	if (velocity>0) {
-		return g_analog_abc_shift_cw;
-	} else {
-		return g_analog_abc_shift_ccw;
-	}
-
-}

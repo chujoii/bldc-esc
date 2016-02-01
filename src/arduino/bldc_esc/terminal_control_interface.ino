@@ -42,21 +42,25 @@
 */
 
 
-void read_ctrl(char *algorithm,  struct ctrl *ctrlarray)
+void read_ctrl(char *algorithm,  struct ctrl *ctrlarray, float *analog_abc_shift_cw, float *analog_abc_shift_ccw, int *main_ctrl_parameter)
 {
+	static char cmd_line [50];
+	static int cmd_line_max_length = 50;
+	static int cmd_line_length = 0;
+
 	if (Serial.available() > 0) {
 		byte incoming_byte;
                 // read the incoming byte:
                 incoming_byte = Serial.read();
 		
-		if ((incoming_byte != 0xa) && (g_cmd_line_length<g_cmd_line_max_length)) {
-			g_cmd_line[g_cmd_line_length++] = incoming_byte;
+		if ((incoming_byte != 0xa) && (cmd_line_length<cmd_line_max_length)) {
+			cmd_line[cmd_line_length++] = incoming_byte;
 		} else {
-			exec_cmd(g_cmd_line, g_cmd_line_length - 1, &(*algorithm), &(*ctrlarray));
-			for (int i = 0; i < g_cmd_line_max_length; i++){ // fixme: maybe need reset command line only from 0 to g_cmd_line_length
-				g_cmd_line[i]='\0';
+			exec_cmd(cmd_line, cmd_line_length - 1, &(*algorithm), &(*ctrlarray), &(*analog_abc_shift_cw), &(*analog_abc_shift_ccw), &(*main_ctrl_parameter));
+			for (int i = 0; i < cmd_line_max_length; i++){ // fixme: maybe need reset command line only from 0 to cmd_line_length
+				cmd_line[i]='\0';
 			}
-			g_cmd_line_length = 0;
+			cmd_line_length = 0;
 		}
 	}
 }
@@ -64,7 +68,7 @@ void read_ctrl(char *algorithm,  struct ctrl *ctrlarray)
 
 
 
-void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
+void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray, float *analog_abc_shift_cw, float *analog_abc_shift_ccw, int *main_ctrl_parameter)
 {
 	int i; // counter
 
@@ -89,24 +93,24 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 		break;
 	case 'a': // angle cw
 		if (cmd_len > 1) {
-			g_analog_abc_shift_cw = atof(&cmd[2]);
+			*analog_abc_shift_cw = atof(&cmd[2]);
 		} else {
 			Serial.print("angle shift = ");
-			Serial.println(g_analog_abc_shift_cw);
+			Serial.println(*analog_abc_shift_cw);
 		}
 		break;
 	case 'A': // angle ccw
 		if (cmd_len > 1) {
-			g_analog_abc_shift_ccw = atof(&cmd[2]);
+			*analog_abc_shift_ccw = atof(&cmd[2]);
 		} else {
 			Serial.print("angle shift = ");
-			Serial.println(g_analog_abc_shift_ccw);
+			Serial.println(*analog_abc_shift_ccw);
 		}
 		break;
 	case 's': // velocity
 		if (cmd_len > 1) {
 			ctrlarray[CTRL_VELOCITY].value = atoi(&cmd[2]);
-			g_main_ctrl_parameter = CTRL_VELOCITY;
+			*main_ctrl_parameter = CTRL_VELOCITY;
 		} else {
 			Serial.print("velocity = ");
 			Serial.println(ctrlarray[CTRL_VELOCITY].value);
@@ -123,7 +127,7 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 	case 'u': // voltage
 		if (cmd_len > 1) {
 			ctrlarray[CTRL_VOLTAGE].value = atoi(&cmd[2]);
-			g_main_ctrl_parameter = CTRL_VOLTAGE;
+			*main_ctrl_parameter = CTRL_VOLTAGE;
 		} else {
 			Serial.print("voltage = ");
 			Serial.println(ctrlarray[CTRL_VOLTAGE].value);
@@ -140,7 +144,7 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 	case 'i': // current
 		if (cmd_len > 1) {
 			ctrlarray[CTRL_CURRENT].value = atoi(&cmd[2]);
-			g_main_ctrl_parameter = CTRL_CURRENT;
+			*main_ctrl_parameter = CTRL_CURRENT;
 		} else {
 			Serial.print("current = ");
 			Serial.println(ctrlarray[CTRL_CURRENT].value);
@@ -200,11 +204,11 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 			while (cmd[i] != ' ' && i < cmd_len){i++;}
 			c = atof(&cmd[i]);
 
-			ctrlarray[g_main_ctrl_parameter].coeff_proportional = a;
-			ctrlarray[g_main_ctrl_parameter].coeff_integral     = b;
-			ctrlarray[g_main_ctrl_parameter].coeff_derivative   = c;
+			ctrlarray[*main_ctrl_parameter].coeff_proportional = a;
+			ctrlarray[*main_ctrl_parameter].coeff_integral     = b;
+			ctrlarray[*main_ctrl_parameter].coeff_derivative   = c;
 		} else {
-			switch (g_main_ctrl_parameter){
+			switch (*main_ctrl_parameter){
 			case 's':
 				Serial.print("for velocity");
 				break;
@@ -216,11 +220,11 @@ void exec_cmd(char *cmd, int cmd_len, char *algorithm, struct ctrl *ctrlarray)
 				break;
 			}
 			Serial.print("\tproportional = ");
-			Serial.print(ctrlarray[g_main_ctrl_parameter].coeff_proportional);
+			Serial.print(ctrlarray[*main_ctrl_parameter].coeff_proportional);
 			Serial.print("\tintegral = ");
-			Serial.print(ctrlarray[g_main_ctrl_parameter].coeff_integral);
+			Serial.print(ctrlarray[*main_ctrl_parameter].coeff_integral);
 			Serial.print("\tderivative = ");
-			Serial.println(ctrlarray[g_main_ctrl_parameter].coeff_derivative);
+			Serial.println(ctrlarray[*main_ctrl_parameter].coeff_derivative);
 		}
 		break;
 	default:

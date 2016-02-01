@@ -91,6 +91,17 @@ int get_rpm(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, un
 }
 
 
+float calculate_analog_angle_shift_by_velocity(int velocity, float analog_abc_shift_cw, float analog_abc_shift_ccw)
+{
+	if (velocity>0) {
+		return analog_abc_shift_cw;
+	} else {
+		return analog_abc_shift_ccw;
+	}
+
+}
+
+
 float angular_velocity()
 {
 	

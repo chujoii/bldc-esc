@@ -56,6 +56,7 @@
 
 
 #define NUM_OF_CTRL   3
+
 #define CTRL_VELOCITY 0
 #define CTRL_CURRENT  1
 #define CTRL_VOLTAGE  2
@@ -81,8 +82,6 @@ const float EPSILON_ANGLE = 0.01;
 
 //const boolean DIGITAL_ABC_SHIFT_CW  = true;         // !=0 true for cw
 //const boolean DIGITAL_ABC_SHIFT_CCW = false;        // ==0 false for ccw
-float   g_analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
-float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
 
 
 
@@ -94,8 +93,6 @@ float   g_analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
 
 
 
-int g_main_ctrl_parameter = CTRL_VELOCITY;
-int g_old_ctrl_value = 0;
 
 const byte DAC_MIN = 0;
 const byte DAC_MAX = 255;
@@ -200,9 +197,6 @@ const int DELAY_BETWEEN_STEP_US = 1; // us
 
 const unsigned long PRINT_DT = 200;
 
-char g_cmd_line [50];
-int g_cmd_line_max_length = 50;
-int g_cmd_line_length = 0;
 
 
 
@@ -327,6 +321,12 @@ void loop()
 	unsigned long time_to_print = 0;
 
 
+	float   analog_abc_shift_cw   = M_PI/6.0;     // 30[degree] for ccw
+	float   analog_abc_shift_ccw  = M_PI*7.0/6.0; // 210[degree] for cw
+
+
+	int main_ctrl_parameter = CTRL_VELOCITY;
+	int old_ctrl_value = 0;
 
 	struct ctrl ctrlarray[NUM_OF_CTRL];
 
@@ -385,7 +385,7 @@ void loop()
 		
 		sensor_statistic(STATISTIC_MEAN, VALUE_ERR, value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, &hall_min, &hall_max, &hall_zero);
 		
-		int velocity = apply_pid(halfturn_timer_us, old_turn_timer_us, turn_timer_us, abc_current, current_time_us, ctrlarray);
+		int velocity = apply_pid(halfturn_timer_us, old_turn_timer_us, turn_timer_us, abc_current, current_time_us, ctrlarray, main_ctrl_parameter, &old_ctrl_value);
 		
 		byte  digital_angle = 0;
 		float analog_angle = 0.0;
@@ -397,7 +397,7 @@ void loop()
 		} else {
 			//digital_angle = digital_read_angle(value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, hall_zero);
 			analog_angle = analog_read_angle(value_analog_a_hall, value_analog_b_hall, value_analog_c_hall, hall_min, hall_max);
-			turn_analog(abs(velocity), analog_angle, calculate_analog_angle_shift_by_velocity(velocity));
+			turn_analog(abs(velocity), analog_angle, calculate_analog_angle_shift_by_velocity(velocity, analog_abc_shift_cw, analog_abc_shift_ccw));
 			turn_analog_statistic(analog_angle, old_analog_angle, &turn_counter, current_time_us, &old_turn_timer_us, &turn_timer_us, &real_direction);
 		}
 		
@@ -412,12 +412,12 @@ void loop()
 			sprintf (buffer, "current = %d\t", abc_current); // fixme
 			Serial.print(buffer);
 			
-			//find_best_angle_shift(&old_turn_counter, &best_turn_counter, &best_angle_abc_shift);
+			//find_best_angle_shift(&old_turn_counter, &best_turn_counter, &best_angle_abc_shift, &analog_abc_shift_cw);
 			
 			//g_analog_abc_shift_cw = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
 			//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw); Serial.print("\t"); // only for cw (velocity > 0)
 			
-			read_ctrl(&algorithm, ctrlarray);
+			read_ctrl(&algorithm, ctrlarray, &analog_abc_shift_cw, &analog_abc_shift_ccw, &main_ctrl_parameter);
 			
 			Serial.print("rpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us));
 			
