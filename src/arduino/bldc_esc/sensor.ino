@@ -144,8 +144,8 @@ void sensor_statistic(int n, int lim, int a_hall_value, int b_hall_value, int c_
 	c = a + ((b - a) / (m + 1));
 	*hall_min = c;
 		
-	
-	*hall_zero = ((*hall_max) + (*hall_min))/2;
+
+	*hall_zero =  (a_hall_value + b_hall_value + c_hall_value) / 3;
 }
 
 
