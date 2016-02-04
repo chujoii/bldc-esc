@@ -62,7 +62,7 @@ int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, 
 		//sum = 0.0;
 	        //diff = 0.0;
 		result = (*old_ctrl_value) + (coeff_proportional * error); // + 0
-		//Serial.print("\tlimit: current "); 
+		Serial.print("\tlim:c "); 
 	} else {
 		switch (main_ctrl_parameter){
 		case CTRL_VELOCITY:
@@ -87,7 +87,7 @@ int apply_pid(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, 
 			ctrlarray[CTRL_VELOCITY].coeff_derivative    * diff;
 	}
 
-	//Serial.print("\tresult = ");Serial.println(result);
+	Serial.print("\tresult = ");Serial.println(result);
 	
 	*old_ctrl_value = result;
 	return constrain(result, -DAC_DRIVER_MAX, DAC_DRIVER_MAX);

@@ -87,7 +87,7 @@ float analog_read_angle (float state_a_hall, float state_b_hall, float state_c_h
 int get_rpm(unsigned long halfturn_timer_us, unsigned long old_turn_timer_us, unsigned long turn_timer_us){
 	unsigned long full_turn_time = turn_timer_us - old_turn_timer_us;
 	unsigned long half_turn_time = halfturn_timer_us - old_turn_timer_us;
-	return (int) (60000000 / max(half_turn_time, full_turn_time));
+	return (int) (60000000L / max(half_turn_time, full_turn_time));
 }
 
 

@@ -83,8 +83,15 @@ const float EPSILON_ANGLE = 0.01;
 //const boolean DIGITAL_ABC_SHIFT_CW  = true;         // !=0 true for cw
 //const boolean DIGITAL_ABC_SHIFT_CCW = false;        // ==0 false for ccw
 
-
-
+/*
+//                cba
+const float ANGLE_101 = M_PI        / 6.0; //  30.0[degree]
+const float ANGLE_001 = M_PI        / 2.0; //  90.0[degree]
+const float ANGLE_011 = M_PI * 5.0  / 6.0; // 150.0[degree]
+const float ANGLE_010 = M_PI * 7.0  / 6.0; // 210.0[degree]
+const float ANGLE_110 = M_PI * 3.0  / 2.0; // 270.0[degree]
+const float ANGLE_100 = M_PI * 11.0 / 6.0; // 330.0[degree]
+*/
 
 
 // ----------------------------------- limit, ctrl --------------------------------
@@ -406,6 +413,10 @@ void loop()
 		if (current_time_ms > time_to_print){
 			time_to_print = current_time_ms + PRINT_DT;
 			
+
+			read_ctrl(&algorithm, ctrlarray, &analog_abc_shift_cw, &analog_abc_shift_ccw, &main_ctrl_parameter);
+
+
 			
 			char buffer [50];
 			
@@ -417,12 +428,11 @@ void loop()
 			//g_analog_abc_shift_cw = fmap((float)analogRead(A4), 0.0, 1023.0, 0.0, 6.3);
 			//Serial.print("angle_shift = "); Serial.print(g_analog_abc_shift_cw); Serial.print("\t"); // only for cw (velocity > 0)
 			
-			read_ctrl(&algorithm, ctrlarray, &analog_abc_shift_cw, &analog_abc_shift_ccw, &main_ctrl_parameter);
 			
 			Serial.print("rpm = "); Serial.print(get_rpm(halfturn_timer_us, old_turn_timer_us, turn_timer_us));
 			
 			Serial.print("\tanalog_angle = ");Serial.print(analog_angle);
-			Serial.print("\tdigital_angle = ");Serial.print(digital_angle);
+			//Serial.print("\tdigital_angle = ");Serial.print(digital_angle);
 			
 			//Serial.print("old_turn_time = "); Serial.print(old_turn_timer_us);
 			//Serial.print("\tturn_time = "); Serial.print((turn_timer_us - old_turn_timer_us)/1000);
@@ -439,8 +449,8 @@ void loop()
 			//Serial.print("\ta_hall = "); Serial.print(a_hall_value);
 			//Serial.print("\tb_hall = "); Serial.print(b_hall_value);
 			//Serial.print("\tc_hall = "); Serial.print(c_hall_value);
-			Serial.print("\tmax = "); Serial.print(hall_max);
-			Serial.print("\tmin = "); Serial.print(hall_min);
+			//Serial.print("\tmax = "); Serial.print(hall_max);
+			//Serial.print("\tmin = "); Serial.print(hall_min);
 			//Serial.print("\tzero = "); Serial.print(hall_zero);
 			
 			Serial.println();
