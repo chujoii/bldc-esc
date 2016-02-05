@@ -1,0 +1,190 @@
+\documentclass[unicode, 12pt, a4paper]{article}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\usepackage[cm-default]{fontspec}
+\defaultfontfeatures{Mapping=tex-text}    %% устанавливаем поведение шрифтов по умолчанию
+\usepackage{polyglossia}    %% подключаем пакет многоязыкой верстки
+%\setdefaultlanguage{russian}    %% установка языка по умолчанию
+\setdefaultlanguage{english}    %% установка языка по умолчанию
+%\setotherlanguages{english}
+\setmainfont{Old Standard}      %% зададим основной шрифт документа
+%\setmainfont{DejaVu Sans Mono}
+\setmonofont{DejaVu Sans Mono}
+
+\usepackage{mathtext}               % если нужны русские буквы в формулах
+%\usepackage{ucs}
+%\usepackage[utf8x]{inputenc}       % Кодировка входного документа;
+                                   % при необходимости, вместо cp1251
+                                   % можно указать cp866 (Alt-кодировка
+                                   % DOS) или koi8-r.
+
+\usepackage{textcomp}              % типографские значки
+
+% \usepackage[T2A]{fontenc}           % Кодировка для шрифтов LH
+%\usepackage{indentfirst}    % неизвестно
+%\usepackage{cmap}           % неизвестно
+%\usepackage[english,russian]{babel} % Включение русификации, русских и
+                                    % английских стилей и переносов
+
+%\renewcommand{\rmdefault}{ost_____} % add new font  Old_Standard
+%\renewcommand{\sfdefault}{ost_____}
+%\renewcommand{\ttdefault}{osti____}
+
+\usepackage{graphics}
+\usepackage{pgf}
+\usepackage{wrapfig}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{tabularx}
+%\usepackage{fullpage}
+\usepackage{amsmath} % для спец знаков в формулах
+\usepackage{amssymb} % для спец знаков в формулах
+\usepackage{topcapt} % подписи к таблицам
+\usepackage{dcolumn} % выравнивание чисел
+\usepackage{ulem} % подчёркивание
+
+%\hyphenpenalty=10000 % запретить переносы
+%\exhyphenpenalty=10000
+%\tolerance=-1
+%\emergencystretch=-1
+%
+%\pretolerance=10000  % запретить переносы другой вариант
+%
+%
+% work wersion
+\hyphenpenalty=10000      %% or any of the other ways
+\exhyphenpenalty=10000    %% to turn hyphenation off
+\pretolerance=9999
+\tolerance=\pretolerance
+\emergencystretch=10pt    % it may be necessary to experiment with this value.
+
+
+\usepackage[colorlinks=true]{hyperref} % url hyperlink
+
+\usepackage{makeidx} % индекс
+
+
+
+
+
+
+
+
+
+
+\author{Р.В.~Приходченко}
+\title{Trigonometric functions\\for\\three-phase sin}
+\frenchspacing
+
+
+
+\frenchspacing
+\makeindex
+
+\begin{document}
+
+\maketitle
+
+
+
+\begin{table}[ht]
+  \begin{tabular}{cc}
+    \includegraphics[width=2cm]{../CC_BY-SA_88x31.png} &
+    \shortstack{руководство распространяется в соответствии с
+      условиями\\
+      \href{http://creativecommons.org/licenses/by-sa/3.0/}{Attribution-ShareAlike} \\
+      (Атрибуция — С сохранением условий) CC BY-SA \\
+      Копирование и распространение приветствуется.}
+  \end{tabular}
+\end{table}
+
+
+\section{Find zero}
+
+\begin{equation}
+  \label{eq:zero:three-phase-case}
+  \begin{cases}
+    a = sin(x)       + z\\
+    b = sin(x + 120) + z\\
+    c = sin(x + 240) + z
+  \end{cases}
+\end{equation}
+
+given: a, b, c
+
+x - unknown, and not need to calculate
+
+z = constant in each ``x''
+
+to find: z = ?
+
+
+\subsection{solution}
+
+\begin{equation}
+  \begin{cases}
+    sin x = a - z\\
+    b = sin x \cdot cos 120 + cos x \cdot sin 120 + z\\
+    c = sin x \cdot cos 240 + cos x \cdot sin 240 + z
+  \end{cases}
+\end{equation}
+
+\begin{equation}
+  \begin{cases}
+    b = (a - z) \cdot cos 120 + cos x \cdot sin 120 + z\\
+    c = (a - z) \cdot cos 240 + cos x \cdot sin 240 + z
+  \end{cases}
+\end{equation}
+
+extract $cos x$
+
+\begin{equation}
+  \frac{b - (a - z) \cdot cos 120 - z}{sin 120} = \frac{c - (a - z) \cdot cos 240 - z}{sin 240}
+\end{equation}
+
+
+\begin{equation}
+  (b - (a - z) \cdot cos 120 - z) \cdot sin 240 = (c - (a - z) \cdot cos 240 - z) \cdot sin 120
+\end{equation}
+
+\begin{equation}
+  (b - a \cdot cos 120) \cdot sin 240 + z \cdot (cos 120 - 1) \cdot sin 240 = (c - a \cdot cos 240) \cdot sin 120 + z \cdot (cos 240 - 1) \cdot sin 120
+\end{equation}
+
+
+\begin{equation}
+  z \cdot (cos 120 - 1) \cdot sin 240  - z \cdot (cos 240 - 1) \cdot sin 120 = (c - a \cdot cos 240) \cdot sin 120 - (b - a \cdot cos 120) \cdot sin 240
+\end{equation}
+
+
+\begin{equation}
+  z = \frac{(c - a \cdot cos 240) \cdot sin 120 - (b - a \cdot cos 120) \cdot sin 240}{(cos 120 - 1) \cdot sin 240  - (cos 240 - 1) \cdot sin 120} =
+\end{equation}
+
+\begin{equation}
+  = \frac{(c - a \cdot (-\frac{1}{2})) \cdot \frac{\sqrt{3}}{2} - (b - a \cdot (-\frac{1}{2})) \cdot (-\frac{\sqrt{3}}{2})}{(-\frac{1}{2} - 1) \cdot (-\frac{\sqrt{3}}{2})  - (-\frac{1}{2} - 1) \cdot \frac{\sqrt{3}}{2}} =
+\end{equation}
+
+\begin{equation}
+  = \frac{c + \frac{a}{2} + b + \frac{a}{2}}{\frac{1}{2} + 1 + \frac{1}{2} + 1}
+\end{equation}
+
+
+\begin{equation}
+  z = \frac{a + b + c}{3}
+\end{equation}
+
+
+
+\end{document}
