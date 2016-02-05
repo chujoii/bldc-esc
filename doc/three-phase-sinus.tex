@@ -110,16 +110,19 @@
 \end{table}
 
 
-\section{Find zero}
+
+\section{Find three-phase sin zero}
 
 \begin{equation}
-  \label{eq:zero:three-phase-case}
+  \label{eq:zero-shift:three-phase-case}
   \begin{cases}
     a = sin(x)       + z\\
     b = sin(x + 120) + z\\
     c = sin(x + 240) + z
   \end{cases}
 \end{equation}
+
+(all angles in dergees)
 
 given: a, b, c
 
@@ -131,6 +134,13 @@ to find: z = ?
 
 
 \subsection{solution}
+
+\begin{equation}
+  \label{eq:trigonometric:rule:sin-a-b}
+    sin (\alpha + \beta) = sin \alpha \cdot cos \beta + cos \alpha \cdot sin \beta
+\end{equation}
+
+from formula (~\ref{eq:zero-shift:three-phase-case}) and (~\ref{eq:trigonometric:rule:sin-a-b})
 
 \begin{equation}
   \begin{cases}
@@ -185,6 +195,147 @@ extract $cos x$
   z = \frac{a + b + c}{3}
 \end{equation}
 
+
+\section{Find envelope of three phase sinus graphic}
+
+\begin{equation}
+  \label{eq:envelope:three-phase-case}
+  \begin{cases}
+    a = k \cdot sin(x)\\
+    b = k \cdot sin(x + 120)\\
+    c = k \cdot sin(x + 240)
+  \end{cases}
+\end{equation}
+
+given: a, b, c
+
+x - unknown, and not need to calculate
+
+k = constant in each ``x''
+
+to find: k = ?
+
+
+\subsection{solution a-b}
+
+we need only two, for example ``a'' and ``b''
+
+\begin{equation}
+  \label{eq:envelope:phase-a-b}
+  \begin{cases}
+    a = k \cdot sin(x)\\
+    b = k \cdot sin(x + 120)
+  \end{cases}
+\end{equation}
+
+
+\begin{equation}
+  sin^2 \alpha + cos^2 \alpha = 1
+\end{equation}
+
+\begin{equation}
+  \label{eq:trigonometric:rule:sin2acos2aeq1}
+  cos \alpha = \sqrt{1 - sin^2 \alpha}
+\end{equation}
+
+
+use formula (~\ref{eq:trigonometric:rule:sin-a-b}) and (~\ref{eq:trigonometric:rule:sin2acos2aeq1})
+
+\begin{equation}
+  \begin{cases}
+    sin x = \frac{a}{k}\\
+    b = k \cdot sin x \cdot cos 120 + k \cdot cos x \cdot sin 120
+  \end{cases}
+\end{equation}
+
+
+\begin{equation}
+  \begin{cases}
+    sin x = \frac{a}{k}\\
+    b = k \cdot sin x \cdot cos 120 + k \cdot \sqrt{1 - sin^2 x} \cdot sin 120
+  \end{cases}
+\end{equation}
+
+
+\begin{equation}
+  b = k \cdot \frac{a}{k} \cdot cos 120 + k \cdot \sqrt{1 - \left(\frac{a}{k}\right)^2} \cdot sin 120
+\end{equation}
+
+\begin{equation}
+  b = a \cdot cos 120 + k \cdot \sqrt{1 - \left(\frac{a}{k}\right)^2} \cdot sin 120
+\end{equation}
+
+\begin{equation}
+  \sqrt{k^2 - \left(\frac{a^2 \cdot k^2}{k^2}\right)} =  \frac{b - a \cdot cos 120}{sin 120}
+\end{equation}
+
+\begin{equation}
+  k^2 - a^2  =  \left(\frac{b - a \cdot cos 120}{sin 120}\right)^2
+\end{equation}
+
+\begin{equation}
+  k = \sqrt{\left(\frac{b - a \cdot cos 120}{sin 120}\right)^2 + a^2}
+\end{equation}
+
+\begin{equation}
+  k = \sqrt{\frac{(2 \cdot b + a)^2}{3} + a^2}
+\end{equation}
+
+
+
+
+
+\subsection{solution b-c}
+
+if we take ``b'' and ``c'', then
+
+\begin{equation}
+  \begin{cases}
+    b = k \cdot sin(x + 120)\\
+    c = k \cdot sin(x + 240)
+  \end{cases}
+\end{equation}
+
+if $t = x + 120$, then
+
+\begin{equation}
+  \label{eq:envelope:phase-b-c}
+  \begin{cases}
+    b = k \cdot sin(t)\\
+    c = k \cdot sin(t + 120)
+  \end{cases}
+\end{equation}
+
+and (~\ref{eq:envelope:phase-b-c}) looks like (~\ref{eq:envelope:phase-a-b})
+
+so final solution:
+
+\begin{equation}
+  k = \sqrt{\frac{(2 \cdot c + b)^2}{3} + b^2}
+\end{equation}
+
+
+\subsection{solution a-c}
+
+at the last we take ``a'' and ``c'', so
+
+\begin{equation}
+  \label{eq:envelope:phase-a-c}
+  \begin{cases}
+    a = k \cdot sin(x)\\
+    c = k \cdot sin(x + 240)
+  \end{cases}
+\end{equation}
+
+and (~\ref{eq:envelope:phase-a-b}) looks like (~\ref{eq:envelope:phase-a-c}), but in all formulas we change $120° \rightarrow 240°$
+
+\begin{equation}
+  k = \sqrt{\left(\frac{c - a \cdot cos 240}{sin 240}\right)^2 + a^2}
+\end{equation}
+
+\begin{equation}
+  k = \sqrt{\frac{(2 \cdot c + a)^2}{3} + a^2}
+\end{equation}
 
 
 \end{document}
