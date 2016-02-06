@@ -83,7 +83,7 @@
 
 
 
-\author{Р.В.~Приходченко}
+\author{R.V.~Prikhodchenko}
 \title{Trigonometric functions\\for\\three-phase sin}
 \frenchspacing
 
@@ -137,11 +137,11 @@ to find: z = ?
 \subsection{solution}
 
 \begin{equation}
-  \label{eq:trigonometric:rule:sin-a-b}
+  \label{eq:trigonometric:rule:sin-a-plus-b}
     sin (\alpha + \beta) = sin \alpha \cdot cos \beta + cos \alpha \cdot sin \beta
 \end{equation}
 
-from formula (~\ref{eq:zero-shift:three-phase-case}) and (~\ref{eq:trigonometric:rule:sin-a-b})
+from formula (~\ref{eq:zero-shift:three-phase-case}) and (~\ref{eq:trigonometric:rule:sin-a-plus-b})
 
 \begin{equation}
   \begin{cases}
@@ -241,7 +241,7 @@ we need only two, for example ``a'' and ``b''
 \end{equation}
 
 
-use formula (~\ref{eq:trigonometric:rule:sin-a-b}) and (~\ref{eq:trigonometric:rule:sin2acos2aeq1})
+use formula (~\ref{eq:trigonometric:rule:sin-a-plus-b}) and (~\ref{eq:trigonometric:rule:sin2acos2aeq1})
 
 \begin{equation}
   \begin{cases}
@@ -319,7 +319,7 @@ so final solution:
 
 \subsection{solution a-c}
 
-at the last we take ``a'' and ``c'', so
+now we take ``a'' and ``c'', so
 
 \begin{equation}
   \label{eq:envelope:phase-a-c}
@@ -338,6 +338,135 @@ and (~\ref{eq:envelope:phase-a-b}) looks like (~\ref{eq:envelope:phase-a-c}), bu
 \begin{equation}
   k = \sqrt{\frac{(2 \cdot c + a)^2}{3} + a^2}
 \end{equation}
+
+\subsection{solution a-b-c}
+
+at the last we take all: ``a'', ``b'' and ``c''
+
+i think it`s better solution, because contains all a, b, c values, and
+because a, b, and c contain error.
+
+multiple second and third equation from (~\ref{eq:envelope:three-phase-case})
+
+\begin{equation}
+  \begin{cases}
+    a = k \cdot sin x\\
+    b \cdot c = k^2 \cdot sin(x + 120) \cdot sin(x + 240)
+  \end{cases}
+\end{equation}
+
+use formula (~\ref{eq:trigonometric:rule:sin-a-plus-b}) and (~\ref{eq:trigonometric:rule:sin2acos2aeq1})
+
+\begin{equation}
+  \begin{cases}
+    sin x = \frac{a}{k}\\
+    cos x = \sqrt{1 - \left(\frac{a}{k}\right)^2} = \sqrt{\frac{k^2 - a^2}{k^2}\right} = \frac{\sqrt{k^2 - a^2}}{k}\\
+    b \cdot c = k^2 \cdot (sin x \cdot cos 120 + cos x \cdot sin 120) \cdot (sin x \cdot cos 240 + cos x \cdot sin 240) 
+  \end{cases}
+\end{equation}
+
+
+
+\begin{equation}
+  b \cdot c = k^2 \cdot (\frac{a}{k} \cdot cos 120 + \frac{\sqrt{k^2 - a^2}}{k} \cdot sin 120) \cdot (\frac{a}{k} \cdot cos 240 + \frac{\sqrt{k^2 - a^2}}{k} \cdot sin 240) 
+\end{equation}
+
+\begin{equation}
+  \label{eq:envelope:phase-a-b-c-before-simplification}
+  b \cdot c = (a \cdot cos 120 + \sqrt{k^2 - a^2} \cdot sin 120) \cdot (a \cdot cos 240 + \sqrt{k^2 - a^2} \cdot sin 240)
+\end{equation}
+
+
+simplification:
+\begin{equation}
+  \label{eq:envelope:phase-a-b-c-f}
+  f = \sqrt{k^2 - a^2}
+\end{equation}
+
+\begin{equation}
+  \label{eq:envelope:phase-a-b-c-c1}
+  cos 120 = c_1 = -\frac{1}{2}
+\end{equation}
+
+\begin{equation}
+  \label{eq:envelope:phase-a-b-c-c2}
+  cos 240 = c_2 = -\frac{1}{2}
+\end{equation}
+
+\begin{equation}
+  \label{eq:envelope:phase-a-b-c-s1}
+  sin 120 = s_1 = \frac{\sqrt{3}}{2}
+\end{equation}
+
+\begin{equation}
+  \label{eq:envelope:phase-a-b-c-s2}
+  sin 240 = s_2 = -\frac{\sqrt{3}}{2}
+\end{equation}
+
+and now equation
+(~\ref{eq:envelope:phase-a-b-c-before-simplification}) look like:
+
+\begin{equation}
+  b \cdot c = (a \cdot c_1 + f \cdot s_1) \cdot (a \cdot c_2 + f \cdot s_2)
+\end{equation}
+
+\begin{equation}
+  b \cdot c =
+  a^2 \cdot c_1 \cdot c_2 +
+  a \cdot c_1 \cdot s_2 \cdot f +
+  a \cdot s_1 \cdot c_2 \cdot f +
+  s_1 \cdot s_2 \cdot f^2
+\end{equation}
+
+\begin{equation}
+  s_1 \cdot s_2 \cdot f^2 +
+  a \cdot (c_1 \cdot s_2 + s_1 \cdot c_2) \cdot f +
+  a^2 \cdot c_1 \cdot c_2 - b \cdot c =
+  0
+\end{equation}
+
+\begin{equation}
+  f^2 +
+  \underbrace{\frac{a \cdot (c_1 \cdot s_2 + s_1 \cdot c_2)}{s_1 \cdot s_2}}_{p} \cdot f +
+  \underbrace{\frac{a^2 \cdot c_1 \cdot c_2 - b \cdot c}{s_1 \cdot s_2}}_{q} =
+  0
+\end{equation}
+
+use
+(~\ref{eq:envelope:phase-a-b-c-c1}),
+(~\ref{eq:envelope:phase-a-b-c-c2}),
+(~\ref{eq:envelope:phase-a-b-c-s1}),
+(~\ref{eq:envelope:phase-a-b-c-s2}):
+
+\begin{equation}
+  p = \frac{a \left(\frac{1}{2} \cdot \frac{\sqrt{3}}{2} - \frac{\sqrt{3}}{2} \cdot \frac{1}{2} \right)}
+    {\frac{-\sqrt{3}}{2} \cdot \frac{\sqrt{3}}{2}} =
+    0
+\end{equation}
+
+\begin{equation}
+  q =
+  \frac{a^2 \cdot \frac{1}{2} \cdot \frac{1}{2} - b \cdot c}
+  {-\frac{\sqrt{3}}{2} \cdot \frac{\sqrt{3}}{2}} =
+  -\frac{\frac{a^2}{4} - b \cdot c}
+  {\frac{3}{4}} =
+  -\frac{a^2 - 4 \cdot b \cdot c}{3}
+\end{equation}
+
+\begin{equation}
+  f^2 = \frac{a^2 - 4 \cdot b \cdot c}{3}
+\end{equation}
+
+use (~\ref{eq:envelope:phase-a-b-c-f})
+
+\begin{equation}
+  k^2 - a^2 = \frac{a^2 - 4 \cdot b \cdot c}{3}
+\end{equation}
+
+\begin{equation}
+  k = 2 \cdot \sqrt{\frac{a^2 - b \cdot c}{3}}
+\end{equation}
+
 
 \subsection{other solutions}
 

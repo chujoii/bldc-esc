@@ -24,6 +24,7 @@ max(x, y) = (x>y?x:y)
 min(x, y) = (x<y?x:y)
 
 plot a(x), b(x), c(x), \
+     2*sqrt((a(x)**2 - b(x)*c(x))/3), \
      sqrt(((2 * b(x) + a(x))**2)/3 + a(x)**2), \
      sqrt(((2 * c(x) + b(x))**2)/3 + b(x)**2), \
      sqrt(((2 * c(x) + a(x))**2)/3 + a(x)**2), \
